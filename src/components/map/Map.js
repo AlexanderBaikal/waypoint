@@ -71,17 +71,15 @@ const Map = ({
   return (
     <>
       <MapContainer
-        center={[52.27, 104.29]}
+        center={[8.98, -79.50]}
         zoom={13}
         scrollWheelZoom={true}
         zoomControl={false}
         whenCreated={setMap}
       >
         <TileLayer
-          url="https://api.mapbox.com/styles/v1/{id}/tiles/512/{z}/{x}/{y}?access_token={accessToken}"
-          attribution='Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a> | Follow me <a href="https://github.com/AlexanderBaikal">AlexanderBaikal &copy;</a>'
-          id="mapbox/outdoors-v11"
-          accessToken="pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw"
+          url="https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=aqjLoB2kRuhWSZjNO6YJ"
+          attribution='\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e | Follow me <a href="https://github.com/AlexanderBaikal">AlexanderBaikal &copy;</a>'
           maxZoom={18}
           tileSize={512}
           zoomOffset={-1}
