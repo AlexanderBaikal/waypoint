@@ -16,6 +16,8 @@ import TimelineOutlinedIcon from "@material-ui/icons/TimelineOutlined";
 import PermIdentityOutlinedIcon from "@material-ui/icons/PermIdentityOutlined";
 import clsx from "clsx";
 import LinkIcon from "@material-ui/icons/Link";
+import InfoIcon from "@material-ui/icons/InfoOutlined";
+import BookmarkIcon from "@material-ui/icons/TurnedInNot";
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -122,6 +124,27 @@ const MenuSidebar = ({ menuSidebar, setMenuSidebar }) => {
         <ListItemText
           classes={{ primary: classes.listItemText }}
           primary={"github.com/AlexanderBaikal"}
+        />
+      </ListItem>
+      <Divider />
+      <ListItem>
+        <ListItemIcon>
+          <InfoIcon />
+        </ListItemIcon>
+        <ListItemText
+          classes={{ primary: classes.listItemText }}
+          primary={"About this project"}
+          secondary={"This project was created as a study project when i first started learning frontend development in August 2021. It was created from scratch based on Leaflet and it doesn't use Google Maps API"}
+        />
+      </ListItem>
+      <ListItem>
+        <ListItemIcon>
+          <BookmarkIcon />
+        </ListItemIcon>
+        <ListItemText
+          classes={{ primary: classes.listItemText }}
+          primary={"See more"}
+          secondary={"You can see other projects here: alexbaikalov.com"}
         />
       </ListItem>
     </Paper>

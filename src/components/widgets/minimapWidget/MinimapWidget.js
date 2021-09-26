@@ -67,7 +67,7 @@ const MinimapWidget = ({ bottomGallery }) => {
       <img className={classes.minimapImage} src={imgTempUrl} alt="" />
       <div className={classes.minimapLabel}>
         <LayersRoundedIcon fontSize="small" />
-        <label className={classes.labelText}>Слои</label>
+        <label className={classes.labelText}>Layers</label>
       </div>
     </div>
   );

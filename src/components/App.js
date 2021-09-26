@@ -7,6 +7,7 @@ import MapContainer from "./map/MapContainer";
 import OutterModals from "./modals/OutterModals";
 import PhotoGalleryContainer from "./photoGallery/PhotoGalleryContainer";
 import UploadPhotoContainer from "./modals/uploadPhoto/UploadPhotoContainer";
+import InfoModalContainer from "./modals/info/InfoModalContainer";
 
 function App({}) {
   return (
@@ -16,6 +17,7 @@ function App({}) {
         <WidgetsContainer />
         <MenuSidebarContainer />
         <OutterModals />
+        <InfoModalContainer/>
         <UploadPhotoContainer />
         <PhotoGalleryContainer />
       </div>

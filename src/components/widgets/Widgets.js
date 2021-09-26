@@ -1,6 +1,4 @@
 import { makeStyles } from "@material-ui/core";
-import clsx from "clsx";
-import BottomGallery from "./bottomGallery/BottomGallery";
 import UnderSearchContainer from "../sidebars/wrapper/UnderSearchContainer";
 import HorizontalContainer from "./horizontalWidget/HorizontalContainer";
 import MinimapWidget from "./minimapWidget/MinimapWidget";
@@ -8,6 +6,7 @@ import SearchbarContainer from "./searchBar/SearchbarContainer";
 import UserWidget from "./userWidget/UserWidget";
 import VerticalContainer from "./verticalWidget/VerticalContainer";
 import BottomGalleryContainer from "./bottomGallery/BottomGalleryContainer";
+import InfoWidget from "./infoWidget/InfoWidget";
 
 const useStyles = makeStyles({
   bottomRightWidgets: {
@@ -41,6 +40,7 @@ const useStyles = makeStyles({
     top: "15px",
     right: "30px",
     position: "absolute",
+    display: "flex",
     zIndex: 500,
   },
 
@@ -95,6 +95,7 @@ const Widgets = ({ underSearchBar, bottomGallery, profile }) => {
         <UnderSearchContainer />
       </div>
       <div className={classes.topRightWidgets}>
+        <InfoWidget/>
         <UserWidget profile={profile} />
       </div>
     </div>

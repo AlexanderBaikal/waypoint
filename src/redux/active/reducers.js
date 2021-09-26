@@ -17,7 +17,8 @@ import {
   SET_MENU_SIDEBAR,
   SET_LOCATION_MODAL,
   SET_PHOTO_GALLERY,
-  SET_SHOWN_MORE
+  SET_SHOWN_MORE,
+  SET_INFO_MODAL
 } from "./actions";
 
 const defaultState = {
@@ -26,6 +27,7 @@ const defaultState = {
   hoursModal: false,
   scheduleModal: false,
   locationModal: false,
+  infoModal: false,
   addComment: false,
   openEdit: false,
   openEditInfo: false,
@@ -57,6 +59,11 @@ export const activeReducer = (state = defaultState, action) => {
       return {
         ...state,
         locationModal: action.payload,
+      };
+    case SET_INFO_MODAL:
+      return {
+        ...state,
+        infoModal: action.payload,
       };
     case SET_HOURS_MODAL:
       return {

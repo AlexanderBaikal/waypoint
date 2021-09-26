@@ -1,10 +1,8 @@
 import {
   MapContainer,
   Marker,
-  Popup,
   TileLayer,
   Tooltip,
-  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./map.css";
@@ -78,8 +76,8 @@ const Map = ({
         whenCreated={setMap}
       >
         <TileLayer
-          url="https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=aqjLoB2kRuhWSZjNO6YJ"
-          attribution='\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e | Follow me <a href="https://github.com/AlexanderBaikal">AlexanderBaikal &copy;</a>'
+          url="https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}@2x.png?key=aqjLoB2kRuhWSZjNO6YJ"
+          attribution='<a href="https://www.maptiler.com/copyright/\" target="_blank">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors | Follow me <a href="https://github.com/AlexanderBaikal" target="_blank">AlexanderBaikal</a> | <a href="https://alexbaikalov.com" target="_blank">Personal website</a>'
           maxZoom={18}
           tileSize={512}
           zoomOffset={-1}

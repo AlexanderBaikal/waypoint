@@ -44,6 +44,9 @@
     "sharp": "^0.29.0",
     "web-vitals": "^1.1.2"
   },
+  "devDependencies": {
+    "node-gyp": "^8.4.1"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

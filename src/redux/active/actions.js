@@ -25,6 +25,15 @@ export const setLocationModal = (data) => {
   };
 };
 
+export const SET_INFO_MODAL = "SET_INFO_MODAL";
+
+export const setInfoModal = (data) => {
+  return {
+    type: SET_INFO_MODAL,
+    payload: data,
+  };
+};
+
 export const SET_HOURS_MODAL = "SET_HOURS_MODAL";
 
 export const setHoursModal = (data) => {

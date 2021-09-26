@@ -9,6 +9,9 @@ import {
   Paper,
 } from "@material-ui/core";
 import { emptyContent } from "../../utils/emptyContent";
+import { login } from "../../redux/auth/actions";
+
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles({
   listItem: {
@@ -34,6 +37,8 @@ const ContextMenu = ({
   profile,
 }) => {
   const classes = useStyles({ screenCoords });
+
+  const dispatch = useDispatch();
 
   const handleClickAway = () => {
     setOpened(false);
@@ -71,7 +76,7 @@ const ContextMenu = ({
           <ListItem
             button
             className={classes.listItem}
-            onClick={profile ? onAddClick : () => {}}
+            onClick={profile ? onAddClick : () => {dispatch(login());}}
           >
             <ListItemText
               primary={
