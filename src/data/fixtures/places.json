@@ -1,0 +1,1287 @@
+[
+  {
+    "id": "appetite",
+    "name": "Appetite",
+    "type": "Bar",
+    "coords": {
+      "lat": 52.2855,
+      "lng": 104.2887
+    },
+    "address": "Gogol street, Irkutsk",
+    "phone": "+79990009990",
+    "website": null,
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Appetite%2Fcaption%20(1).jpg?alt=media&token=147651ff-91d8-4c1f-80c3-7dc1c54849d2",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Appetite%2Fcaption%20(1).jpg?alt=media&token=147651ff-91d8-4c1f-80c3-7dc1c54849d2",
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Appetite%2Fblue_check.png?alt=media&token=81d4b07f-f707-4cd8-9527-9def5759bec5"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "baikal-state-univesity",
+    "name": "Baikal State Univesity",
+    "type": "University",
+    "coords": {
+      "lat": 52.2808,
+      "lng": 104.283
+    },
+    "address": "Lenin st., 11, Irkutsk",
+    "phone": "8 (395) 250-00-08",
+    "website": "www.bsu.ru",
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Baikal%20State%20Univesity%2Facbe175a-550d-4ab0-96fd-22e8dd55373d_jpg_800x600_x-False_q85.jpg?alt=media&token=d941675b-48cc-4a3b-9547-33f1a4926f5b",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Baikal%20State%20Univesity%2Facbe175a-550d-4ab0-96fd-22e8dd55373d_jpg_800x600_x-False_q85.jpg?alt=media&token=d941675b-48cc-4a3b-9547-33f1a4926f5b",
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Baikal%20State%20Univesity%2FI_yLfheUZio.jpg?alt=media&token=878f5bb2-85d2-4495-a33c-ad67fc07c206"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "18:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": true
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "city-clinical-hospital-n1",
+    "name": "City clinical hospital N1",
+    "type": "Pharmacy",
+    "coords": {
+      "lat": 52.264,
+      "lng": 104.3086
+    },
+    "address": null,
+    "phone": null,
+    "website": null,
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/City%20clinical%20hospital%20N1%2Fob.jpg?alt=media&token=b6878cec-9893-4837-a6b7-83c67e94ef59",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/City%20clinical%20hospital%20N1%2Fob.jpg?alt=media&token=b6878cec-9893-4837-a6b7-83c67e94ef59"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "courtyard-marriott",
+    "name": "Courtyard Marriott",
+    "type": "Beauty Salon",
+    "coords": {
+      "lat": 52.28820443489498,
+      "lng": 104.27315426029963
+    },
+    "address": null,
+    "phone": null,
+    "website": null,
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Courtyard%20Marriott%20%2F76e364322824217884a84bf3e47c5f41.jpg?alt=media&token=0e2e38ae-7d9a-43e3-acf4-36f757a555b1",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Courtyard%20Marriott%20%2F76e364322824217884a84bf3e47c5f41.jpg?alt=media&token=0e2e38ae-7d9a-43e3-acf4-36f757a555b1"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "friday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "dikaya-loshad",
+    "name": "Dikaya Loshad'",
+    "type": "Nightclub",
+    "coords": {
+      "lat": 52.2227,
+      "lng": 104.3263
+    },
+    "address": "Ulitsa Yakobi, 35, Irkutsk, Irkutsk Oblast, 664056",
+    "phone": "No data yet",
+    "website": "дикаялошадь.рф",
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Dikaya%20Loshad'%2FKEV_1997.jpg?alt=media&token=dca6ff77-df8d-4a9b-8221-d7a482e28018",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Dikaya%20Loshad'%2FKEV_1997.jpg?alt=media&token=dca6ff77-df8d-4a9b-8221-d7a482e28018",
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Dikaya%20Loshad'%2FiVUP_nsB3go.jpg?alt=media&token=91336058-6b9a-448e-9906-7fc9b163620e",
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Dikaya%20Loshad'%2F8UCO3uWWYzI.jpg?alt=media&token=17c8b8dd-8497-40ed-801e-9a11f43faf99"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": true
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": true
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": true
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": true
+      },
+      "friday": {
+        "open": "19:00",
+        "close": "06:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "19:00",
+        "close": "06:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": true
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "house-mafia",
+    "name": "House mafia",
+    "type": "Bar",
+    "coords": {
+      "lat": 52.25939814559317,
+      "lng": 104.26112938032023
+    },
+    "address": "Lermontova St, 102, Irkutsk, Irkutsk Oblast, 664074",
+    "phone": "+73952995596",
+    "website": "http://www.991366.ru/",
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/House%20mafia%2Funnamed%20(1).jpg?alt=media&token=a289b88e-7fb2-4d55-933b-955a98fa52f6",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/House%20mafia%2Funnamed%20(1).jpg?alt=media&token=a289b88e-7fb2-4d55-933b-955a98fa52f6",
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/House%20mafia%202%2FXXL.jpg?alt=media&token=7f98d391-f7bd-464e-804e-cf015b73f993"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": true
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "inrtu",
+    "name": "INRTU",
+    "type": "University",
+    "coords": {
+      "lat": 52.2625,
+      "lng": 104.2612
+    },
+    "address": "Lermontova street, 83, Irkutsk",
+    "phone": "8 (395) 240-58-87",
+    "website": "www.istu.edu",
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/INRTU%2FwTu0kT5C-o0.jpg?alt=media&token=22b8d656-32d3-40e9-8240-0dd722197f07",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/INRTU%2FwTu0kT5C-o0.jpg?alt=media&token=22b8d656-32d3-40e9-8240-0dd722197f07",
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/INRTU%2F16309072221441283963493872754162.jpg?alt=media&token=e2125e90-d514-469f-98da-172678af2351"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "08:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "18:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": true
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "kfc",
+    "name": "KFC",
+    "type": "Restaurant",
+    "coords": {
+      "lat": 52.26842861026239,
+      "lng": 104.28955947374631
+    },
+    "address": "Ulitsa Verkhnyaya Naberezhnaya, д. 10, Irkutsk, Irkutsk Oblast, 664033",
+    "phone": "+78005558333",
+    "website": "http://www.kfc.ru/restaurants/605",
+    "about": null,
+    "cover": "https://avatars.mds.yandex.net/get-altay/1908863/2a00000169d600ca73dc74ae8373608080fa/XXL",
+    "photos": [
+      "https://avatars.mds.yandex.net/get-altay/1908863/2a00000169d600ca73dc74ae8373608080fa/XXL"
+    ],
+    "rating": {
+      "value": 4.14,
+      "count": 1501
+    },
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "kinomoll",
+    "name": "Kinomoll",
+    "type": "Movie theater",
+    "coords": {
+      "lat": 52.26842861026239,
+      "lng": 104.28955947374631
+    },
+    "address": "Trts Komsomoll, Ulitsa Verkhnyaya Naberezhnaya, 10, 3 этаж, Irkutsk, Irkutsk Oblast, 664022",
+    "phone": "+73952787787",
+    "website": "kino-mall.ru",
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/2017-09-08.jpg?alt=media&token=38722447-4c46-463d-9061-a63929f5cefa",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/2017-09-08.jpg?alt=media&token=38722447-4c46-463d-9061-a63929f5cefa"
+    ],
+    "rating": {
+      "value": 4.54,
+      "count": 2382
+    },
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "kraysneft",
+    "name": "Kraysneft'",
+    "type": "Car wash",
+    "coords": {
+      "lat": 52.27,
+      "lng": 104.2922
+    },
+    "address": null,
+    "phone": null,
+    "website": null,
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Kraysneft'%2F76e364322824217884a84bf3e47c5f41.jpg?alt=media&token=b5b6597f-03a2-4390-a74b-7d37aba16e5e",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Kraysneft'%2F76e364322824217884a84bf3e47c5f41.jpg?alt=media&token=b5b6597f-03a2-4390-a74b-7d37aba16e5e"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "friday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": true,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "okey",
+    "name": "O'key",
+    "type": "Supermarket",
+    "coords": {
+      "lat": 52.26842861026239,
+      "lng": 104.28955947374631
+    },
+    "address": "Trts Komsomoll, Ulitsa Verkhnyaya Naberezhnaya, 10, Irkutsk, Irkutsk Oblast, 664022",
+    "phone": "+73952784400",
+    "website": "okmarket.ru",
+    "about": null,
+    "cover": "https://avatars.mds.yandex.net/get-altay/1938795/2a0000016f5ab38334765c681438cd793159/XXL",
+    "photos": [
+      "https://avatars.mds.yandex.net/get-altay/1938795/2a0000016f5ab38334765c681438cd793159/XXL"
+    ],
+    "rating": {
+      "value": 4.42,
+      "count": 3343
+    },
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "parque-omar",
+    "name": "Parque Omar",
+    "type": "Park and Garden",
+    "coords": {
+      "lat": 8.9973,
+      "lng": -79.5065
+    },
+    "address": "Via Porras",
+    "phone": null,
+    "website": null,
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Parque%20Omar%2F0ED7A1E4-6547-4DC4-94F8-9D046B9791D3.jpeg?alt=media&token=c6795bbe-56db-478f-a6a0-ad617c84b81a",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Parque%20Omar%2F0ED7A1E4-6547-4DC4-94F8-9D046B9791D3.jpeg?alt=media&token=c6795bbe-56db-478f-a6a0-ad617c84b81a"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "01:02",
+        "close": "01:02",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "02:03",
+        "close": "03:03",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "03:34",
+        "close": "04:43",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "sberbank",
+    "name": "Sberbank",
+    "type": "Bank",
+    "coords": {
+      "lat": 52.2851,
+      "lng": 104.2962
+    },
+    "address": "Dzerzhinskogo 27a",
+    "phone": null,
+    "website": null,
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Sberbank%2Fsb600.jpg?alt=media&token=bd939447-0762-41f4-ab4d-ab29a0645950",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Sberbank%2Fsb600.jpg?alt=media&token=bd939447-0762-41f4-ab4d-ab29a0645950"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "silvermoll",
+    "name": "Silvermoll",
+    "type": "Shopping mall",
+    "coords": {
+      "lat": 52.2651,
+      "lng": 104.2249
+    },
+    "address": "Sergeeva st, 3",
+    "phone": null,
+    "website": null,
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Silvermoll%2Fa7114512-3748-4c0e-81ed-a1d8fdfcf0ae_png_800x600_x-False_q85.jpg?alt=media&token=d8d2ed4b-56cc-49a9-be3a-f9a1ba2457ac",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Silvermoll%2Fa7114512-3748-4c0e-81ed-a1d8fdfcf0ae_png_800x600_x-False_q85.jpg?alt=media&token=d8d2ed4b-56cc-49a9-be3a-f9a1ba2457ac"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "slata",
+    "name": "Slata",
+    "type": "Beauty Salon",
+    "coords": {
+      "lat": 52.26540750658373,
+      "lng": 104.25940418295795
+    },
+    "address": "Lermontova St, 81/1, Irkutsk, Irkutsk Oblast, 664074",
+    "phone": "+73952768832",
+    "website": "slata.ru",
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Slata%2FAF1QipM708a0FOewFvfLHSWMJig1Z96sFe_sRx8kLuuv%3Ds512.jpg?alt=media&token=68d5fbd6-264e-418f-8768-4b990a0ec0a8",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Slata%2FAF1QipM708a0FOewFvfLHSWMJig1Z96sFe_sRx8kLuuv%3Ds512.jpg?alt=media&token=68d5fbd6-264e-418f-8768-4b990a0ec0a8"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "08:00",
+        "close": "23:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "sportmaster",
+    "name": "Sportmaster",
+    "type": "Sporting goods store",
+    "coords": {
+      "lat": 52.26842861026239,
+      "lng": 104.28955947374631
+    },
+    "address": "Ulitsa Verkhnyaya Naberezhnaya, 10, Irkutsk, Irkutsk Oblast, 664022",
+    "phone": "+78007777771",
+    "website": "www.sportmaster.ru",
+    "about": null,
+    "cover": "https://avatars.mds.yandex.net/get-altay/918124/2a000001622c8217ce0cb913b190624b439b/XXL",
+    "photos": [
+      "https://avatars.mds.yandex.net/get-altay/918124/2a000001622c8217ce0cb913b190624b439b/XXL"
+    ],
+    "rating": {
+      "value": 4.44,
+      "count": 1902
+    },
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "subway",
+    "name": "Subway",
+    "type": "Fast food",
+    "coords": {
+      "lat": 52.2633,
+      "lng": 104.2593
+    },
+    "address": "Lermontova St, дом 90/1, Irkutsk, Irkutsk Oblast, 664074",
+    "phone": "+73952485506",
+    "website": null,
+    "about": null,
+    "cover": null,
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Subway%2F16309937902647839254351381279574.jpg?alt=media&token=311df921-56ab-47a8-ab87-22d610932697"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "22:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "trendy-quarter",
+    "name": "Trendy Quarter",
+    "type": "Shopping mall",
+    "coords": {
+      "lat": 52.27294529674519,
+      "lng": 104.29188420752436
+    },
+    "address": "Ulitsa 3 Iyulya, 25, г.Иркутск, Irkutsk Oblast, 664022",
+    "phone": "+73952485325",
+    "website": "модныйквартал.рф",
+    "about": null,
+    "cover": "https://content.knightfrank.com/property/ruq6uj9a025oa8l/images/8fbdf626-940f-427d-af51-d74c19317e69-0.jpg?cio=true&w=1200",
+    "photos": [
+      "https://content.knightfrank.com/property/ruq6uj9a025oa8l/images/8fbdf626-940f-427d-af51-d74c19317e69-0.jpg?cio=true&w=1200"
+    ],
+    "rating": {
+      "value": 4.756,
+      "count": 10667
+    },
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "trud",
+    "name": "Trud",
+    "type": "Sports club",
+    "coords": {
+      "lat": 52.2768,
+      "lng": 104.2834
+    },
+    "address": "Lenin st",
+    "phone": "No phone number yet",
+    "website": null,
+    "about": null,
+    "cover": "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Trud%2Fea61eb65d6ee9e3c05c76675513c2411.jpg?alt=media&token=a5ac3f95-2a16-4e5f-b8c9-858be3f1e322",
+    "photos": [
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Trud%2Fea61eb65d6ee9e3c05c76675513c2411.jpg?alt=media&token=a5ac3f95-2a16-4e5f-b8c9-858be3f1e322",
+      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Trud%2FXXL.jpg?alt=media&token=75bac519-d6ed-4bc4-8812-d8ca9eb135a8"
+    ],
+    "rating": null,
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  },
+  {
+    "id": "yarkomoll",
+    "name": "Yarkomoll",
+    "type": "Shopping mall",
+    "coords": {
+      "lat": 52.26842861026239,
+      "lng": 104.28955947374631
+    },
+    "address": "Ulitsa Verkhnyaya Naberezhnaya, 10, Irkutsk, Irkutsk Oblast, 664022",
+    "phone": "+73952487744",
+    "website": "яркомолл-ирк.рф",
+    "about": null,
+    "cover": "https://static.irk.ru/media/img/site/gallery/30352/0be0ed29-646c-4fe7-84e7-52ea9906c2a6_jpg_800x600_x-False_q85.jpg",
+    "photos": [
+      "https://static.irk.ru/media/img/site/gallery/30352/0be0ed29-646c-4fe7-84e7-52ea9906c2a6_jpg_800x600_x-False_q85.jpg"
+    ],
+    "rating": {
+      "value": 4.456,
+      "count": 9443
+    },
+    "schedule": {
+      "monday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "tuesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "wednesday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "thursday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "friday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "saturday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      },
+      "sunday": {
+        "open": "10:00",
+        "close": "20:00",
+        "allDay": false,
+        "closed": false
+      }
+    },
+    "authorId": "kf1bfb4TsIUPJ8XKISTOMgc9f1q1"
+  }
+]
