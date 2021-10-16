@@ -1,0 +1,123 @@
+.app {
+  display: grid;
+  grid-template-columns: var(--panel-width) 1fr;
+  height: 100%;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--rule);
+}
+
+.masthead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.wordmark {
+  font-size: var(--step-2);
+  letter-spacing: -0.02em;
+  font-variation-settings:
+    "SOFT" 30,
+    "WONK" 1,
+    "opsz" 40;
+}
+
+.dot {
+  color: var(--accent);
+}
+
+/* Drag handle for the mobile sheet; irrelevant on a wide screen. */
+.grabber {
+  display: none;
+}
+
+.panelBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.filters {
+  padding: 0 1.5rem 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.state {
+  padding: 2rem 1.5rem;
+  color: var(--ink-muted);
+}
+
+.retry {
+  margin-top: 0.75rem;
+  border-bottom: 1px solid var(--accent);
+  color: var(--accent-ink);
+}
+
+.map {
+  position: relative;
+  min-width: 0;
+}
+
+@media (width <= 48rem) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  .map {
+    grid-area: 1 / 1;
+  }
+
+  /* The panel becomes a sheet over the map, showing its header and filters
+     until the user drags it up. */
+  .panel {
+    grid-area: 1 / 1;
+    align-self: end;
+    z-index: 600;
+    max-height: 88%;
+    height: 42vh;
+    border-right: none;
+    border-top: 1px solid var(--rule);
+    border-radius: 12px 12px 0 0;
+    box-shadow: var(--shadow-sheet);
+    transition: height 220ms ease;
+  }
+
+  .panel[data-expanded="true"] {
+    height: 88%;
+  }
+
+  .masthead {
+    padding: 0.5rem 1.25rem 0.75rem;
+  }
+
+  .grabber {
+    display: block;
+    order: -1;
+    align-self: center;
+    width: 2.5rem;
+    height: 1.25rem;
+    position: relative;
+  }
+
+  .grabber::after {
+    content: "";
+    position: absolute;
+    inset: 0.5rem 0 auto;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--rule-strong);
+  }
+
+  .filters {
+    padding-inline: 1.25rem;
+  }
+}

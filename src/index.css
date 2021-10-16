@@ -1,0 +1,137 @@
+:root {
+  --paper: #faf7f2;
+  --surface: #fffdf9;
+  --surface-sunk: #f4efe7;
+  --ink: #1f1b16;
+  --ink-soft: #4a423a;
+  --ink-muted: #7a7067;
+  --rule: #e5dcd0;
+  --rule-strong: #d3c7b7;
+  --accent: #b4471f;
+  --accent-ink: #8d3616;
+  --accent-wash: #f6e7dc;
+  --shadow-sheet: 0 -8px 32px rgb(31 27 22 / 8%);
+
+  --step-0: 0.9375rem;
+  --step-1: 1.0625rem;
+  --step-2: 1.375rem;
+  --step-3: 1.875rem;
+  --step-4: 2.5rem;
+
+  --sans: "Inter Variable", system-ui, -apple-system, sans-serif;
+  --serif: "Fraunces Variable", Georgia, "Times New Roman", serif;
+
+  --panel-width: 24rem;
+  --radius: 2px;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  font-variation-settings: "SOFT" 20, "WONK" 1;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+a {
+  color: var(--accent-ink);
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Leaflet ships opinionated chrome; only the attribution is kept, restyled to
+   sit quietly in the corner instead of floating in a white box. */
+.leaflet-container {
+  background: var(--surface-sunk);
+  font-family: var(--sans);
+}
+
+.leaflet-control-attribution {
+  background: rgb(255 253 249 / 82%) !important;
+  border-radius: var(--radius) 0 0 0;
+  color: var(--ink-muted);
+  font-size: 0.6875rem;
+  padding: 0.15rem 0.5rem;
+}
+
+.leaflet-control-attribution a {
+  color: var(--ink-soft);
+}
+
+.leaflet-tooltip {
+  background: var(--ink);
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: none;
+  color: var(--surface);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 0.2rem 0.5rem;
+}
+
+.leaflet-tooltip-top::before {
+  border-top-color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

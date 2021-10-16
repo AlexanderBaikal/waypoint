@@ -1,0 +1,80 @@
+.root {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.canvas {
+  height: 100%;
+  width: 100%;
+}
+
+/* divIcon wraps our span; Leaflet's own background and border are removed. */
+.pinWrapper {
+  background: none;
+  border: none;
+}
+
+.pin {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  width: 100%;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  line-height: 1;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.pin:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pin[data-selected="true"] {
+  background: var(--accent);
+  border-color: var(--accent-ink);
+  color: var(--surface);
+  font-size: 1rem;
+  box-shadow: 0 4px 14px rgb(180 71 31 / 35%);
+}
+
+.controls {
+  position: absolute;
+  right: 1rem;
+  bottom: 2.25rem;
+  z-index: 500;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.controls button {
+  height: 2.25rem;
+  width: 2.25rem;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1;
+  transition: background-color 120ms ease;
+}
+
+.controls button:hover {
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+@media (width <= 48rem) {
+  .controls {
+    bottom: 45vh;
+  }
+}

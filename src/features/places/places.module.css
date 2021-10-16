@@ -1,0 +1,383 @@
+.resultCount {
+  padding: 0.875rem 1.5rem 0.25rem;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+}
+
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid var(--rule);
+  text-align: left;
+  transition: background-color 120ms ease;
+}
+
+.list li:first-child .listItem {
+  border-top: none;
+}
+
+.listItem:hover {
+  background: var(--surface-sunk);
+}
+
+.listItemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.listItemName {
+  font-family: var(--serif);
+  font-size: var(--step-1);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.savedMark {
+  color: var(--accent);
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+}
+
+.listItemMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-muted);
+  font-size: 0.8125rem;
+}
+
+.thumb {
+  width: 4.5rem;
+  height: 3.25rem;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--surface-sunk);
+}
+
+/* Stands in for a photo. Tinted per place so a list of them reads as a
+   pattern rather than as a column of identical grey boxes. */
+.placeholder {
+  display: grid;
+  place-items: center;
+  border: none;
+  background: linear-gradient(
+    155deg,
+    hsl(var(--tint, 24deg) 38% 93%),
+    hsl(var(--tint, 24deg) 28% 85%)
+  );
+  color: hsl(var(--tint, 24deg) 32% 45%);
+}
+
+.thumb.placeholder {
+  font-size: 0.8125rem;
+}
+
+.hero.placeholder {
+  font-size: 1.75rem;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ratingValue {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.stars {
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+
+.starsEmpty {
+  color: var(--rule-strong);
+}
+
+.ratingCount {
+  color: var(--ink-muted);
+}
+
+.openBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 600;
+}
+
+.openBadge[data-open="true"] {
+  color: #3f6b43;
+}
+
+.openBadge[data-open="false"] {
+  color: var(--accent-ink);
+}
+
+.openDetail {
+  color: var(--ink-muted);
+  font-weight: 400;
+}
+
+.empty {
+  padding: 2.5rem 1.5rem;
+  color: var(--ink-muted);
+}
+
+.textButton,
+.backButton {
+  color: var(--accent-ink);
+  border-bottom: 1px solid currentcolor;
+}
+
+.hint {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+/* ---- detail panel ---- */
+
+.panel {
+  padding: 0 1.5rem 3rem;
+}
+
+.backButton {
+  margin: 1rem 0;
+  font-size: 0.8125rem;
+}
+
+/* Inset rather than full-bleed: a negative-margin breakout has to guess the
+   scroll container's width and gets it wrong as soon as a scrollbar appears. */
+.hero {
+  width: 100%;
+  height: 11rem;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--surface-sunk);
+}
+
+.panelHead {
+  padding-top: 1.25rem;
+}
+
+.panelTitle {
+  font-size: var(--step-3);
+  font-variation-settings:
+    "SOFT" 40,
+    "WONK" 1,
+    "opsz" 60;
+}
+
+.panelType {
+  color: var(--ink-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding-top: 0.35rem;
+}
+
+.panelStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 0.6rem;
+  font-size: 0.875rem;
+}
+
+.saveButton {
+  margin-top: 1rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.saveButton[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.about {
+  padding-top: 1rem;
+  color: var(--ink-soft);
+}
+
+.details {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+
+.details > div {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.details dt {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding-top: 0.15rem;
+}
+
+.details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.mono {
+  font-variant-numeric: tabular-nums;
+}
+
+.hours {
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+}
+
+.hours summary {
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+
+.hours table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.hours th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--ink-muted);
+  padding: 0.2rem 0;
+  width: 4rem;
+}
+
+.hours td {
+  font-variant-numeric: tabular-nums;
+}
+
+.section {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: var(--step-1);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 0.875rem;
+}
+
+.photoStrip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.photoStrip img {
+  width: 9rem;
+  height: 6.5rem;
+  flex: none;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--surface-sunk);
+}
+
+/* ---- reviews ---- */
+
+.reviews {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.review {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.reviewHead {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.avatar,
+.avatarFallback {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  flex: none;
+}
+
+.avatar {
+  object-fit: cover;
+}
+
+.avatarFallback {
+  display: grid;
+  place-items: center;
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.reviewAuthor {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.reviewMeta {
+  color: var(--accent);
+  font-size: 0.8125rem;
+}
+
+.reviewText {
+  color: var(--ink-soft);
+}
+
+.reviewPhotos {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.reviewPhotos img {
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+@media (width <= 48rem) {
+  .resultCount,
+  .listItem {
+    padding-inline: 1.25rem;
+  }
+
+  .panel {
+    padding-inline: 1.25rem;
+  }
+}
