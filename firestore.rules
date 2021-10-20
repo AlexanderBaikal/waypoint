@@ -1,0 +1,45 @@
+rules_version = '2';
+
+// Waypoint access model
+// ---------------------
+// Place data is public reference data: anyone may read it, nobody may write it
+// from a browser. Per-user state (saved places) is private to its owner.
+//
+// The previous revision of this project shipped with no rules file at all,
+// which left every collection world-writable. Rules live in version control so
+// that a change to the access model shows up in review like any other change.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Public reference data, maintained out-of-band.
+    // `descriptions` and `comments` are legacy collection names kept so the
+    // existing dataset stays readable; the client normalises them on read.
+    match /places/{placeId}       { allow read: if true; allow write: if false; }
+    match /descriptions/{placeId} { allow read: if true; allow write: if false; }
+    match /comments/{reviewId}    { allow read: if true; allow write: if false; }
+
+    // Per-user state. A signed-in user can read and write their own document
+    // and no other. `savedPlaceIds` is capped so a client cannot use the
+    // document as unbounded storage.
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUserDoc();
+      allow delete: if isOwner(userId);
+    }
+
+    // Anything not matched above is denied.
+    match /{document=**} { allow read, write: if false; }
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isValidUserDoc() {
+      let data = request.resource.data;
+      return data.keys().hasOnly(['savedPlaceIds', 'updatedAt'])
+        && data.savedPlaceIds is list
+        && data.savedPlaceIds.size() <= 500;
+    }
+  }
+}

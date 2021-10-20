@@ -1,0 +1,14 @@
+rules_version = '2';
+
+// Place photography is public to read and, for now, immutable from the client.
+// Uploads are reintroduced together with the place editor, at which point this
+// file gains an authenticated write rule with a size and content-type bound.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}
