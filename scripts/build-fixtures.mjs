@@ -7,7 +7,8 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 const OUT = "/Users/alex/develop/google-maps-clone/src/data/fixtures";
 
 const read = (name) =>
-  JSON.parse(readFileSync(new URL(`./raw-${name}.json`, import.meta.url))).documents ?? [];
+  JSON.parse(readFileSync(new URL(`./raw-${name}.json`, import.meta.url))).documents ??
+  [];
 
 /** Firestore REST wraps every scalar in a typed envelope; unwrap it recursively. */
 function unwrap(value) {

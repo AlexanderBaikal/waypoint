@@ -88,7 +88,10 @@ describe("openStateAt", () => {
   it("reports an always-open place without a closing time", () => {
     const allDay = schedule(
       Object.fromEntries(
-        WEEKDAYS.map((day) => [day, { open: "00:00", close: "00:00", allDay: true, closed: false }]),
+        WEEKDAYS.map((day) => [
+          day,
+          { open: "00:00", close: "00:00", allDay: true, closed: false },
+        ]),
       ),
     );
 
@@ -96,9 +99,7 @@ describe("openStateAt", () => {
   });
 
   it("reports closed with no next opening when every day is closed", () => {
-    const never = schedule(
-      Object.fromEntries(WEEKDAYS.map((day) => [day, closed])),
-    );
+    const never = schedule(Object.fromEntries(WEEKDAYS.map((day) => [day, closed])));
 
     expect(openStateAt(never, monday("12:00"))).toEqual({ status: "closed", next: null });
   });

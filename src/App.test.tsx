@@ -109,7 +109,9 @@ describe("App", () => {
     expect(await screen.findByText("1 place")).toBeInTheDocument();
     expect(within(list()).getAllByRole("listitem")).toHaveLength(1);
     expect(screen.getByRole("button", { name: "marker: Subway" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "marker: Sberbank" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "marker: Sberbank" }),
+    ).not.toBeInTheDocument();
   });
 
   it("filters by category chip", async () => {

@@ -2,6 +2,7 @@ node_modules
 dist
 dist-ssr
 coverage
+*.tsbuildinfo
 playwright-report
 test-results
 /blob-report/

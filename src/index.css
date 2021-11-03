@@ -60,7 +60,9 @@ h3 {
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.015em;
-  font-variation-settings: "SOFT" 20, "WONK" 1;
+  font-variation-settings:
+    "SOFT" 20,
+    "WONK" 1;
 }
 
 button,

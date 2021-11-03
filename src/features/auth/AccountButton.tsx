@@ -17,7 +17,12 @@ export function AccountButton() {
     return (
       <div className={styles.account}>
         {user.photoUrl ? (
-          <img className={styles.avatar} src={user.photoUrl} alt="" referrerPolicy="no-referrer" />
+          <img
+            className={styles.avatar}
+            src={user.photoUrl}
+            alt=""
+            referrerPolicy="no-referrer"
+          />
         ) : null}
         <button
           type="button"

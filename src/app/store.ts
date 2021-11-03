@@ -1,8 +1,18 @@
 import { configureStore, createListenerMiddleware, isAnyOf } from "@reduxjs/toolkit";
 import { placesApi } from "./placesApi";
-import { uiReducer, categoryToggled, placeSelected, queryChanged, filtersCleared } from "./uiSlice";
+import {
+  uiReducer,
+  categoryToggled,
+  placeSelected,
+  queryChanged,
+  filtersCleared,
+} from "./uiSlice";
 import { authReducer } from "../features/auth/authSlice";
-import { savedReducer, savedToggled, syncWithAccount } from "../features/saved/savedSlice";
+import {
+  savedReducer,
+  savedToggled,
+  syncWithAccount,
+} from "../features/saved/savedSlice";
 import { writeLocal, writeRemote } from "../features/saved/savedPlacesService";
 
 const listener = createListenerMiddleware();
@@ -33,7 +43,11 @@ listener.startListening({
     if (ui.selectedPlaceId) params.set("place", ui.selectedPlaceId);
 
     const search = params.toString();
-    window.history.replaceState(null, "", search ? `?${search}` : window.location.pathname);
+    window.history.replaceState(
+      null,
+      "",
+      search ? `?${search}` : window.location.pathname,
+    );
   },
 });
 

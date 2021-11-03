@@ -87,7 +87,10 @@ function mergeDocs(
     .sort((a, b) => a.place.name.localeCompare(b.place.name));
 }
 
-async function readCollection(db: Firestore, name: string): Promise<Map<string, DocumentData>> {
+async function readCollection(
+  db: Firestore,
+  name: string,
+): Promise<Map<string, DocumentData>> {
   const snapshot = await getDocs(collection(db, name));
   return new Map(snapshot.docs.map((doc) => [doc.id, doc.data()]));
 }
@@ -145,7 +148,9 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
               text,
               date: readDate(data.date),
               photos: Array.isArray(data.photos)
-                ? data.photos.filter((photo): photo is string => typeof photo === "string")
+                ? data.photos.filter(
+                    (photo): photo is string => typeof photo === "string",
+                  )
                 : [],
             };
           })

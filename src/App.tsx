@@ -34,7 +34,9 @@ export function App() {
 
   const dispatch = useAppDispatch();
   const { data: places = [], isLoading, isError, error, refetch } = useListPlacesQuery();
-  const { query, categories, selectedPlaceId, listExpanded } = useAppSelector((s) => s.ui);
+  const { query, categories, selectedPlaceId, listExpanded } = useAppSelector(
+    (s) => s.ui,
+  );
   const savedIds = useAppSelector((state) => state.saved.ids);
 
   const filtered = useMemo(
@@ -50,7 +52,8 @@ export function App() {
 
   // A deep link can name a place that has since been filtered out or removed;
   // the map still shows every marker it knows about in that case.
-  const markers = selected && !filtered.includes(selected) ? [...filtered, selected] : filtered;
+  const markers =
+    selected && !filtered.includes(selected) ? [...filtered, selected] : filtered;
 
   return (
     <div className={styles.app}>
@@ -97,7 +100,11 @@ export function App() {
               ) : isError ? (
                 <div className={styles.state}>
                   <p>{errorMessage(error)}</p>
-                  <button type="button" className={styles.retry} onClick={() => void refetch()}>
+                  <button
+                    type="button"
+                    className={styles.retry}
+                    onClick={() => void refetch()}
+                  >
                     Try again
                   </button>
                 </div>

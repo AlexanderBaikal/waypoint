@@ -35,7 +35,9 @@ export async function readRemote(uid: string): Promise<string[]> {
   const { getDoc } = await import("firebase/firestore");
   const snapshot = await getDoc(await userDoc(uid));
   const ids: unknown = snapshot.data()?.savedPlaceIds;
-  return Array.isArray(ids) ? ids.filter((id): id is string => typeof id === "string") : [];
+  return Array.isArray(ids)
+    ? ids.filter((id): id is string => typeof id === "string")
+    : [];
 }
 
 export async function writeRemote(uid: string, ids: readonly string[]): Promise<void> {

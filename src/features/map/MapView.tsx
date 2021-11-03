@@ -44,7 +44,9 @@ export function MapView({ places, selected, filtered, onSelect }: MapViewProps) 
     lastSignature.current = signature;
 
     if (!filtered || places.length === 0) return;
-    const bounds = L.latLngBounds(places.map((place) => [place.coords.lat, place.coords.lng]));
+    const bounds = L.latLngBounds(
+      places.map((place) => [place.coords.lat, place.coords.lng]),
+    );
     map.flyToBounds(bounds, { padding: FIT_PADDING, maxZoom: 16, duration: 0.6 });
   }, [map, places, selected, signature, filtered]);
 

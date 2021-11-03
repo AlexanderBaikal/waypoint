@@ -12,7 +12,12 @@ interface PlaceListProps {
   onClearFilters: () => void;
 }
 
-export function PlaceList({ places, savedIds, onSelect, onClearFilters }: PlaceListProps) {
+export function PlaceList({
+  places,
+  savedIds,
+  onSelect,
+  onClearFilters,
+}: PlaceListProps) {
   if (places.length === 0) {
     return (
       <div className={styles.empty}>
