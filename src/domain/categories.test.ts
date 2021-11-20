@@ -1,5 +1,6 @@
 import { CATEGORY_META, categoryOf, presentCategories } from "./categories";
 import type { Place } from "./place";
+import places from "../data/fixtures/places.json";
 
 const withType = (type: string) => ({ type }) as Place;
 
@@ -14,10 +15,34 @@ describe("categoryOf", () => {
     expect(categoryOf(withType("  fast FOOD "))).toBe("food");
   });
 
+  it("files the long retail tail by suffix", () => {
+    expect(categoryOf(withType("Tile shop"))).toBe("shopping");
+    expect(categoryOf(withType("Variety store"))).toBe("shopping");
+    // The table wins over the suffix where a shop is really a service.
+    expect(categoryOf(withType("Barber shop"))).toBe("services");
+  });
+
   it("falls back to other for anything unrecognised", () => {
     expect(categoryOf(withType("Sporting goods store"))).toBe("shopping");
     expect(categoryOf(withType("Yurt repair"))).toBe("other");
     expect(categoryOf(withType(""))).toBe("other");
+  });
+
+  /**
+   * scripts/import-osm.mjs invents type names from OpenStreetMap tags, and this
+   * table has to keep up with it. When it does not, the symptom is a map full
+   * of "other" pins with no filter chip behind them — so that is what is
+   * measured, rather than the two tables being compared row by row.
+   */
+  it("recognises all but a fraction of the shipped dataset", () => {
+    const unrecognised = (places as Place[]).filter(
+      (place) => categoryOf(place) === "other",
+    );
+    const share = unrecognised.length / places.length;
+
+    expect(share, [...new Set(unrecognised.map((p) => p.type))].join(", ")).toBeLessThan(
+      0.02,
+    );
   });
 });
 
