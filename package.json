@@ -26,11 +26,13 @@
     "@fontsource/fraunces": "^4.5.0",
     "@fontsource/inter": "^4.5.0",
     "@reduxjs/toolkit": "^1.6.1",
+    "@types/supercluster": "^5.0.3",
     "firebase": "^9.1.1",
     "leaflet": "^1.7.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-redux": "^7.2.5"
+    "react-redux": "^7.2.5",
+    "supercluster": "^7.1.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.15.1",

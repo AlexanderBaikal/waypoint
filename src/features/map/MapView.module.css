@@ -45,6 +45,31 @@
   box-shadow: 0 4px 14px rgb(180 71 31 / 35%);
 }
 
+/* Reads as a quieter, denser version of a pin: same family, no glyph. */
+.cluster {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  width: 100%;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent-ink);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: 0 2px 10px rgb(60 40 30 / 18%);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.cluster:hover {
+  background: var(--accent);
+  color: var(--surface);
+}
+
 .controls {
   position: absolute;
   right: 1rem;

@@ -34,21 +34,22 @@ export function MapView({ places, selected, filtered, onSelect }: MapViewProps) 
   }, [map, selected]);
 
   // When a filter narrows the list, frame what is left so the user is not left
-  // staring at empty streets. Tracking the signature keeps this to actual
-  // changes rather than every render.
-  const signature = places.map((place) => place.id).join(",");
-  const lastSignature = useRef(signature);
+  // staring at empty streets. `places` is memoised upstream and changes
+  // identity only when its contents do, so comparing the reference is enough —
+  // and unlike joining every id into a string, it stays free as the dataset
+  // grows into the thousands.
+  const lastPlaces = useRef(places);
   useEffect(() => {
     if (!map || selected) return;
-    if (signature === lastSignature.current) return;
-    lastSignature.current = signature;
+    if (places === lastPlaces.current) return;
+    lastPlaces.current = places;
 
     if (!filtered || places.length === 0) return;
     const bounds = L.latLngBounds(
       places.map((place) => [place.coords.lat, place.coords.lng]),
     );
     map.flyToBounds(bounds, { padding: FIT_PADDING, maxZoom: 16, duration: 0.6 });
-  }, [map, places, selected, signature, filtered]);
+  }, [map, places, selected, filtered]);
 
   const zoomBy = useCallback(
     (delta: number) => {
