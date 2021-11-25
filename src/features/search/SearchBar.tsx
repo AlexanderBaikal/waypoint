@@ -23,8 +23,8 @@ export function SearchBar({ value, resultCount, onChange }: SearchBarProps) {
         value={value}
         placeholder="Search places"
         autoComplete="off"
-        // The dataset is 20 rows in a client-side array; filtering on each
-        // keystroke costs nothing and debouncing would only add latency.
+        // Not debounced: the caller defers the filtering pass instead, so the
+        // field stays responsive without holding results back by a fixed delay.
         onChange={(event) => {
           onChange(event.target.value);
         }}

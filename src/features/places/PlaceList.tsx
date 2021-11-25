@@ -12,6 +12,16 @@ interface PlaceListProps {
   onClearFilters: () => void;
 }
 
+/**
+ * How many results the panel draws. The map shows every match; this list is a
+ * reading surface, and a thousand rows is neither readable nor cheap — each one
+ * costs half a dozen DOM nodes. Search and the category chips are how you get
+ * to the rest, which is how a map application behaves anyway.
+ */
+const VISIBLE = 60;
+
+const count = (value: number) => value.toLocaleString("en-US");
+
 export function PlaceList({
   places,
   savedIds,
@@ -30,15 +40,17 @@ export function PlaceList({
   }
 
   const saved = new Set(savedIds);
+  const shown = places.length > VISIBLE ? places.slice(0, VISIBLE) : places;
 
   return (
     <>
       <p className={styles.resultCount} role="status">
-        {places.length} place{places.length === 1 ? "" : "s"}
+        {count(places.length)} place{places.length === 1 ? "" : "s"}
+        {shown.length < places.length && ` · showing ${String(shown.length)}`}
       </p>
 
       <ul className={styles.list}>
-        {places.map((place) => (
+        {shown.map((place) => (
           <li key={place.id}>
             <button
               type="button"
@@ -70,6 +82,13 @@ export function PlaceList({
           </li>
         ))}
       </ul>
+
+      {shown.length < places.length && (
+        <p className={styles.listFooter}>
+          {count(places.length - shown.length)} more on the map. Search or pick a category
+          to narrow them down.
+        </p>
+      )}
     </>
   );
 }

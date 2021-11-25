@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useDeferredValue, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { useListPlacesQuery } from "./app/placesApi";
 import {
@@ -39,9 +39,15 @@ export function App() {
   );
   const savedIds = useAppSelector((state) => state.saved.ids);
 
+  // Scoring a few thousand places, re-clustering them and repainting the panel
+  // is more work than a keystroke should block on. Deferring the query lets the
+  // field update at once and the results catch up a frame later; the text you
+  // typed never lags behind your fingers.
+  const deferredQuery = useDeferredValue(query);
+
   const filtered = useMemo(
-    () => filterPlaces(places, { query, categories }),
-    [places, query, categories],
+    () => filterPlaces(places, { query: deferredQuery, categories }),
+    [places, deferredQuery, categories],
   );
 
   const available = useMemo(() => presentCategories(places), [places]);
@@ -51,9 +57,12 @@ export function App() {
   );
 
   // A deep link can name a place that has since been filtered out or removed;
-  // the map still shows every marker it knows about in that case.
-  const markers =
-    selected && !filtered.includes(selected) ? [...filtered, selected] : filtered;
+  // the map still shows every marker it knows about in that case. Memoised
+  // because the marker layer keys its work off this array's identity.
+  const markers = useMemo(
+    () => (selected && !filtered.includes(selected) ? [...filtered, selected] : filtered),
+    [filtered, selected],
+  );
 
   return (
     <div className={styles.app}>
@@ -125,7 +134,7 @@ export function App() {
         <MapView
           places={markers}
           selected={selected}
-          filtered={query.trim() !== "" || categories.length > 0}
+          filtered={deferredQuery.trim() !== "" || categories.length > 0}
           onSelect={(id) => dispatch(placeSelected(id))}
         />
       </main>

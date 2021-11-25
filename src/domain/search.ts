@@ -19,8 +19,43 @@ export function normaliseForSearch(value: string): string {
     .trim();
 }
 
-function haystack(place: Place): string {
-  return normaliseForSearch([place.name, place.type, place.address ?? ""].join(" "));
+interface Searchable {
+  name: string;
+  haystack: string;
+}
+
+/**
+ * Normalising is the expensive half of a search — NFD plus two regexes per
+ * field — and the dataset runs to a few thousand places while the query
+ * changes on every keystroke. The result depends only on the place, so it is
+ * computed once and held against the object itself. A WeakMap means a place
+ * dropped from the dataset takes its entry with it.
+ */
+const searchableCache = new WeakMap<Place, Searchable>();
+
+function searchable(place: Place): Searchable {
+  const cached = searchableCache.get(place);
+  if (cached) return cached;
+
+  const entry: Searchable = {
+    name: normaliseForSearch(place.name),
+    haystack: normaliseForSearch([place.name, place.type, place.address ?? ""].join(" ")),
+  };
+  searchableCache.set(place, entry);
+  return entry;
+}
+
+/** Scores against an already-normalised query. */
+function score(place: Place, needle: string, tokens: readonly string[]): number {
+  if (!needle) return 1;
+
+  const { name, haystack } = searchable(place);
+  if (name === needle) return 100;
+  if (name.startsWith(needle)) return 80;
+
+  if (!tokens.every((token) => haystack.includes(token))) return 0;
+
+  return name.includes(needle) ? 60 : 40;
 }
 
 /**
@@ -30,28 +65,37 @@ function haystack(place: Place): string {
  */
 export function scorePlace(place: Place, query: string): number {
   const needle = normaliseForSearch(query);
-  if (!needle) return 1;
+  return score(place, needle, needle.split(" "));
+}
 
-  const name = normaliseForSearch(place.name);
-  if (name === needle) return 100;
-  if (name.startsWith(needle)) return 80;
-
-  const tokens = needle.split(" ");
-  const hay = haystack(place);
-  if (!tokens.every((token) => hay.includes(token))) return 0;
-
-  return name.includes(needle) ? 60 : 40;
+/**
+ * Separates places that score the same. With no query every place scores 1, so
+ * without this the panel opens on whatever the alphabet puts first — which, in
+ * a dataset of sixteen hundred imported places, is a row of names beginning
+ * with digits. Rated and photographed places lead instead: they are the ones
+ * with a detail page worth opening.
+ */
+function prominence(place: Place): number {
+  return (place.rating ? 4 : 0) + (place.cover ? 2 : 0) + (place.about ? 1 : 0);
 }
 
 export function filterPlaces(places: readonly Place[], filter: PlaceFilter): Place[] {
   const categories = new Set(filter.categories);
+  // Normalised once for the whole pass rather than once per place.
+  const needle = normaliseForSearch(filter.query);
+  const tokens = needle.split(" ");
 
   return places
-    .map((place) => ({ place, score: scorePlace(place, filter.query) }))
+    .map((place) => ({ place, score: score(place, needle, tokens) }))
     .filter(({ place, score }) => {
       if (score === 0) return false;
       return categories.size === 0 || categories.has(categoryOf(place));
     })
-    .sort((a, b) => b.score - a.score || a.place.name.localeCompare(b.place.name))
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        prominence(b.place) - prominence(a.place) ||
+        a.place.name.localeCompare(b.place.name),
+    )
     .map(({ place }) => place);
 }
