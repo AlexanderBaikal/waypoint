@@ -48,7 +48,7 @@ jobs:
           retention-days: 7
 
   deploy:
-    name: Deploy to Firebase Hosting
+    name: Deploy to Firebase
     needs: [verify, e2e]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -66,9 +66,23 @@ jobs:
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-      # Security rules are deliberately not deployed from here — they change
-      # who can write to live data, which deserves a deliberate command.
-      - uses: w9jds/firebase-action@master
+
+      # Rules go out before the app, and separately from it. They decide who
+      # may write to live data, so a failure here has to stop the release
+      # rather than be buried in a combined deploy — if the access model did
+      # not land, the build that assumes it must not go live either.
+      #
+      # This needs a service account with the Firebase Rules Admin role
+      # (roles/firebaserules.admin); a hosting-only key will get a 403 here.
+      - name: Deploy security rules
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only firestore:rules,firestore:indexes,storage
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Deploy hosting
+        uses: w9jds/firebase-action@master
         with:
           args: deploy --only hosting
         env:

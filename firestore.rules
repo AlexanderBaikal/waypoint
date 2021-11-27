@@ -7,7 +7,9 @@ rules_version = '2';
 //
 // The previous revision of this project shipped with no rules file at all,
 // which left every collection world-writable. Rules live in version control so
-// that a change to the access model shows up in review like any other change.
+// that a change to the access model shows up in review like any other change,
+// and .github/workflows/ci.yml deploys this file on every push to master —
+// what is committed here is what the database enforces.
 
 service cloud.firestore {
   match /databases/{database}/documents {
