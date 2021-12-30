@@ -29,6 +29,20 @@ function errorMessage(error: unknown): string {
   return "Could not load places.";
 }
 
+/**
+ * The wordmark's mark is the pin the map draws — same circle, same stem. It is
+ * inline rather than the favicon file so it inherits the palette's tokens and
+ * cannot drift away from the markers it stands for.
+ */
+function Mark() {
+  return (
+    <svg className={styles.mark} viewBox="0 0 20 26" aria-hidden="true">
+      <circle cx="10" cy="9" r="6.5" fill="none" stroke="var(--accent)" strokeWidth="3" />
+      <path d="M10 17v7" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function App() {
   useAuthSession();
 
@@ -66,10 +80,23 @@ export function App() {
 
   return (
     <div className={styles.app}>
+      {/* The map is painted first and fills the window; the panel floats over
+          it. Source order matters here — the panel has to come second to sit
+          on top without a z-index war against Leaflet's own controls. */}
+      <main className={styles.map}>
+        <MapView
+          places={markers}
+          selected={selected}
+          filtered={deferredQuery.trim() !== "" || categories.length > 0}
+          onSelect={(id) => dispatch(placeSelected(id))}
+        />
+      </main>
+
       <aside className={styles.panel} data-expanded={String(listExpanded)}>
         <header className={styles.masthead}>
           <h1 className={styles.wordmark}>
-            Waypoint<span className={styles.dot}>.</span>
+            <Mark />
+            Waypoint
           </h1>
           <AccountButton />
         </header>
@@ -129,15 +156,6 @@ export function App() {
           )}
         </div>
       </aside>
-
-      <main className={styles.map}>
-        <MapView
-          places={markers}
-          selected={selected}
-          filtered={deferredQuery.trim() !== "" || categories.length > 0}
-          onSelect={(id) => dispatch(placeSelected(id))}
-        />
-      </main>
     </div>
   );
 }
