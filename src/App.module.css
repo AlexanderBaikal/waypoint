@@ -9,7 +9,7 @@
   flex-direction: column;
   min-height: 0;
   background: var(--surface);
-  border-right: 1px solid var(--rule);
+  border-right: 1px solid var(--line);
 }
 
 .masthead {
@@ -21,12 +21,8 @@
 }
 
 .wordmark {
-  font-size: var(--step-2);
-  letter-spacing: -0.02em;
-  font-variation-settings:
-    "SOFT" 30,
-    "WONK" 1,
-    "opsz" 40;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
 }
 
 .dot {
@@ -47,18 +43,18 @@
 
 .filters {
   padding: 0 1.5rem 0.75rem;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--line);
 }
 
 .state {
   padding: 2rem 1.5rem;
-  color: var(--ink-muted);
+  color: var(--ink-3);
 }
 
 .retry {
   margin-top: 0.75rem;
   border-bottom: 1px solid var(--accent);
-  color: var(--accent-ink);
+  color: var(--accent);
 }
 
 .map {
@@ -85,9 +81,8 @@
     max-height: 88%;
     height: 42vh;
     border-right: none;
-    border-top: 1px solid var(--rule);
+    border-top: 1px solid var(--line);
     border-radius: 12px 12px 0 0;
-    box-shadow: var(--shadow-sheet);
     transition: height 220ms ease;
   }
 
@@ -114,7 +109,7 @@
     inset: 0.5rem 0 auto;
     height: 3px;
     border-radius: 3px;
-    background: var(--rule-strong);
+    background: var(--line-2);
   }
 
   .filters {

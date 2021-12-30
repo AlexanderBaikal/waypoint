@@ -23,7 +23,6 @@
     "fixtures": "node scripts/build-fixtures.mjs"
   },
   "dependencies": {
-    "@fontsource/fraunces": "^4.5.0",
     "@fontsource/inter": "^4.5.0",
     "@reduxjs/toolkit": "^1.6.1",
     "firebase": "^9.1.1",

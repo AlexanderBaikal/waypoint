@@ -13,15 +13,15 @@
 }
 
 .link {
-  color: var(--ink-muted);
-  border-bottom: 1px solid var(--rule-strong);
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--line-2);
   transition:
     color 140ms ease,
     border-color 140ms ease;
 }
 
 .link:hover:not(:disabled) {
-  color: var(--accent-ink);
+  color: var(--accent);
   border-bottom-color: var(--accent);
 }
 
@@ -31,5 +31,5 @@
 }
 
 .error {
-  color: var(--accent-ink);
+  color: var(--accent);
 }

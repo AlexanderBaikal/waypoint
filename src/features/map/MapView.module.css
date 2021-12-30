@@ -20,10 +20,10 @@
   place-items: center;
   height: 100%;
   width: 100%;
-  border: 1px solid var(--rule-strong);
+  border: 1px solid var(--line-2);
   border-radius: 50%;
   background: var(--surface);
-  color: var(--ink-soft);
+  color: var(--ink-2);
   font-size: 0.75rem;
   line-height: 1;
   transition:
@@ -39,7 +39,7 @@
 
 .pin[data-selected="true"] {
   background: var(--accent);
-  border-color: var(--accent-ink);
+  border-color: var(--accent);
   color: var(--surface);
   font-size: 1rem;
   box-shadow: 0 4px 14px rgb(180 71 31 / 35%);
@@ -54,7 +54,7 @@
   border: 1px solid var(--accent);
   border-radius: 50%;
   background: var(--surface);
-  color: var(--accent-ink);
+  color: var(--accent);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
@@ -77,9 +77,9 @@
   z-index: 500;
   display: grid;
   gap: 1px;
-  background: var(--rule);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-tile);
   overflow: hidden;
 }
 
@@ -87,7 +87,7 @@
   height: 2.25rem;
   width: 2.25rem;
   background: var(--surface);
-  color: var(--ink-soft);
+  color: var(--ink-2);
   font-size: 1rem;
   line-height: 1;
   transition: background-color 120ms ease;
@@ -95,7 +95,7 @@
 
 .controls button:hover {
   background: var(--accent-wash);
-  color: var(--accent-ink);
+  color: var(--accent);
 }
 
 @media (width <= 48rem) {

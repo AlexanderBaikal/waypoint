@@ -1,28 +1,41 @@
+/* The interface is chrome around a map, so it is built to stay out of the map's
+   way: a cool neutral scale, one blue that means "you can act on this", and no
+   other saturated colour except the category hues in CATEGORY_META — which are
+   a legend, not decoration. Anything that reads as brand here is a mistake. */
 :root {
-  --paper: #faf7f2;
-  --surface: #fffdf9;
-  --surface-sunk: #f4efe7;
-  --ink: #1f1b16;
-  --ink-soft: #4a423a;
-  --ink-muted: #7a7067;
-  --rule: #e5dcd0;
-  --rule-strong: #d3c7b7;
-  --accent: #b4471f;
-  --accent-ink: #8d3616;
-  --accent-wash: #f6e7dc;
-  --shadow-sheet: 0 -8px 32px rgb(31 27 22 / 8%);
+  --bg: #eef0f2;
+  --surface: #fff;
+  --surface-2: #f4f6f8;
+  --surface-3: #e8ebf0;
 
-  --step-0: 0.9375rem;
-  --step-1: 1.0625rem;
-  --step-2: 1.375rem;
-  --step-3: 1.875rem;
-  --step-4: 2.5rem;
+  --ink: #14171c;
+  --ink-2: #4a505b;
+  --ink-3: #6d7480;
 
-  --sans: "Inter Variable", system-ui, -apple-system, sans-serif;
-  --serif: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  --line: #e2e5ea;
+  --line-2: #cfd4dc;
 
-  --panel-width: 24rem;
-  --radius: 2px;
+  /* 5.95:1 against white in both directions, which is the reason for this
+     particular blue: one token carries white text on a filled button and blue
+     text on a white row, so there is no second "ink" variant to keep in step. */
+  --accent: #1b5fc9;
+  --accent-wash: #eaf1fc;
+
+  /* Open / closing soon / closed. Their job is to be read without the label,
+     so they are the three colours everyone already knows. */
+  --ok: #17794a;
+  --warn: #9a5b08;
+  --bad: #c02626;
+
+  --panel-width: 23rem;
+
+  /* Three sizes of object — a control, a card, a tile — so three judgements,
+     rather than one number multiplied about. */
+  --r-control: 8px;
+  --r-card: 12px;
+  --r-tile: 7px;
+
+  --font: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   color-scheme: light;
 }
@@ -44,25 +57,22 @@ body,
 }
 
 body {
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
-  font-family: var(--sans);
-  font-size: var(--step-0);
-  line-height: 1.55;
+  font-family: var(--font);
+  font-size: 0.875rem;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
 
+/* Two weights in the whole application: 400 reads, 600 labels. A third would
+   only ever be someone reaching for emphasis they could get from colour. */
 h1,
 h2,
 h3 {
-  font-family: var(--serif);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.015em;
-  font-variation-settings:
-    "SOFT" 20,
-    "WONK" 1;
+  font-size: inherit;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 button,
@@ -79,9 +89,13 @@ button {
 }
 
 a {
-  color: var(--accent-ink);
-  text-underline-offset: 0.2em;
-  text-decoration-thickness: 1px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 img {
@@ -89,39 +103,44 @@ img {
   max-width: 100%;
 }
 
+/* Figures are compared down a column — ratings against ratings, closing times
+   against closing times — so they are set on a fixed advance everywhere. */
+:where(time, output, .tnum) {
+  font-variant-numeric: tabular-nums;
+}
+
 :focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
 /* Leaflet ships opinionated chrome; only the attribution is kept, restyled to
    sit quietly in the corner instead of floating in a white box. */
 .leaflet-container {
-  background: var(--surface-sunk);
-  font-family: var(--sans);
+  background: var(--surface-3);
+  font-family: var(--font);
 }
 
 .leaflet-control-attribution {
-  background: rgb(255 253 249 / 82%) !important;
-  border-radius: var(--radius) 0 0 0;
-  color: var(--ink-muted);
+  background: rgb(255 255 255 / 78%) !important;
+  border-radius: var(--r-tile) 0 0 0;
+  color: var(--ink-3);
   font-size: 0.6875rem;
   padding: 0.15rem 0.5rem;
 }
 
 .leaflet-control-attribution a {
-  color: var(--ink-soft);
+  color: var(--ink-2);
 }
 
 .leaflet-tooltip {
   background: var(--ink);
   border: none;
-  border-radius: var(--radius);
+  border-radius: var(--r-tile);
   box-shadow: none;
-  color: var(--surface);
+  color: #fff;
   font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  font-weight: 600;
   padding: 0.2rem 0.5rem;
 }
 

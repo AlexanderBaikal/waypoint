@@ -176,7 +176,7 @@ and merges into the user's document on sign-in.
 
 ## Notes on the numbers
 
-- 9 runtime dependencies, down from 40. The removed set included `sharp`, `firebase-admin` and
+- 8 runtime dependencies, down from 40. The removed set included `sharp`, `firebase-admin` and
   `firebase-functions` — server-side packages that were never imported — and `node-sass`, which
   made `npm install` fail on any Node newer than 16.
 - ~3,100 lines of application code, down from ~10,900, for a wider feature set.

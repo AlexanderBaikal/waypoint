@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import "@fontsource/fraunces";
 import "@fontsource/inter";
 import "./index.css";
 import { App } from "./App";
