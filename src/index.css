@@ -27,6 +27,10 @@
   --warn: #9a5b08;
   --bad: #c02626;
 
+  /* Ratings only. Darker than the amber a star usually gets, because it has to
+     hold 3:1 against white to read as a shape rather than a smudge. */
+  --star: #c9821b;
+
   --panel-width: 23rem;
 
   /* Three sizes of object — a control, a card, a tile — so three judgements,

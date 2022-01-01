@@ -1,4 +1,3 @@
-import { CATEGORY_META, categoryOf } from "../../domain/categories";
 import type { Place } from "../../domain/place";
 import { OpenBadge } from "./OpenBadge";
 import { PlaceImage } from "./PlaceImage";
@@ -59,25 +58,29 @@ export function PlaceList({
                 onSelect(place.id);
               }}
             >
+              <PlaceImage place={place} variant="thumb" />
+
               <span className={styles.listItemBody}>
-                <span className={styles.listItemName}>
-                  {place.name}
-                  {saved.has(place.id) && (
-                    <span className={styles.savedMark} title="Saved">
-                      ✦
-                    </span>
-                  )}
-                </span>
-                <span className={styles.listItemMeta}>
-                  {CATEGORY_META[categoryOf(place)].label} · {place.type}
-                </span>
-                <span className={styles.listItemMeta}>
+                <span className={styles.listItemTop}>
+                  <span className={styles.listItemName}>
+                    {place.name}
+                    {saved.has(place.id) && (
+                      <span className={styles.savedMark} title="Saved">
+                        ✦
+                      </span>
+                    )}
+                  </span>
                   <Rating rating={place.rating} />
+                </span>
+                {/* The category is already said by the tile's colour, so the
+                    line spends its width on the specific type instead. The
+                    separator before the badge is drawn in CSS, because the
+                    badge renders nothing at all for a place with no hours. */}
+                <span className={styles.listItemMeta}>
+                  {place.type}
                   <OpenBadge schedule={place.schedule} />
                 </span>
               </span>
-
-              <PlaceImage place={place} variant="thumb" />
             </button>
           </li>
         ))}

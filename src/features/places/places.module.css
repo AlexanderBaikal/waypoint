@@ -1,9 +1,9 @@
 .resultCount {
-  padding: 0.875rem 1.5rem 0.25rem;
+  padding: 0.4375rem 0.75rem;
+  border-bottom: 1px solid var(--line);
   color: var(--ink-3);
   font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
 }
 
 .list {
@@ -12,95 +12,127 @@
 }
 
 .listFooter {
-  padding: 1rem 1.5rem 1.5rem;
+  padding: 0.75rem;
   border-top: 1px solid var(--line);
   color: var(--ink-3);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   text-wrap: pretty;
 }
 
+/* A 48px row: a 32px tile beside two lines of text. The list is a scanning
+   surface — you are reading down it for a name, not studying one entry — so it
+   is built to fit as many places on screen as stay legible. */
 .listItem {
   display: flex;
-  align-items: flex-start;
-  gap: 0.875rem;
+  align-items: center;
+  gap: 0.625rem;
   width: 100%;
-  padding: 0.875rem 1.5rem;
+  padding: 0.5rem 0.75rem;
   border-top: 1px solid var(--line);
   text-align: left;
-  transition: background-color 120ms ease;
+  transition: background-color 100ms ease;
 }
 
 .list li:first-child .listItem {
   border-top: none;
 }
 
+/* Three states, three different things to look at: hover fills, pressing fills
+   harder, and the keyboard ring is inset so the panel's rounded corners cannot
+   clip it. */
 .listItem:hover {
   background: var(--surface-2);
+}
+
+.listItem:active {
+  background: var(--surface-3);
+}
+
+.listItem:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .listItemBody {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.0625rem;
   flex: 1;
   min-width: 0;
+  /* Tighter than the body default: two lines and a 32px tile have to come out
+     at the same 48px, or the tile ends up floating in a taller row. */
+  line-height: 1.3;
+}
+
+.listItemTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .listItemName {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: -0.005em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .savedMark {
   color: var(--accent);
-  margin-left: 0.35rem;
-  font-size: 0.75rem;
+  margin-left: 0.25rem;
+  font-size: 0.6875rem;
 }
 
+/* One line that clips rather than wraps — a row that grows by a line when a
+   place has a long type would break the rhythm the list is here to provide. */
 .listItemMeta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
   color: var(--ink-3);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .thumb {
-  width: 4.5rem;
-  height: 3.25rem;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
   object-fit: cover;
   border-radius: var(--r-tile);
   background: var(--surface-2);
 }
 
-/* Stands in for a photo. Tinted per place so a list of them reads as a
-   pattern rather than as a column of identical grey boxes. */
+/* Stands in for a photo, in the category's own colour — so a place with no
+   picture still says what kind of place it is, and the tile agrees with the
+   chip that filtered it and the pin that marks it. */
 .placeholder {
   display: grid;
   place-items: center;
   border: none;
-  background: linear-gradient(
-    155deg,
-    hsl(var(--tint, 24deg) 38% 93%),
-    hsl(var(--tint, 24deg) 28% 85%)
-  );
-  color: hsl(var(--tint, 24deg) 32% 45%);
+  background: var(--cat);
+  color: #fff;
 }
 
 .thumb.placeholder {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
 }
 
 .hero.placeholder {
-  font-size: 1.75rem;
+  font-size: 2rem;
 }
 
+/* The rating is one number and one star, not five glyphs to count. Five stars
+   take a third of the row to say what "4.4" says outright. */
 .rating {
   display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
+  align-items: baseline;
+  gap: 0.1875rem;
+  flex: none;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .ratingValue {
@@ -108,13 +140,9 @@
   font-weight: 600;
 }
 
-.stars {
-  color: var(--accent);
-  letter-spacing: 0.05em;
-}
-
-.starsEmpty {
-  color: var(--line-2);
+.star {
+  color: var(--star);
+  font-size: 0.6875rem;
 }
 
 .ratingCount {
@@ -122,27 +150,31 @@
 }
 
 .openBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
   font-weight: 600;
 }
 
+.listItemMeta .openBadge::before {
+  content: " · ";
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
 .openBadge[data-open="true"] {
-  color: #3f6b43;
+  color: var(--ok);
 }
 
 .openBadge[data-open="false"] {
-  color: var(--accent);
+  color: var(--bad);
 }
 
 .openDetail {
+  margin-left: 0.3em;
   color: var(--ink-3);
   font-weight: 400;
 }
 
 .empty {
-  padding: 2.5rem 1.5rem;
+  padding: 2rem 0.75rem;
   color: var(--ink-3);
 }
 

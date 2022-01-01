@@ -6,23 +6,17 @@ import styles from "./places.module.css";
 /**
  * Photography for this dataset lives in Firebase Storage, which currently
  * answers 402 for the whole bucket, and individual URLs rot anyway. Rather
- * than leave broken image frames around, a place without a usable photo gets a
- * tinted panel carrying its category mark — a deliberate empty state instead of
- * an accident. If the bucket comes back, nothing here needs changing.
+ * than leave broken image frames around, a place without a usable photo gets
+ * its category's colour and mark — a deliberate empty state instead of an
+ * accident. If the bucket comes back, nothing here needs changing.
+ *
+ * The fallback used to be a gradient tinted from a hash of the place id, which
+ * made a pretty column of pastels that meant nothing. The category colour says
+ * something true, and it is the same colour the chips and the pins use.
  */
 interface PlaceImageProps {
   place: Place;
   variant: "thumb" | "hero";
-}
-
-/** Stable per place, so a place keeps the same tint between renders. */
-function tint(id: string): number {
-  let hash = 0;
-  for (let index = 0; index < id.length; index += 1) {
-    hash = (hash * 31 + id.charCodeAt(index)) % 360;
-  }
-  // Kept in the warm quadrant so the placeholders sit inside the palette.
-  return 18 + (hash % 34);
 }
 
 /**
@@ -52,13 +46,15 @@ export function PlaceImage({ place, variant }: PlaceImageProps) {
   const shape = variant === "hero" ? styles.hero : styles.thumb;
 
   if (!place.cover || failed) {
+    const category = CATEGORY_META[categoryOf(place)];
+
     return (
       <div
         className={`${shape ?? ""} ${styles.placeholder ?? ""}`}
-        style={{ "--tint": `${String(tint(place.id))}deg` } as React.CSSProperties}
+        style={{ "--cat": category.colour } as React.CSSProperties}
         aria-hidden="true"
       >
-        <span>{CATEGORY_META[categoryOf(place)].glyph}</span>
+        <span>{category.glyph}</span>
       </div>
     );
   }
