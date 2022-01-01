@@ -24,11 +24,12 @@ export function CategoryChips({ available, selected, onToggle }: CategoryChipsPr
             className={styles.chip}
             data-active={String(isActive)}
             aria-pressed={isActive}
+            // The chip's dot and its selected fill are both drawn from this.
+            style={{ "--cat": CATEGORY_META[category].colour } as React.CSSProperties}
             onClick={() => {
               onToggle(category);
             }}
           >
-            <span aria-hidden="true">{CATEGORY_META[category].glyph}</span>
             {CATEGORY_META[category].label}
           </button>
         );

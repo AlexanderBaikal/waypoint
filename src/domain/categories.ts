@@ -17,17 +17,34 @@ interface CategoryMeta {
   label: string;
   /** Single glyph drawn inside the map pin. */
   glyph: string;
+  /**
+   * The category's colour wherever it appears — filter chip, list row, map
+   * pin. This is the only saturated colour in the application, and it is a
+   * legend: two things sharing a hue are the same kind of place.
+   */
+  colour: string;
 }
 
+/**
+ * Hues follow what a reader already expects from a map — food warm, leisure
+ * green, services a neutral slate — with two forced moves. Shopping is teal
+ * rather than the blue maps usually give it, because blue is the interface's
+ * "you can act on this" and a category must never look clickable. Other is
+ * grey on purpose: it is the bucket for a type we failed to classify, and it
+ * should not advertise itself next to seven real categories.
+ *
+ * Every one of these clears 3:1 against white, which is what the white glyph
+ * sitting on top of it needs.
+ */
 export const CATEGORY_META: Record<Category, CategoryMeta> = {
-  food: { label: "Food", glyph: "◆" },
-  nightlife: { label: "Nightlife", glyph: "✦" },
-  shopping: { label: "Shopping", glyph: "▲" },
-  services: { label: "Services", glyph: "■" },
-  leisure: { label: "Leisure", glyph: "●" },
-  education: { label: "Education", glyph: "▮" },
-  lodging: { label: "Stay", glyph: "▼" },
-  other: { label: "Other", glyph: "×" },
+  food: { label: "Food", glyph: "◆", colour: "#e2582a" },
+  nightlife: { label: "Nightlife", glyph: "✦", colour: "#8b46c4" },
+  shopping: { label: "Shopping", glyph: "▲", colour: "#0f8a8a" },
+  services: { label: "Services", glyph: "■", colour: "#5b6674" },
+  leisure: { label: "Leisure", glyph: "●", colour: "#2f9e44" },
+  education: { label: "Education", glyph: "▮", colour: "#b8790c" },
+  lodging: { label: "Stay", glyph: "▼", colour: "#d1477a" },
+  other: { label: "Other", glyph: "×", colour: "#7b8290" },
 };
 
 // The `type` field is free text — typed by whoever added the place, or derived

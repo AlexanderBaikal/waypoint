@@ -16,6 +16,19 @@ export function SearchBar({ value, resultCount, onChange }: SearchBarProps) {
         Search places
       </label>
 
+      <svg
+        className={styles.icon}
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        aria-hidden="true"
+      >
+        <circle cx="7" cy="7" r="4.75" />
+        <path d="M10.5 10.5 14 14" />
+      </svg>
+
       <input
         id={id}
         className={styles.input}
