@@ -48,7 +48,10 @@ export function ReviewList({ reviews, loading }: ReviewListProps) {
               <div>
                 <p className={styles.reviewAuthor}>{review.author.name}</p>
                 <p className={styles.reviewMeta}>
-                  <span aria-label={`${String(review.rating)} out of 5`}>
+                  <span
+                    className={styles.reviewStars}
+                    aria-label={`${String(review.rating)} out of 5`}
+                  >
                     {"★★★★★".slice(0, review.rating)}
                   </span>
                   {date ? ` · ${date}` : null}

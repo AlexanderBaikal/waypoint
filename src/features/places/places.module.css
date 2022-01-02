@@ -178,26 +178,51 @@
   color: var(--ink-3);
 }
 
-.textButton,
-.backButton {
+.textButton {
   color: var(--accent);
-  border-bottom: 1px solid currentcolor;
+  font-weight: 600;
+}
+
+.textButton:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .hint {
   color: var(--ink-3);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* ---- detail panel ---- */
 
 .panel {
-  padding: 0 1.5rem 3rem;
+  padding: 0 0.75rem 2.5rem;
 }
 
+/* A way back, not a link to somewhere else — so it stays quiet until you look
+   for it rather than sitting in accent blue above the title. */
 .backButton {
-  margin: 1rem 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0.625rem 0;
+  color: var(--ink-3);
   font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.backButton:hover {
+  color: var(--ink);
 }
 
 /* Inset rather than full-bleed: a negative-margin breakout has to guess the
@@ -211,7 +236,7 @@
 }
 
 .panelHead {
-  padding-top: 1.25rem;
+  padding-top: 0.875rem;
 }
 
 .panelTitle {
@@ -219,66 +244,114 @@
   letter-spacing: -0.015em;
 }
 
+/* The dot is the category's colour — the same one the pin on the map carries,
+   so the panel and the marker it opened plainly belong together. */
 .panelType {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding-top: 0.1875rem;
   color: var(--ink-3);
   font-size: 0.8125rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding-top: 0.35rem;
+}
+
+.panelType::before {
+  content: "";
+  flex: none;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  background: var(--cat);
 }
 
 .panelStats {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.75rem;
-  padding-top: 0.6rem;
-  font-size: 0.875rem;
+  padding-top: 0.4375rem;
+  font-size: 0.8125rem;
 }
 
 .saveButton {
-  margin-top: 1rem;
-  padding: 0.4rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  height: 2.25rem;
+  margin-top: 0.875rem;
+  padding: 0 0.9375rem;
   border: 1px solid var(--line-2);
-  border-radius: 999px;
+  border-radius: var(--r-control);
   font-size: 0.8125rem;
+  font-weight: 600;
   transition:
-    border-color 140ms ease,
-    color 140ms ease;
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
 }
 
+.saveButton:hover {
+  background: var(--surface-2);
+}
+
+/* Saved is a state you should be able to see without reading the label, so it
+   fills rather than just changing the border colour. */
 .saveButton[aria-pressed="true"] {
+  background: var(--accent);
   border-color: var(--accent);
-  color: var(--accent);
+  color: #fff;
+}
+
+.saveButton[aria-pressed="true"]:hover {
+  filter: brightness(0.94);
 }
 
 .about {
-  padding-top: 1rem;
+  padding-top: 0.875rem;
   color: var(--ink-2);
+  text-wrap: pretty;
 }
 
-.details {
-  margin-top: 1.5rem;
-  border-top: 1px solid var(--line);
+/* Address, phone, website, hours, coordinates. The labels used to be uppercase
+   words in a 6.5rem column, which spent a third of the panel's width saying
+   things a 16px glyph says faster — and left the values in a gutter too narrow
+   for an address. The label survives for screen readers. */
+.info {
+  margin-top: 1.125rem;
 }
 
-.details > div {
+.info > div,
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 2.5rem;
+  text-align: left;
+}
+
+.infoIcon {
+  flex: none;
   display: grid;
-  grid-template-columns: 6.5rem 1fr;
-  gap: 0.75rem;
-  padding: 0.65rem 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.details dt {
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--r-tile);
+  background: var(--surface-2);
   color: var(--ink-3);
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding-top: 0.15rem;
 }
 
-.details dd {
+.infoIcon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.info dd {
+  min-width: 0;
   margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
@@ -286,28 +359,46 @@
   font-variant-numeric: tabular-nums;
 }
 
-.hours {
-  margin-top: 1.25rem;
-  font-size: 0.875rem;
-}
-
+/* The week sits behind a disclosure rather than always being open — you nearly
+   always want today, which the row already shows. <details> keeps that working
+   with no JavaScript and no state to get out of step. */
 .hours summary {
   cursor: pointer;
-  color: var(--ink-2);
+  font-size: 0.8125rem;
+  list-style: none;
+}
+
+.hours summary::-webkit-details-marker {
+  display: none;
+}
+
+.hours summary:hover {
+  color: var(--accent);
+}
+
+.chevron {
+  margin-left: auto;
+  color: var(--ink-3);
+  transition: transform 150ms ease;
+}
+
+.hours[open] .chevron {
+  transform: rotate(180deg);
 }
 
 .hours table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 0.5rem;
+  margin: 0.125rem 0 0.5rem 2.625rem;
+  font-size: 0.8125rem;
 }
 
 .hours th {
   text-align: left;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--ink-3);
-  padding: 0.2rem 0;
-  width: 4rem;
+  padding: 0.15rem 0;
+  width: 3.5rem;
 }
 
 .hours td {
@@ -315,14 +406,14 @@
 }
 
 .section {
-  margin-top: 2rem;
+  margin-top: 1.75rem;
 }
 
 .sectionTitle {
-  font-size: 0.875rem;
-  padding-bottom: 0.75rem;
+  font-size: 0.8125rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--line);
-  margin-bottom: 0.875rem;
+  margin-bottom: 0.75rem;
 }
 
 .photoStrip {
@@ -383,16 +474,26 @@
 
 .reviewAuthor {
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .reviewMeta {
-  color: var(--accent);
-  font-size: 0.8125rem;
+  color: var(--ink-3);
+  font-size: 0.75rem;
+}
+
+/* A review's score is one of five whole numbers, so here the stars are the
+   honest picture of it — unlike the 4.4 in a list row, which they would round
+   away. */
+.reviewStars {
+  color: var(--star);
+  letter-spacing: 0.04em;
 }
 
 .reviewText {
   color: var(--ink-2);
+  font-size: 0.8125rem;
+  text-wrap: pretty;
 }
 
 .reviewPhotos {
