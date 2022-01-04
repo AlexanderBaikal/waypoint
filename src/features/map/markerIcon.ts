@@ -3,8 +3,8 @@ import { CATEGORY_META, categoryOf } from "../../domain/categories";
 import type { Place } from "../../domain/place";
 import styles from "./MapView.module.css";
 
-const SIZE = 30;
-const SELECTED_SIZE = 42;
+const SIZE = 26;
+const SELECTED_SIZE = 38;
 
 /**
  * A divIcon is raw HTML, and place names are third-party data — the imported
@@ -26,7 +26,7 @@ function escapeHtml(value: string): string {
  */
 export function markerIcon(place: Place, selected: boolean): L.DivIcon {
   const size = selected ? SELECTED_SIZE : SIZE;
-  const glyph = CATEGORY_META[categoryOf(place)].glyph;
+  const category = CATEGORY_META[categoryOf(place)];
   const label = escapeHtml(`${place.name}, ${place.type}`);
 
   // CSS module lookups are `string | undefined` under noUncheckedIndexedAccess,
@@ -36,9 +36,13 @@ export function markerIcon(place: Place, selected: boolean): L.DivIcon {
 
   return L.divIcon({
     className: wrapperClass,
+    // The colour is interpolated into a style attribute unescaped, which is
+    // safe only because it comes from CATEGORY_META — our own table of hex
+    // literals. The place's own fields never reach this line unescaped.
     html:
       `<span class="${pinClass}" role="img" aria-label="${label}"` +
-      ` data-selected="${String(selected)}">${glyph}</span>`,
+      ` style="--cat:${category.colour}"` +
+      ` data-selected="${String(selected)}">${category.glyph}</span>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
     // Keeps the tooltip clear of the pin at either size.

@@ -15,87 +15,107 @@
   border: none;
 }
 
+/* A pin is a filled disc in its category's colour with the category's mark on
+   it. Before this they were all the same white circle, which meant the map
+   could tell you where things were but not what they were — the one question a
+   map of a city is for.
+   The white ring is what lifts it off the tiles. A drop shadow would do the
+   same job, sixty times a frame, and leave a grey smudge on every pin. */
 .pin {
   display: grid;
   place-items: center;
   height: 100%;
   width: 100%;
-  border: 1px solid var(--line-2);
   border-radius: 50%;
-  background: var(--surface);
-  color: var(--ink-2);
-  font-size: 0.75rem;
+  background: var(--cat);
+  box-shadow: 0 0 0 2px var(--surface);
+  color: #fff;
+  font-size: 0.6875rem;
   line-height: 1;
-  transition:
-    transform 160ms ease,
-    background-color 160ms ease,
-    color 160ms ease;
+  transition: transform 140ms ease;
 }
 
 .pin:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  transform: scale(1.15);
 }
 
+/* The open place has to be findable at a glance in a field of its own kind, so
+   it grows and takes a second ring in the interface's blue. It keeps its
+   category colour: selection is not a change of what the place is. */
 .pin[data-selected="true"] {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--surface);
   font-size: 1rem;
-  box-shadow: 0 4px 14px rgb(180 71 31 / 35%);
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 5px var(--accent);
 }
 
-/* Reads as a quieter, denser version of a pin: same family, no glyph. */
+/* A cluster is a count, not a place, so it stays out of the legend entirely —
+   white with black figures, the one thing on the map that carries no hue. */
 .cluster {
   display: grid;
   place-items: center;
   height: 100%;
   width: 100%;
-  border: 1px solid var(--accent);
+  border: 1.5px solid var(--line-2);
   border-radius: 50%;
   background: var(--surface);
-  color: var(--accent);
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 55%);
+  color: var(--ink);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   line-height: 1;
-  box-shadow: 0 2px 10px rgb(60 40 30 / 18%);
   transition:
-    background-color 160ms ease,
-    color 160ms ease;
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
 }
 
 .cluster:hover {
-  background: var(--accent);
-  color: var(--surface);
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
 }
 
 .controls {
   position: absolute;
-  right: 1rem;
-  bottom: 2.25rem;
+  right: 0.75rem;
+  bottom: 1.75rem;
   z-index: 500;
   display: grid;
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: var(--r-tile);
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-control);
   overflow: hidden;
 }
 
 .controls button {
-  height: 2.25rem;
-  width: 2.25rem;
-  background: var(--surface);
+  height: 2rem;
+  width: 2rem;
   color: var(--ink-2);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   line-height: 1;
-  transition: background-color 120ms ease;
+  transition: background-color 100ms ease;
+}
+
+/* One rule rather than a 1px grid gap: a gap paints the container's background
+   between the buttons, which meant a stray line above the first one. */
+.controls button + button {
+  border-top: 1px solid var(--line);
 }
 
 .controls button:hover {
-  background: var(--accent-wash);
-  color: var(--accent);
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.controls button:active {
+  background: var(--surface-3);
+}
+
+.controls button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 @media (width <= 48rem) {
