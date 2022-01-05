@@ -52,14 +52,21 @@ function readFirebaseConfig(): FirebaseConfig | null {
 
 export const firebaseConfig = readFirebaseConfig();
 
+export type Basemap = "light" | "dark";
+
 /**
- * CARTO Positron by default: no API key, and its muted palette leaves the
- * accent colour to the markers instead of competing with them.
+ * CARTO Positron and Dark Matter: no API key, and both are muted enough to
+ * leave the category colours to the markers instead of competing with them.
+ * They are the same cartography in two values, so switching between them moves
+ * nothing on the map but its brightness.
  */
 export const tiles = {
-  url:
+  light:
     value(env.VITE_TILE_URL) ??
     "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  dark:
+    value(env.VITE_TILE_URL_DARK) ??
+    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
   attribution:
     value(env.VITE_TILE_ATTRIBUTION) ??
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>',

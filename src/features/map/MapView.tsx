@@ -1,6 +1,7 @@
 import L from "leaflet";
 import { useCallback, useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
+import type { Basemap } from "../../config";
 import type { Place } from "../../domain/place";
 import { useLeafletMap } from "./useLeafletMap";
 import { useMarkerLayer } from "./useMarkerLayer";
@@ -16,13 +17,22 @@ interface MapViewProps {
    */
   filtered: boolean;
   onSelect: (placeId: string) => void;
+  basemap: Basemap;
+  onToggleBasemap: () => void;
 }
 
 /** Keeps a fitted marker clear of the panel edges. */
 const FIT_PADDING: L.PointExpression = [64, 64];
 
-export function MapView({ places, selected, filtered, onSelect }: MapViewProps) {
-  const { ref, map } = useLeafletMap();
+export function MapView({
+  places,
+  selected,
+  filtered,
+  onSelect,
+  basemap,
+  onToggleBasemap,
+}: MapViewProps) {
+  const { ref, map } = useLeafletMap(basemap);
 
   useMarkerLayer(map, places, selected?.id ?? null, onSelect);
 
@@ -62,8 +72,10 @@ export function MapView({ places, selected, filtered, onSelect }: MapViewProps) 
     map?.locate({ setView: true, maxZoom: 15 });
   }, [map]);
 
+  const dark = basemap === "dark";
+
   return (
-    <div className={styles.root}>
+    <div className={styles.root} data-basemap={basemap}>
       <div ref={ref} className={styles.canvas} data-testid="map-canvas" />
 
       <div className={styles.controls}>
@@ -87,6 +99,29 @@ export function MapView({ places, selected, filtered, onSelect }: MapViewProps) 
         </button>
         <button type="button" onClick={locate} aria-label="Find my location">
           ⌖
+        </button>
+
+        {/* A half-filled disc rather than a sun and a moon: this changes how
+            the map is drawn, not what time it is. It sits below the zoom pair
+            because it is the one control here you press once and forget. */}
+        <button
+          type="button"
+          onClick={onToggleBasemap}
+          aria-pressed={dark}
+          aria-label={dark ? "Use the light map" : "Use the dark map"}
+          title={dark ? "Light map" : "Dark map"}
+        >
+          <svg
+            className={styles.glyph}
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <circle cx="8" cy="8" r="5.5" />
+            <path d="M8 2.5a5.5 5.5 0 0 1 0 11Z" fill="currentColor" stroke="none" />
+          </svg>
         </button>
       </div>
     </div>

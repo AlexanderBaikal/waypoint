@@ -118,6 +118,26 @@
   outline-offset: -2px;
 }
 
+.controls button[aria-pressed="true"] {
+  color: var(--accent);
+}
+
+.glyph {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Leaflet's attribution is a global class, and on the dark basemap its white
+   plate is the one bright rectangle left on screen. */
+.root[data-basemap="dark"] :global(.leaflet-control-attribution) {
+  background: rgb(20 23 28 / 78%) !important;
+  color: #9aa1ab;
+}
+
+.root[data-basemap="dark"] :global(.leaflet-control-attribution a) {
+  color: #c3c9d2;
+}
+
 @media (width <= 48rem) {
   .controls {
     bottom: 45vh;

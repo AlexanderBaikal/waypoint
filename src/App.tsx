@@ -2,6 +2,7 @@ import { useDeferredValue, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { useListPlacesQuery } from "./app/placesApi";
 import {
+  basemapToggled,
   categoryToggled,
   filtersCleared,
   listExpandedChanged,
@@ -48,7 +49,7 @@ export function App() {
 
   const dispatch = useAppDispatch();
   const { data: places = [], isLoading, isError, error, refetch } = useListPlacesQuery();
-  const { query, categories, selectedPlaceId, listExpanded } = useAppSelector(
+  const { query, categories, selectedPlaceId, listExpanded, basemap } = useAppSelector(
     (s) => s.ui,
   );
   const savedIds = useAppSelector((state) => state.saved.ids);
@@ -89,6 +90,8 @@ export function App() {
           selected={selected}
           filtered={deferredQuery.trim() !== "" || categories.length > 0}
           onSelect={(id) => dispatch(placeSelected(id))}
+          basemap={basemap}
+          onToggleBasemap={() => dispatch(basemapToggled())}
         />
       </main>
 
