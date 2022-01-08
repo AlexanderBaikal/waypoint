@@ -95,7 +95,9 @@ async function readCollection(
   return new Map(snapshot.docs.map((doc) => [doc.id, doc.data()]));
 }
 
-export function createFirestoreRepository(config: FirebaseConfig): PlacesRepository {
+export function createLegacyFirestoreRepository(
+  config: FirebaseConfig,
+): PlacesRepository {
   const db = getFirestore(firebaseApp(config));
 
   // listReviews needs the legacy key for a slug, so both calls share one load.
@@ -115,8 +117,24 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
     return merged;
   };
 
+  // The 2021 database is read-only from here. Writing into a schema whose two
+  // halves have already drifted apart would deepen the drift, and there is
+  // nowhere sane to put an owner: its rows predate the idea of one.
+  const readOnly = () =>
+    Promise.reject(
+      new RepositoryError(
+        "The inherited schema is read-only. Seed a project with " +
+          "scripts/seed-firestore.mjs and drop VITE_FIREBASE_SCHEMA to write.",
+      ),
+    );
+
   return {
     source: "firestore",
+    writable: false,
+
+    createPlace: readOnly,
+    updatePlace: readOnly,
+    addReview: readOnly,
 
     listPlaces: async () => (await load()).map((entry) => entry.place),
 

@@ -52,6 +52,14 @@ function readFirebaseConfig(): FirebaseConfig | null {
 
 export const firebaseConfig = readFirebaseConfig();
 
+/**
+ * Which Firestore shape to read. `legacy` is the inherited 2021 database —
+ * places split across two collections, reviews joined by storage folder name,
+ * no writes. Anything else means the schema this project seeds for itself.
+ */
+export const firebaseSchema: "legacy" | "v2" =
+  value(env.VITE_FIREBASE_SCHEMA) === "legacy" ? "legacy" : "v2";
+
 export type Basemap = "light" | "dark";
 
 /**

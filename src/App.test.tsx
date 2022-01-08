@@ -69,12 +69,19 @@ const reviews: Review[] = [
   },
 ];
 
+/** Writes reject unless a test opts in, so an unexpected one is a failure. */
+const unexpected = () => Promise.reject(new Error("not expected to write"));
+
 function stubRepository(overrides: Partial<PlacesRepository> = {}): PlacesRepository {
   return {
     source: "fixtures",
+    writable: true,
     listPlaces: () => Promise.resolve(places),
     listReviews: (placeId) =>
       Promise.resolve(reviews.filter((review) => review.placeId === placeId)),
+    createPlace: unexpected,
+    updatePlace: unexpected,
+    addReview: unexpected,
     ...overrides,
   };
 }

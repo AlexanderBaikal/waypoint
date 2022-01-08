@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_PROJECT_ID?: string;
   readonly VITE_FIREBASE_STORAGE_BUCKET?: string;
   readonly VITE_FIREBASE_APP_ID?: string;
+  readonly VITE_FIREBASE_SCHEMA?: string;
   readonly VITE_TILE_URL?: string;
   readonly VITE_TILE_URL_DARK?: string;
   readonly VITE_TILE_ATTRIBUTION?: string;

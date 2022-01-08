@@ -2,8 +2,10 @@ rules_version = '2';
 
 // Waypoint access model
 // ---------------------
-// Place data is public reference data: anyone may read it, nobody may write it
-// from a browser. Per-user state (saved places) is private to its owner.
+// Place data is public to read. Writing needs a session, and what a session may
+// write is bounded here rather than in the client: src/domain/placeInput.ts
+// checks the same limits, but only so the user gets a message before a round
+// trip. This file is the copy that is enforced.
 //
 // The previous revision of this project shipped with no rules file at all,
 // which left every collection world-writable. Rules live in version control so
@@ -14,16 +16,55 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Public reference data, maintained out-of-band.
-    // `descriptions` and `comments` are legacy collection names kept so the
-    // existing dataset stays readable; the client normalises them on read.
-    match /places/{placeId}       { allow read: if true; allow write: if false; }
-    match /descriptions/{placeId} { allow read: if true; allow write: if false; }
-    match /comments/{reviewId}    { allow read: if true; allow write: if false; }
+    // ---- the schema this project seeds for itself ----
 
-    // Per-user state. A signed-in user can read and write their own document
-    // and no other. `savedPlaceIds` is capped so a client cannot use the
-    // document as unbounded storage.
+    match /places/{placeId} {
+      allow read: if true;
+
+      // A new place belongs to whoever created it and starts unrated.
+      allow create: if signedIn()
+        && isWellFormedPlace()
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.ratingCount == 0
+        && request.resource.data.ratingValue == null;
+
+      // Two disjoint ways to update, and nothing else gets through.
+      allow update: if (isEditor() && isEdit() && isWellFormedPlace())
+        || (signedIn() && isRatingBump());
+
+      // Nothing is deleted from a browser. A place with reviews under it would
+      // leave them orphaned, and there is no undo here.
+      allow delete: if false;
+
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if signedIn()
+          && request.resource.data.authorId == request.auth.uid
+          && request.resource.data.rating is int
+          && request.resource.data.rating >= 1
+          && request.resource.data.rating <= 5
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 1000;
+        // Reviews are a record of what someone thought at a time. Editing one
+        // after the fact would also desynchronise the place's average, which
+        // is folded in at creation and never recomputed.
+        allow update, delete: if false;
+      }
+    }
+
+    /** Written by scripts/seed-firestore.mjs with admin credentials, which
+        bypass these rules; from a browser it is read-only. */
+    match /meta/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ---- per-user state ----
+
+    // A signed-in user can read and write their own document and no other.
+    // `savedPlaceIds` is capped so a client cannot use the document as
+    // unbounded storage.
     match /users/{userId} {
       allow read: if isOwner(userId);
       allow create, update: if isOwner(userId) && isValidUserDoc();
@@ -33,8 +74,66 @@ service cloud.firestore {
     // Anything not matched above is denied.
     match /{document=**} { allow read, write: if false; }
 
+    // ---- predicates ----
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
     function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * A place with no author is community-maintained — anyone signed in may
+     * correct it, which is the bargain OpenStreetMap makes and where most of
+     * this data came from. A place someone created belongs to them.
+     */
+    function isEditor() {
+      return signedIn()
+        && (resource.data.authorId == null || resource.data.authorId == request.auth.uid);
+    }
+
+    /** An edit may not touch ownership, ratings, photos or provenance. */
+    function isEdit() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['name', 'type', 'coords', 'address', 'phone', 'website',
+                  'about', 'schedule', 'updatedAt']);
+    }
+
+    /**
+     * The other legal update: posting a review folds one score into the
+     * place's average, so any signed-in user may move exactly those two
+     * fields, and only upwards by one review at a time.
+     *
+     * Worth being honest about the limit. Rules can check that the count went
+     * up by one and that the average stayed inside 1–5; they cannot recompute
+     * the average, because that would mean reading every review. A determined
+     * client can therefore push the average around within those bounds. Closing
+     * that gap properly needs the write to happen somewhere the client is not —
+     * a Cloud Function — which requires the Blaze plan this project does not use.
+     */
+    function isRatingBump() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['ratingValue', 'ratingCount'])
+        && request.resource.data.ratingCount == resource.data.ratingCount + 1
+        && request.resource.data.ratingValue is number
+        && request.resource.data.ratingValue >= 1
+        && request.resource.data.ratingValue <= 5;
+    }
+
+    function isWellFormedPlace() {
+      let data = request.resource.data;
+      return data.name is string
+        && data.name.size() > 0 && data.name.size() <= 80
+        && data.type is string
+        && data.type.size() > 0 && data.type.size() <= 40
+        && data.coords is latlng
+        && (data.address == null || (data.address is string && data.address.size() <= 120))
+        && (data.phone == null || (data.phone is string && data.phone.size() <= 32))
+        && (data.website == null || (data.website is string && data.website.size() <= 200))
+        && (data.about == null || (data.about is string && data.about.size() <= 600))
+        && (data.schedule == null || data.schedule is map);
     }
 
     function isValidUserDoc() {
