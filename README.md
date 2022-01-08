@@ -16,11 +16,13 @@ Every tile, marker, popup and control on screen is rendered by Leaflet against o
 Nothing here is an embedded Google map, and that was the point of building it:
 
 - **No vendor lock-in.** The basemap is a URL template. Switching from CARTO to Stadia, to a
-  self-hosted tile server, or to raw OSM tiles is one environment variable.
+  self-hosted tile server, or to raw OSM tiles is one environment variable. The light/dark
+  control on the map is the same idea with two of them.
 - **No metered API.** The Google Maps JavaScript API bills per map load. This runs on tiles that
   cost nothing at this scale, so a demo can stay online indefinitely.
 - **Control over rendering.** Markers are DOM elements styled with the same CSS as the rest of the
-  interface, so the map is part of the design rather than an iframe with its own opinions.
+  interface, so the map is part of the design rather than an iframe with its own opinions — each
+  pin carries its category's colour, so the map is legible by kind and not just by position.
 
 The trade is real and worth stating: there is no routing, no Street View, and no places database.
 For a viewer over a dataset you own, none of those are needed.
