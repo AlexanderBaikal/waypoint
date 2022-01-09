@@ -104,6 +104,7 @@ const toDocument = (input: PlaceInput) => ({
   phone: input.phone,
   website: input.website,
   about: input.about,
+  cover: input.cover,
   schedule: input.schedule,
 });
 
@@ -179,7 +180,6 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
       try {
         await setDoc(doc(db, PLACES, id), {
           ...toDocument(input),
-          cover: null,
           photos: [],
           ratingValue: null,
           ratingCount: 0,
@@ -201,7 +201,7 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
         phone: input.phone,
         website: input.website,
         about: input.about,
-        cover: null,
+        cover: input.cover,
         photos: [],
         rating: null,
         schedule: input.schedule,
@@ -234,6 +234,7 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
         phone: input.phone,
         website: input.website,
         about: input.about,
+        cover: input.cover,
         schedule: input.schedule,
       };
     },

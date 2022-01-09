@@ -94,11 +94,11 @@ service cloud.firestore {
         && (resource.data.authorId == null || resource.data.authorId == request.auth.uid);
     }
 
-    /** An edit may not touch ownership, ratings, photos or provenance. */
+    /** An edit may not touch ownership, ratings or provenance. */
     function isEdit() {
       return request.resource.data.diff(resource.data).affectedKeys()
         .hasOnly(['name', 'type', 'coords', 'address', 'phone', 'website',
-                  'about', 'schedule', 'updatedAt']);
+                  'about', 'cover', 'schedule', 'updatedAt']);
     }
 
     /**
@@ -133,6 +133,12 @@ service cloud.firestore {
         && (data.phone == null || (data.phone is string && data.phone.size() <= 32))
         && (data.website == null || (data.website is string && data.website.size() <= 200))
         && (data.about == null || (data.about is string && data.about.size() <= 600))
+        // A photograph is a link to one, never an upload. Held to https so a
+        // stored address cannot smuggle in another scheme, and so it can
+        // actually load on a page served over https.
+        && (data.cover == null || (data.cover is string
+              && data.cover.size() <= 500
+              && data.cover.matches('^https://.*')))
         && (data.schedule == null || data.schedule is map);
     }
 

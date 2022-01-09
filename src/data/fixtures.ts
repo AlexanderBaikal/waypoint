@@ -106,7 +106,7 @@ export function createFixtureRepository(): PlacesRepository {
         phone: input.phone,
         website: input.website,
         about: input.about,
-        cover: null,
+        cover: input.cover,
         photos: [],
         rating: null,
         schedule: input.schedule,
@@ -129,6 +129,7 @@ export function createFixtureRepository(): PlacesRepository {
         phone: input.phone,
         website: input.website,
         about: input.about,
+        cover: input.cover,
         schedule: input.schedule,
       };
       commit(place);

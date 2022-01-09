@@ -54,6 +54,33 @@ describe("validatePlace", () => {
     expect(validatePlace({ ...filled(), website: "no website" }).website).toBeDefined();
   });
 
+  it("refuses a scheme that is not the web", () => {
+    // These end up in an href and an img src. A pattern that looks like it
+    // matches hostnames will happily match a hostname-shaped tail after
+    // `javascript:`, which is why the check parses the URL instead.
+    for (const hostile of [
+      "javascript://example.com/%0aalert(1)",
+      "data:text/html;base64,PHNjcmlwdD4=",
+      "file://example.com/etc/passwd",
+    ]) {
+      expect(validatePlace({ ...filled(), website: hostile }).website).toBeDefined();
+      expect(validatePlace({ ...filled(), cover: hostile }).cover).toBeDefined();
+    }
+  });
+
+  it("takes a cover as an https link and nothing else", () => {
+    expect(
+      validatePlace({ ...filled(), cover: "https://example.com/photo.jpg" }).cover,
+    ).toBeUndefined();
+    // A page served over https cannot show an http image, so accepting one
+    // would only produce a silent placeholder.
+    expect(
+      validatePlace({ ...filled(), cover: "http://example.com/photo.jpg" }).cover,
+    ).toBeDefined();
+    expect(validatePlace({ ...filled(), cover: "photo.jpg" }).cover).toBeDefined();
+    expect(validatePlace({ ...filled(), cover: null }).cover).toBeUndefined();
+  });
+
   it("rejects a day that is open but has no hours", () => {
     const schedule = blankSchedule();
     schedule.monday = { open: "", close: "", allDay: false, closed: false };

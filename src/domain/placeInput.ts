@@ -18,6 +18,13 @@ export interface PlaceInput {
   phone: string | null;
   website: string | null;
   about: string | null;
+  /**
+   * A photograph, as a link to one that is already on the web. The app stores
+   * the address and never the bytes: no upload, no bucket, and — since the
+   * link can rot, as this project's own Firebase Storage links did — a
+   * placeholder is the normal state rather than the error state.
+   */
+  cover: string | null;
   schedule: Schedule | null;
 }
 
@@ -41,6 +48,7 @@ export const LIMITS = {
   phone: 32,
   website: 200,
   about: 600,
+  cover: 500,
   reviewText: 1000,
 } as const;
 
@@ -53,6 +61,32 @@ const tooLong = (field: keyof typeof LIMITS) =>
 export function optional(value: string): string | null {
   const trimmed = value.trim();
   return trimmed === "" ? null : trimmed;
+}
+
+/**
+ * Parses a web address the way a person types one — usually without a scheme.
+ *
+ * Parsed rather than matched against a pattern. A regular expression that
+ * looks like it accepts hostnames will also accept `javascript:` with a
+ * hostname-shaped tail, and this value ends up in an `href` and an `img src`.
+ * Asking the URL parser what the protocol is leaves no room for that.
+ */
+export function webUrl(value: string): URL | null {
+  const trimmed = value.trim();
+  if (trimmed === "") return null;
+
+  try {
+    // Only prepend a scheme when there is none; `example.com:8080` has a colon
+    // but no scheme, so look for a scheme shape rather than for a colon.
+    const url = new URL(
+      /^[a-z][\w+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`,
+    );
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    // A host with no dot is a typo far more often than it is an intranet name.
+    return url.hostname.includes(".") ? url : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -100,8 +134,26 @@ export function validatePlace(input: PlaceInput): FieldErrors<PlaceInput> {
   if (input.website) {
     if (input.website.length > LIMITS.website) errors.website = tooLong("website");
     // Bare hostnames are what people type; a scheme is added on the way out.
-    else if (!/^([a-z]+:\/\/)?[\w-]+(\.[\w-]+)+/i.test(input.website)) {
+    else if (!webUrl(input.website)) {
       errors.website = "That does not look like a web address";
+    }
+  }
+
+  if (input.cover) {
+    const url = webUrl(input.cover);
+    // A scheme is required here, unlike for `website`. "Copy image address"
+    // always yields one, and a bare "photo.jpg" parses as a hostname — so
+    // guessing would accept a filename and then quietly fail to load it.
+    const hasScheme = /^https?:\/\//i.test(input.cover.trim());
+
+    if (input.cover.length > LIMITS.cover) errors.cover = tooLong("cover");
+    else if (!url || !hasScheme) {
+      errors.cover = "Paste the image's full address, starting with https://";
+    }
+    // A page served over https cannot show an http image — the browser blocks
+    // it — so accepting one here would only produce a silent placeholder.
+    else if (url.protocol !== "https:") {
+      errors.cover = "Use an https:// link; browsers block plain http images";
     }
   }
 
@@ -145,21 +197,13 @@ export function blankPlace(coords: Coords): PlaceInput {
     phone: null,
     website: null,
     about: null,
+    cover: null,
     schedule: null,
   };
 }
 
 /** An existing place, in the shape the form edits. */
-export function toInput(place: {
-  name: string;
-  type: string;
-  coords: Coords;
-  address: string | null;
-  phone: string | null;
-  website: string | null;
-  about: string | null;
-  schedule: Schedule | null;
-}): PlaceInput {
+export function toInput(place: PlaceInput): PlaceInput {
   return {
     name: place.name,
     type: place.type,
@@ -168,6 +212,7 @@ export function toInput(place: {
     phone: place.phone,
     website: place.website,
     about: place.about,
+    cover: place.cover,
     schedule: place.schedule,
   };
 }
