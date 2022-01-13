@@ -386,8 +386,13 @@
   transform: rotate(180deg);
 }
 
+/* Indented to sit under the row's text, past the icon tile. Sized to its
+   content rather than to 100%, because a full-width table plus that indent is
+   wider than the panel — which is what was putting a horizontal scrollbar
+   under the whole thing. The week reads better tight anyway: two columns of
+   one phrase, not a day stranded from its hours by 200px of nothing. */
 .hours table {
-  width: 100%;
+  width: auto;
   border-collapse: collapse;
   margin: 0.125rem 0 0.5rem 2.625rem;
   font-size: 0.8125rem;

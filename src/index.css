@@ -92,6 +92,18 @@ button {
   padding: 0;
 }
 
+/* Controls are not prose. Dragging across the panel — which is a thing people
+   do on a map, on the way to dragging the map — used to leave chip labels, row
+   names and the hours summary highlighted in blue. Anything you press stops
+   taking a selection; an address, a phone number or a review is content and
+   still selects normally. */
+button,
+summary,
+[role="img"] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 a {
   color: var(--accent);
   text-decoration: none;
