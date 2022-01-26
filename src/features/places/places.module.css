@@ -1,5 +1,11 @@
+/* Sticks to the top of the scroller so the count still answers "of how many?"
+   forty rows down. */
 .resultCount {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   padding: 0.4375rem 0.75rem;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
   color: var(--ink-3);
   font-size: 0.75rem;
@@ -209,13 +215,28 @@
   padding: 0 0.75rem 2.5rem;
 }
 
+/* Rides the top of the scroller: on a place with photos, hours and a page of
+   reviews you should never have to scroll back up to find the way out.
+   The negative margin cancels .panel's padding exactly so the bar reaches both
+   edges — safe here, unlike the note on .hero below, because the scrollbar
+   belongs to the parent and this element's width does not have to guess at it. */
+.backBar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin-inline: -0.75rem;
+  padding-inline: 0.75rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
 /* A way back, not a link to somewhere else — so it stays quiet until you look
    for it rather than sitting in accent blue above the title. */
 .backButton {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  margin: 0.625rem 0;
+  margin: 0.5rem 0;
   color: var(--ink-3);
   font-size: 0.8125rem;
   font-weight: 600;

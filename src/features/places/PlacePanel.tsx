@@ -83,9 +83,11 @@ export function PlacePanel({ place, saved, onBack, onToggleSaved }: PlacePanelPr
 
   return (
     <article className={styles.panel}>
-      <button type="button" className={styles.backButton} onClick={onBack}>
-        ← All places
-      </button>
+      <div className={styles.backBar}>
+        <button type="button" className={styles.backButton} onClick={onBack}>
+          ← All places
+        </button>
+      </div>
 
       <PlaceImage place={place} variant="hero" />
 

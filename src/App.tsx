@@ -111,6 +111,24 @@ export function App() {
           aria-label={listExpanded ? "Collapse list" : "Expand list"}
         />
 
+        {/* Outside the scroller on purpose. The field is how you get anything
+            out of this panel, so it does not get to scroll away with the
+            results it produces. */}
+        {selected ? null : (
+          <div className={styles.filters}>
+            <SearchBar
+              value={query}
+              resultCount={filtered.length}
+              onChange={(value) => dispatch(queryChanged(value))}
+            />
+            <CategoryChips
+              available={available}
+              selected={categories}
+              onToggle={(category) => dispatch(categoryToggled(category))}
+            />
+          </div>
+        )}
+
         <div className={styles.panelBody}>
           {selected ? (
             <PlacePanel
@@ -121,19 +139,6 @@ export function App() {
             />
           ) : (
             <>
-              <div className={styles.filters}>
-                <SearchBar
-                  value={query}
-                  resultCount={filtered.length}
-                  onChange={(value) => dispatch(queryChanged(value))}
-                />
-                <CategoryChips
-                  available={available}
-                  selected={categories}
-                  onToggle={(category) => dispatch(categoryToggled(category))}
-                />
-              </div>
-
               {isLoading ? (
                 <p className={styles.state}>Loading places…</p>
               ) : isError ? (
