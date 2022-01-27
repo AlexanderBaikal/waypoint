@@ -113,21 +113,43 @@
 
 /* Stands in for a photo, in the category's own colour — so a place with no
    picture still says what kind of place it is, and the tile agrees with the
-   chip that filtered it and the pin that marks it. */
+   chip that filtered it and the pin that marks it.
+
+   Both ends of the gradient are mixed from the one --cat token rather than
+   hand-picked, so adding a category means choosing one colour and nothing
+   else. The lit end stays close to the source: these hues were chosen to clear
+   3:1 against the white mark sitting on them, and lightening them far would
+   spend that. */
 .placeholder {
   display: grid;
   place-items: center;
   border: none;
-  background: var(--cat);
   color: #fff;
 }
 
-.thumb.placeholder {
-  font-size: 0.75rem;
+/* Both shapes name themselves here rather than letting `.placeholder` carry the
+   background alone. `.thumb` and `.hero` each set a neutral background for the
+   photograph they usually hold, and at equal specificity the winner is whichever
+   rule comes last in the file — which quietly left the hero grey. */
+.thumb.placeholder,
+.hero.placeholder {
+  background: linear-gradient(
+    150deg,
+    color-mix(in oklab, var(--cat) 90%, #fff),
+    color-mix(in oklab, var(--cat) 82%, #000)
+  );
 }
 
-.hero.placeholder {
-  font-size: 2rem;
+.placeholder svg {
+  width: 60%;
+  height: 60%;
+}
+
+/* Capped so the mark stays a mark: on the hero it would otherwise grow to the
+   size of the picture it is standing in for. */
+.hero.placeholder svg {
+  width: 2.75rem;
+  height: 2.75rem;
 }
 
 /* The rating is one number and one star, not five glyphs to count. Five stars
