@@ -60,7 +60,7 @@ export const firebaseConfig = readFirebaseConfig();
 export const firebaseSchema: "legacy" | "v2" =
   value(env.VITE_FIREBASE_SCHEMA) === "legacy" ? "legacy" : "v2";
 
-export type Basemap = "light" | "dark";
+export type Theme = "light" | "dark";
 
 export interface TileSource {
   url: string;
@@ -81,7 +81,7 @@ export interface TileSource {
  * cost of the swap — street classes and label density do not match exactly
  * between them. Reading the map beats matching it.
  */
-export const tiles: Record<Basemap, TileSource> = {
+export const tiles: Record<Theme, TileSource> = {
   light: {
     url:
       value(env.VITE_TILE_URL) ??

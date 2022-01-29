@@ -121,6 +121,26 @@
   background: rgb(255 255 255 / 80%);
 }
 
+/* The hues were picked to clear 3:1 against white; on a dark panel two of them
+   (nightlife, services) fall to about 2.8 and the dot stops reading as a dot.
+   Lifting every hue toward white by the same amount keeps them a set rather
+   than eight separately corrected colours — and keeps the correction here,
+   where the background is known, instead of in the category table. */
+:root[data-theme="dark"] .chip::before {
+  background: color-mix(in oklab, var(--cat) 70%, #fff);
+}
+
+/* A lightened fill needs dark ink on it, the same trade --on-accent makes. */
+:root[data-theme="dark"] .chip[data-active="true"] {
+  background: color-mix(in oklab, var(--cat) 74%, #fff);
+  border-color: color-mix(in oklab, var(--cat) 74%, #fff);
+  color: #10161f;
+}
+
+:root[data-theme="dark"] .chip[data-active="true"]::before {
+  background: rgb(16 22 31 / 55%);
+}
+
 .srOnly {
   position: absolute;
   width: 1px;

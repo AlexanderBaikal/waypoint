@@ -28,7 +28,7 @@
   width: 100%;
   border-radius: 50%;
   background: var(--cat);
-  box-shadow: 0 0 0 2px var(--surface);
+  box-shadow: 0 0 0 2px var(--marker-plate);
   color: #fff;
   font-size: 0.6875rem;
   line-height: 1;
@@ -45,7 +45,7 @@
 .pin[data-selected="true"] {
   font-size: 1rem;
   box-shadow:
-    0 0 0 3px var(--surface),
+    0 0 0 3px var(--marker-plate),
     0 0 0 5px var(--accent);
 }
 
@@ -56,11 +56,11 @@
   place-items: center;
   height: 100%;
   width: 100%;
-  border: 1.5px solid var(--line-2);
+  border: 1.5px solid color-mix(in srgb, var(--marker-ink) 14%, transparent);
   border-radius: 50%;
-  background: var(--surface);
+  background: var(--marker-plate);
   box-shadow: 0 0 0 2px rgb(255 255 255 / 55%);
-  color: var(--ink);
+  color: var(--marker-ink);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
@@ -72,9 +72,9 @@
 }
 
 .cluster:hover {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: #fff;
+  background: var(--marker-ink);
+  border-color: var(--marker-ink);
+  color: var(--marker-plate);
 }
 
 .controls {
@@ -131,19 +131,8 @@
    than CARTO's CDN, so on the dark map the default light ground was a second
    of flashbulb in a checkerboard; this is Dark Gray Canvas's own ground tone,
    sampled from a tile, so the map now assembles instead of flashing. */
-.root[data-basemap="dark"] :global(.leaflet-container) {
+:root[data-theme="dark"] .root :global(.leaflet-container) {
   background: #4d4d4f;
-}
-
-/* Leaflet's attribution is a global class, and on the dark basemap its white
-   plate is the one bright rectangle left on screen. */
-.root[data-basemap="dark"] :global(.leaflet-control-attribution) {
-  background: rgb(20 23 28 / 78%) !important;
-  color: #9aa1ab;
-}
-
-.root[data-basemap="dark"] :global(.leaflet-control-attribution a) {
-  color: #c3c9d2;
 }
 
 @media (width <= 48rem) {

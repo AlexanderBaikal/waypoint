@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Basemap } from "../config";
+import type { Theme } from "../config";
 import { CATEGORIES, type Category } from "../domain/categories";
 
 export interface UiState {
@@ -8,32 +8,32 @@ export interface UiState {
   selectedPlaceId: string | null;
   /** Mobile only: whether the results sheet covers the map. */
   listExpanded: boolean;
-  basemap: Basemap;
+  theme: Theme;
 }
 
 function isCategory(value: string): value is Category {
   return (CATEGORIES as readonly string[]).includes(value);
 }
 
-const BASEMAP_KEY = "waypoint:basemap";
+const THEME_KEY = "waypoint:theme";
 
 /**
- * Which basemap is a preference about this browser, not about what is on
+ * Which theme is a preference about this browser, not about what is on
  * screen, so it lives in localStorage rather than in the deep link — a URL you
  * send someone should carry the place you are looking at, not how bright you
  * like your map. Blocked storage throws; a preference is not worth a crash.
  */
-function readBasemap(): Basemap {
+function readTheme(): Theme {
   try {
-    return localStorage.getItem(BASEMAP_KEY) === "dark" ? "dark" : "light";
+    return localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
   } catch {
     return "light";
   }
 }
 
-function writeBasemap(basemap: Basemap): void {
+function writeTheme(theme: Theme): void {
   try {
-    localStorage.setItem(BASEMAP_KEY, basemap);
+    localStorage.setItem(THEME_KEY, theme);
   } catch {
     // Nothing useful to do — the choice still holds for this session.
   }
@@ -48,7 +48,7 @@ export function initialUiState(search = window.location.search): UiState {
     categories: (params.get("cat") ?? "").split(",").filter(isCategory),
     selectedPlaceId: params.get("place"),
     listExpanded: false,
-    basemap: readBasemap(),
+    theme: readTheme(),
   };
 }
 
@@ -76,9 +76,9 @@ const uiSlice = createSlice({
     listExpandedChanged(state, action: PayloadAction<boolean>) {
       state.listExpanded = action.payload;
     },
-    basemapToggled(state) {
-      state.basemap = state.basemap === "dark" ? "light" : "dark";
-      writeBasemap(state.basemap);
+    themeToggled(state) {
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      writeTheme(state.theme);
     },
   },
 });
@@ -89,7 +89,7 @@ export const {
   filtersCleared,
   placeSelected,
   listExpandedChanged,
-  basemapToggled,
+  themeToggled,
 } = uiSlice.actions;
 
 export const uiReducer = uiSlice.reducer;

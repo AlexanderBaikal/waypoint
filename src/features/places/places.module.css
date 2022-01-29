@@ -307,6 +307,12 @@
   background: var(--cat);
 }
 
+/* Lifted for the dark panel, the same way and by the same amount as the chip
+   dot it has to agree with. */
+:root[data-theme="dark"] .panelType::before {
+  background: color-mix(in oklab, var(--cat) 70%, #fff);
+}
+
 .panelStats {
   display: flex;
   flex-wrap: wrap;
@@ -343,7 +349,7 @@
 .saveButton[aria-pressed="true"] {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .saveButton[aria-pressed="true"]:hover {

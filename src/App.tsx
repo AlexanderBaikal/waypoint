@@ -1,13 +1,13 @@
-import { useDeferredValue, useMemo } from "react";
+import { useDeferredValue, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { useListPlacesQuery } from "./app/placesApi";
 import {
-  basemapToggled,
   categoryToggled,
   filtersCleared,
   listExpandedChanged,
   placeSelected,
   queryChanged,
+  themeToggled,
 } from "./app/uiSlice";
 import { presentCategories } from "./domain/categories";
 import { filterPlaces } from "./domain/search";
@@ -49,10 +49,17 @@ export function App() {
 
   const dispatch = useAppDispatch();
   const { data: places = [], isLoading, isError, error, refetch } = useListPlacesQuery();
-  const { query, categories, selectedPlaceId, listExpanded, basemap } = useAppSelector(
+  const { query, categories, selectedPlaceId, listExpanded, theme } = useAppSelector(
     (s) => s.ui,
   );
   const savedIds = useAppSelector((state) => state.saved.ids);
+
+  // On the document element rather than on our own root, because the theme has
+  // to reach things React does not render inside it: Leaflet's controls, its
+  // attribution, and the scrollbars the UA paints from `color-scheme`.
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   // Scoring a few thousand places, re-clustering them and repainting the panel
   // is more work than a keystroke should block on. Deferring the query lets the
@@ -90,8 +97,8 @@ export function App() {
           selected={selected}
           filtered={deferredQuery.trim() !== "" || categories.length > 0}
           onSelect={(id) => dispatch(placeSelected(id))}
-          basemap={basemap}
-          onToggleBasemap={() => dispatch(basemapToggled())}
+          theme={theme}
+          onToggleTheme={() => dispatch(themeToggled())}
         />
       </main>
 

@@ -17,9 +17,10 @@
 
   /* 5.95:1 against white in both directions, which is the reason for this
      particular blue: one token carries white text on a filled button and blue
-     text on a white row, so there is no second "ink" variant to keep in step. */
+     text on a white row. --on-accent is what rides a filled one. */
   --accent: #1b5fc9;
   --accent-wash: #eaf1fc;
+  --on-accent: #fff;
 
   /* Open / closing soon / closed. Their job is to be read without the label,
      so they are the three colours everyone already knows. */
@@ -30,6 +31,13 @@
   /* Ratings only. Darker than the amber a star usually gets, because it has to
      hold 3:1 against white to read as a shape rather than a smudge. */
   --star: #c9821b;
+
+  /* Marker chrome — the pin's ring and the cluster's plate. Deliberately NOT
+     themed: these sit on tiles, not on the panel, and the tiles are near-white
+     under one basemap and mid-grey under the other, so white reads on both.
+     Flipping them with the interface would put a dark disc on a dark map. */
+  --marker-plate: #fff;
+  --marker-ink: #14171c;
 
   --panel-width: 23rem;
 
@@ -42,6 +50,41 @@
   --font: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   color-scheme: light;
+}
+
+/* The dark theme is this interface with its values turned over, not a second
+   design: every token here answers one above, and nothing else in the
+   application is told which is in force.
+   It rides the same switch as the basemap because the white panel was the
+   uncomfortable part of the dark map — one bright rectangle in a dim field,
+   which is the light a dark map exists to avoid. */
+:root[data-theme="dark"] {
+  --bg: #14171b;
+  --surface: #1c2026;
+  --surface-2: #252a31;
+  --surface-3: #2f353d;
+
+  --ink: #e9ecef;
+  --ink-2: #b4bac3;
+  --ink-3: #8b929c;
+
+  --line: #2b313a;
+  --line-2: #3b424c;
+
+  /* The blue has to travel the other way here. Light enough to read as text on
+     a dark row (5.8:1), which drops white on a filled one to 2.8:1 — so a
+     filled accent takes dark ink instead, and --on-accent is why that is one
+     token to change rather than a hunt through the sheet. */
+  --accent: #5b9bf5;
+  --accent-wash: #1b2b41;
+  --on-accent: #10161f;
+
+  --ok: #45b877;
+  --warn: #d59a3f;
+  --bad: #ef6f6f;
+  --star: #d9a13c;
+
+  color-scheme: dark;
 }
 
 *,
@@ -138,7 +181,9 @@ img {
 }
 
 .leaflet-control-attribution {
-  background: rgb(255 255 255 / 78%) !important;
+  /* Opaque enough to be its own plate. At 82% the dark theme let Esri's mid
+     grey through and the credit sat at about 4:1 on its own background. */
+  background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
   border-radius: var(--r-tile) 0 0 0;
   color: var(--ink-3);
   font-size: 0.6875rem;
@@ -154,7 +199,9 @@ img {
   border: none;
   border-radius: var(--r-tile);
   box-shadow: none;
-  color: #fff;
+  /* Ink on surface, inverted — so the tooltip flips with the theme instead of
+     becoming white-on-white when --ink goes light. */
+  color: var(--surface);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.2rem 0.5rem;

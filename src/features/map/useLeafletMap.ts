@@ -1,6 +1,6 @@
 import L from "leaflet";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { INITIAL_VIEW, tileOptions, tiles, type Basemap } from "../../config";
+import { INITIAL_VIEW, tileOptions, tiles, type Theme } from "../../config";
 
 export interface LeafletBinding {
   /** Attach to the element that should host the map. */
@@ -17,15 +17,15 @@ export interface LeafletBinding {
  * calling setState during the effect, which is exactly the cascading-render
  * pattern the hooks lint warns about.
  */
-export function useLeafletMap(basemap: Basemap): LeafletBinding {
+export function useLeafletMap(theme: Theme): LeafletBinding {
   const [map, setMap] = useState<L.Map | null>(null);
   const layer = useRef<L.TileLayer | null>(null);
 
-  // The ref callback must not depend on the basemap — rebuilding it would tear
+  // The ref callback must not depend on the theme — rebuilding it would tear
   // the map down and put it back on every switch. It reads the current value
   // through a ref instead, so a map created later still starts on the right
   // tiles, and the effect below handles switching an existing one.
-  const current = useRef(basemap);
+  const current = useRef(theme);
 
   const ref = useCallback((element: HTMLDivElement | null) => {
     if (!element) return;
@@ -68,15 +68,15 @@ export function useLeafletMap(basemap: Basemap): LeafletBinding {
   // what the layer told the attribution control when it was added.
   useEffect(() => {
     const previous = current.current;
-    if (previous === basemap) return;
-    current.current = basemap;
+    if (previous === theme) return;
+    current.current = theme;
 
     if (!layer.current || !map) return;
-    layer.current.setUrl(tiles[basemap].url);
+    layer.current.setUrl(tiles[theme].url);
     map.attributionControl
       .removeAttribution(tiles[previous].attribution)
-      .addAttribution(tiles[basemap].attribution);
-  }, [basemap, map]);
+      .addAttribution(tiles[theme].attribution);
+  }, [theme, map]);
 
   return { ref, map };
 }

@@ -1,7 +1,7 @@
 import L from "leaflet";
 import { useCallback, useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
-import type { Basemap } from "../../config";
+import type { Theme } from "../../config";
 import type { Place } from "../../domain/place";
 import { useLeafletMap } from "./useLeafletMap";
 import { useMarkerLayer } from "./useMarkerLayer";
@@ -17,8 +17,8 @@ interface MapViewProps {
    */
   filtered: boolean;
   onSelect: (placeId: string) => void;
-  basemap: Basemap;
-  onToggleBasemap: () => void;
+  theme: Theme;
+  onToggleTheme: () => void;
 }
 
 /** Keeps a fitted marker clear of the panel edges. */
@@ -29,10 +29,10 @@ export function MapView({
   selected,
   filtered,
   onSelect,
-  basemap,
-  onToggleBasemap,
+  theme,
+  onToggleTheme,
 }: MapViewProps) {
-  const { ref, map } = useLeafletMap(basemap);
+  const { ref, map } = useLeafletMap(theme);
 
   useMarkerLayer(map, places, selected?.id ?? null, onSelect);
 
@@ -72,10 +72,10 @@ export function MapView({
     map?.locate({ setView: true, maxZoom: 15 });
   }, [map]);
 
-  const dark = basemap === "dark";
+  const dark = theme === "dark";
 
   return (
-    <div className={styles.root} data-basemap={basemap}>
+    <div className={styles.root}>
       <div ref={ref} className={styles.canvas} data-testid="map-canvas" />
 
       <div className={styles.controls}>
@@ -101,15 +101,15 @@ export function MapView({
           ⌖
         </button>
 
-        {/* A half-filled disc rather than a sun and a moon: this changes how
-            the map is drawn, not what time it is. It sits below the zoom pair
-            because it is the one control here you press once and forget. */}
+        {/* A half-filled disc rather than a sun and a moon: this switches how
+            everything is drawn, not what time it is. It sits below the zoom
+            pair because it is the one control here you press once and forget. */}
         <button
           type="button"
-          onClick={onToggleBasemap}
+          onClick={onToggleTheme}
           aria-pressed={dark}
-          aria-label={dark ? "Use the light map" : "Use the dark map"}
-          title={dark ? "Light map" : "Dark map"}
+          aria-label={dark ? "Switch to the light theme" : "Switch to the dark theme"}
+          title={dark ? "Light theme" : "Dark theme"}
         >
           <svg
             className={styles.glyph}
