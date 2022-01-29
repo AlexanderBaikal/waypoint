@@ -86,6 +86,10 @@ export function App() {
     [filtered, selected],
   );
 
+  // Whether the user has asked for anything. Decides both whether the map
+  // reframes and whether the panel lists results at all.
+  const filtering = deferredQuery.trim() !== "" || categories.length > 0;
+
   return (
     <div className={styles.app}>
       {/* The map is painted first and fills the window; the panel floats over
@@ -95,7 +99,7 @@ export function App() {
         <MapView
           places={markers}
           selected={selected}
-          filtered={deferredQuery.trim() !== "" || categories.length > 0}
+          filtered={filtering}
           onSelect={(id) => dispatch(placeSelected(id))}
           theme={theme}
           onToggleTheme={() => dispatch(themeToggled())}
@@ -161,8 +165,9 @@ export function App() {
                 </div>
               ) : (
                 <PlaceList
-                  places={filtered}
+                  places={filtering ? filtered : places}
                   savedIds={savedIds}
+                  filtering={filtering}
                   onSelect={(id) => dispatch(placeSelected(id))}
                   onClearFilters={() => dispatch(filtersCleared())}
                 />

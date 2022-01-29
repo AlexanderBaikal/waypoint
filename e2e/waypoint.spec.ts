@@ -19,6 +19,15 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByText(/1,620 places/)).toBeVisible();
 });
 
+test("the panel waits to be asked before it lists anything", async ({ page }) => {
+  // Every place is on the map already; the list is what a question produces.
+  await expect(results(page)).toHaveCount(0);
+  await expect(page.getByText(/search for one, or pick a category/i)).toBeVisible();
+
+  await search(page).fill("museum");
+  expect(await results(page).count()).toBeGreaterThan(0);
+});
+
 test("clusters the full dataset instead of drawing every pin", async ({ page }) => {
   await expect(page.locator(".leaflet-tile-loaded").first()).toBeVisible();
   await expect(clusters(page).first()).toBeVisible();
@@ -30,6 +39,13 @@ test("clusters the full dataset instead of drawing every pin", async ({ page }) 
 });
 
 test("the panel lists a readable page of a large result set", async ({ page }) => {
+  // Services is the biggest category in the city by some way, so it is well
+  // past the sixty the panel will draw.
+  await page
+    .getByRole("group", { name: /filter by category/i })
+    .getByRole("button", { name: /services/i })
+    .click();
+
   await expect(results(page)).toHaveCount(60);
   await expect(page.getByText(/more on the map/i)).toBeVisible();
 });

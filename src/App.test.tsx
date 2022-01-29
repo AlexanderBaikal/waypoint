@@ -98,18 +98,26 @@ afterEach(() => {
 
 const list = () => screen.getByRole("list");
 
-describe("App", () => {
-  it("lists every place once loaded", async () => {
-    renderWithStore(<App />);
+/** The panel opens on its invitation, so that is what "loaded" looks like. */
+const loaded = () => screen.findByText(/3 places on the map/);
 
-    expect(await screen.findByText("3 places")).toBeInTheDocument();
-    expect(within(list()).getAllByRole("listitem")).toHaveLength(3);
+describe("App", () => {
+  it("waits to be asked before it lists anything", async () => {
+    const user = userEvent.setup();
+    renderWithStore(<App />);
+    await loaded();
+
+    // Every place is already on the map; the list is what a question produces.
+    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+
+    await user.type(screen.getByRole("searchbox", { name: /search places/i }), "sub");
+    expect(within(list()).getAllByRole("listitem")).toHaveLength(1);
   });
 
   it("filters the list and the map together as you type", async () => {
     const user = userEvent.setup();
     renderWithStore(<App />);
-    await screen.findByText("3 places");
+    await loaded();
 
     await user.type(screen.getByRole("searchbox", { name: /search places/i }), "sub");
 
@@ -124,7 +132,7 @@ describe("App", () => {
   it("filters by category chip", async () => {
     const user = userEvent.setup();
     renderWithStore(<App />);
-    await screen.findByText("3 places");
+    await loaded();
 
     // Scoped to the chips: list rows also carry their category in the label.
     const filters = screen.getByRole("group", { name: /filter by category/i });
@@ -137,19 +145,19 @@ describe("App", () => {
   it("offers a way out when nothing matches", async () => {
     const user = userEvent.setup();
     renderWithStore(<App />);
-    await screen.findByText("3 places");
+    await loaded();
 
     await user.type(screen.getByRole("searchbox", { name: /search places/i }), "zzzz");
     expect(await screen.findByText(/nothing here matches/i)).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /clear filters/i }));
-    expect(await screen.findByText("3 places")).toBeInTheDocument();
+    expect(await loaded()).toBeInTheDocument();
   });
 
   it("opens the detail panel from a marker and comes back", async () => {
     const user = userEvent.setup();
     renderWithStore(<App />);
-    await screen.findByText("3 places");
+    await loaded();
 
     await user.click(screen.getByRole("button", { name: "marker: Subway" }));
 
@@ -157,13 +165,13 @@ describe("App", () => {
     expect(await screen.findByText("Reliable enough")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /all places/i }));
-    expect(await screen.findByText("3 places")).toBeInTheDocument();
+    expect(await loaded()).toBeInTheDocument();
   });
 
   it("puts the selected place in the URL so it can be linked", async () => {
     const user = userEvent.setup();
     renderWithStore(<App />);
-    await screen.findByText("3 places");
+    await loaded();
 
     await user.click(screen.getByRole("button", { name: "marker: Kinomoll" }));
 
@@ -175,7 +183,7 @@ describe("App", () => {
   it("keeps a saved place in the store and in localStorage", async () => {
     const user = userEvent.setup();
     const { store } = renderWithStore(<App />);
-    await screen.findByText("3 places");
+    await loaded();
 
     await user.click(screen.getByRole("button", { name: "marker: Subway" }));
     await user.click(await screen.findByRole("button", { name: /save/i }));

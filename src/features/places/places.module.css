@@ -206,6 +206,19 @@
   color: var(--ink-3);
 }
 
+/* What the panel shows before you have asked it anything. */
+.intro {
+  display: grid;
+  gap: 0.1875rem;
+  padding: 1.125rem 0.75rem;
+}
+
+.introCount {
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 .textButton {
   color: var(--accent);
   font-weight: 600;

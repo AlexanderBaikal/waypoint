@@ -7,6 +7,8 @@ import styles from "./places.module.css";
 interface PlaceListProps {
   places: readonly Place[];
   savedIds: readonly string[];
+  /** Whether a query or a category is narrowing `places`. */
+  filtering: boolean;
   onSelect: (placeId: string) => void;
   onClearFilters: () => void;
 }
@@ -24,9 +26,23 @@ const count = (value: number) => value.toLocaleString("en-US");
 export function PlaceList({
   places,
   savedIds,
+  filtering,
   onSelect,
   onClearFilters,
 }: PlaceListProps) {
+  // Nothing has been asked for yet. Sixty places off the top of an alphabetical
+  // list are not an answer to a question nobody put, and they push the map —
+  // which is already showing all of them — out of the argument. So the panel
+  // says what is out there and waits, the way a map application does.
+  if (!filtering) {
+    return (
+      <div className={styles.intro}>
+        <p className={styles.introCount}>{count(places.length)} places on the map</p>
+        <p className={styles.hint}>Search for one, or pick a category.</p>
+      </div>
+    );
+  }
+
   if (places.length === 0) {
     return (
       <div className={styles.empty}>
