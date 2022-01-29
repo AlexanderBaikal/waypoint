@@ -62,25 +62,46 @@ export const firebaseSchema: "legacy" | "v2" =
 
 export type Basemap = "light" | "dark";
 
+export interface TileSource {
+  url: string;
+  /** Each provider states its own terms, so this travels with the URL. */
+  attribution: string;
+}
+
 /**
- * CARTO Positron and Dark Matter: no API key, and both are muted enough to
- * leave the category colours to the markers instead of competing with them.
- * They are the same cartography in two values, so switching between them moves
- * nothing on the map but its brightness.
+ * Light is CARTO Positron. Dark is Esri's Dark Gray Canvas rather than CARTO's
+ * own Dark Matter, which was the obvious pairing and the wrong one: Dark Matter
+ * is drawn for data overlays, so it is near-black and its streets are a shade
+ * off the background — legible as a backdrop for a heatmap, not as a map you
+ * read. Dark Gray Canvas sits at a mid grey with light streets, and you can
+ * follow a road across it. Both are keyless, and this one goes to zoom 23, so
+ * nothing is given up for it.
+ *
+ * The two are different cartography by different cartographers, which is the
+ * cost of the swap — street classes and label density do not match exactly
+ * between them. Reading the map beats matching it.
  */
-export const tiles = {
-  light:
-    value(env.VITE_TILE_URL) ??
-    "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-  dark:
-    value(env.VITE_TILE_URL_DARK) ??
-    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-  attribution:
-    value(env.VITE_TILE_ATTRIBUTION) ??
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  subdomains: "abcd",
-  maxZoom: 19,
+export const tiles: Record<Basemap, TileSource> = {
+  light: {
+    url:
+      value(env.VITE_TILE_URL) ??
+      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    attribution:
+      value(env.VITE_TILE_ATTRIBUTION) ??
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  },
+  dark: {
+    url:
+      value(env.VITE_TILE_URL_DARK) ??
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    attribution:
+      value(env.VITE_TILE_ATTRIBUTION_DARK) ??
+      'Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  },
 };
+
+/** Shared by both sources; `subdomains` is simply unused by a URL with no {s}. */
+export const tileOptions = { subdomains: "abcd", maxZoom: 19 };
 
 /** Irkutsk — where the sample dataset lives. */
 export const INITIAL_VIEW = { center: { lat: 52.278, lng: 104.295 }, zoom: 13 };

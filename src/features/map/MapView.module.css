@@ -127,6 +127,14 @@
   height: 1rem;
 }
 
+/* What shows through until a tile arrives. Esri serves from a slower origin
+   than CARTO's CDN, so on the dark map the default light ground was a second
+   of flashbulb in a checkerboard; this is Dark Gray Canvas's own ground tone,
+   sampled from a tile, so the map now assembles instead of flashing. */
+.root[data-basemap="dark"] :global(.leaflet-container) {
+  background: #4d4d4f;
+}
+
 /* Leaflet's attribution is a global class, and on the dark basemap its white
    plate is the one bright rectangle left on screen. */
 .root[data-basemap="dark"] :global(.leaflet-control-attribution) {

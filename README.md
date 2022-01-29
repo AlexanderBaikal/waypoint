@@ -207,4 +207,4 @@ because a faithful copy of Google Maps reads as an embedded Google map no matter
 ## Licence
 
 MIT. Place data and map data © OpenStreetMap contributors ([ODbL](https://www.openstreetmap.org/copyright)),
-tiles © CARTO.
+light tiles © CARTO, dark tiles © Esri, HERE, Garmin.

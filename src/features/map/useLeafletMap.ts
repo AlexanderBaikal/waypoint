@@ -1,6 +1,6 @@
 import L from "leaflet";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { INITIAL_VIEW, tiles, type Basemap } from "../../config";
+import { INITIAL_VIEW, tileOptions, tiles, type Basemap } from "../../config";
 
 export interface LeafletBinding {
   /** Attach to the element that should host the map. */
@@ -37,10 +37,10 @@ export function useLeafletMap(basemap: Basemap): LeafletBinding {
       attributionControl: true,
     });
 
-    layer.current = L.tileLayer(tiles[current.current], {
-      attribution: tiles.attribution,
-      subdomains: tiles.subdomains,
-      maxZoom: tiles.maxZoom,
+    const source = tiles[current.current];
+    layer.current = L.tileLayer(source.url, {
+      attribution: source.attribution,
+      ...tileOptions,
       detectRetina: true,
     }).addTo(instance);
 
@@ -62,12 +62,21 @@ export function useLeafletMap(basemap: Basemap): LeafletBinding {
   }, []);
 
   // setUrl rather than swapping layers: Leaflet keeps the tiles already on
-  // screen until the replacements load, so the map darkens in place instead of
-  // blinking through empty grey.
+  // screen until the replacements load, so the map changes in place instead of
+  // blinking through empty grey. The credit has to be moved by hand, though —
+  // the two basemaps come from different providers, and setUrl does not touch
+  // what the layer told the attribution control when it was added.
   useEffect(() => {
+    const previous = current.current;
+    if (previous === basemap) return;
     current.current = basemap;
-    layer.current?.setUrl(tiles[basemap]);
-  }, [basemap]);
+
+    if (!layer.current || !map) return;
+    layer.current.setUrl(tiles[basemap].url);
+    map.attributionControl
+      .removeAttribution(tiles[previous].attribution)
+      .addAttribution(tiles[basemap].attribution);
+  }, [basemap, map]);
 
   return { ref, map };
 }
