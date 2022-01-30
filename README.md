@@ -141,7 +141,7 @@ key-free raster basemap here is one URL template), and needs WebGL — which hea
 reliably have. The trade only starts paying at tens of thousands of points, or when the map needs
 tilt, rotation or data-driven styling. None of that is on this map.
 
-![A place, with hours, contact details and reviews](docs/screenshot-place.jpg)
+![A place — hours, contact details and reviews — in the dark theme](docs/screenshot-place.jpg)
 
 ## Testing
 
