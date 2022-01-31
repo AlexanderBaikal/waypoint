@@ -14,11 +14,17 @@
   isolation: isolate;
 }
 
+/* Pinned at the top and grown by its contents, not stretched between two
+   edges. Anchoring the bottom too made every state full height, so an
+   invitation of two lines came with 800px of empty white over the map. The cap
+   is what turns it back into a scroller once there is enough to scroll. */
 .panel {
   position: absolute;
   z-index: 1;
-  inset: 0.75rem auto 0.75rem 0.75rem;
+  top: 0.75rem;
+  left: 0.75rem;
   width: var(--panel-width);
+  max-height: calc(100% - 1.5rem);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -62,8 +68,11 @@
   display: none;
 }
 
+/* `auto` basis rather than 0: the panel is now sized by its contents, and a
+   zero basis would tell it the body contributes no height at all. It still
+   grows to fill the mobile sheet, which does have a height of its own. */
 .panelBody {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
