@@ -9,6 +9,22 @@ export interface LeafletBinding {
 }
 
 /**
+ * The two sources differ in more than their URL — how deep their cache goes and
+ * whether they have a 2x tile — and those are construction-time options, which
+ * is why switching builds a layer rather than repointing one.
+ */
+function tileLayer(theme: Theme): L.TileLayer {
+  const source = tiles[theme];
+  return L.tileLayer(source.url, {
+    attribution: source.attribution,
+    subdomains: tileOptions.subdomains,
+    maxZoom: tileOptions.maxZoom,
+    maxNativeZoom: source.maxNativeZoom,
+    detectRetina: source.retina,
+  });
+}
+
+/**
  * Owns the Leaflet instance for the lifetime of its container element.
  *
  * This hangs off a ref callback rather than an effect: the map's life is tied
@@ -37,12 +53,7 @@ export function useLeafletMap(theme: Theme): LeafletBinding {
       attributionControl: true,
     });
 
-    const source = tiles[current.current];
-    layer.current = L.tileLayer(source.url, {
-      attribution: source.attribution,
-      ...tileOptions,
-      detectRetina: true,
-    }).addTo(instance);
+    layer.current = tileLayer(current.current).addTo(instance);
 
     // Leaflet caches the container size, so it has to be told when the layout
     // shifts under it — the results sheet expanding, or a phone rotating.
@@ -61,21 +72,36 @@ export function useLeafletMap(theme: Theme): LeafletBinding {
     };
   }, []);
 
-  // setUrl rather than swapping layers: Leaflet keeps the tiles already on
-  // screen until the replacements load, so the map changes in place instead of
-  // blinking through empty grey. The credit has to be moved by hand, though —
-  // the two basemaps come from different providers, and setUrl does not touch
-  // what the layer told the attribution control when it was added.
+  // The new layer goes on over the old one and the old one only comes off once
+  // the new tiles have painted, so the map changes value in place rather than
+  // blinking through empty ground. Removing the outgoing layer also takes its
+  // credit off the attribution control with it, which is why nothing here
+  // touches attribution by hand.
   useEffect(() => {
-    const previous = current.current;
-    if (previous === theme) return;
+    if (current.current === theme) return;
     current.current = theme;
+    if (!map) return;
 
-    if (!layer.current || !map) return;
-    layer.current.setUrl(tiles[theme].url);
-    map.attributionControl
-      .removeAttribution(tiles[previous].attribution)
-      .addAttribution(tiles[theme].attribution);
+    const outgoing = layer.current;
+    const incoming = tileLayer(theme).addTo(map);
+    layer.current = incoming;
+
+    let done = false;
+    const drop = () => {
+      if (done) return;
+      done = true;
+      outgoing?.remove();
+    };
+
+    // `load` is the signal; the timer is the backstop, because a layer whose
+    // tiles are all already cached can settle without firing it.
+    incoming.once("load", drop);
+    const backstop = setTimeout(drop, 2000);
+
+    return () => {
+      clearTimeout(backstop);
+      drop();
+    };
   }, [theme, map]);
 
   return { ref, map };

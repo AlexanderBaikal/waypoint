@@ -66,6 +66,14 @@ export interface TileSource {
   url: string;
   /** Each provider states its own terms, so this travels with the URL. */
   attribution: string;
+  /**
+   * The deepest zoom the provider actually has tiles for, where that is
+   * shallower than the map's own maximum. Past it Leaflet stretches the last
+   * real level instead of asking for tiles that do not exist.
+   */
+  maxNativeZoom?: number;
+  /** Whether the provider serves a 2x tile for the same URL. */
+  retina: boolean;
 }
 
 /**
@@ -74,12 +82,13 @@ export interface TileSource {
  * is drawn for data overlays, so it is near-black and its streets are a shade
  * off the background — legible as a backdrop for a heatmap, not as a map you
  * read. Dark Gray Canvas sits at a mid grey with light streets, and you can
- * follow a road across it. Both are keyless, and this one goes to zoom 23, so
- * nothing is given up for it.
+ * follow a road across it, and it needs no key either.
  *
- * The two are different cartography by different cartographers, which is the
- * cost of the swap — street classes and label density do not match exactly
- * between them. Reading the map beats matching it.
+ * Two things are given up for that. The cartography is not the same hand, so
+ * street classes and label density do not match exactly across the switch. And
+ * its cache stops at zoom 16 — the service advertises levels to 23, but asking
+ * for one over this city returns a tile that reads "Map data not yet
+ * available", which is why the depth is declared here rather than trusted.
  */
 export const tiles: Record<Theme, TileSource> = {
   light: {
@@ -89,6 +98,7 @@ export const tiles: Record<Theme, TileSource> = {
     attribution:
       value(env.VITE_TILE_ATTRIBUTION) ??
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    retina: true,
   },
   dark: {
     url:
@@ -97,6 +107,14 @@ export const tiles: Record<Theme, TileSource> = {
     attribution:
       value(env.VITE_TILE_ATTRIBUTION_DARK) ??
       'Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxNativeZoom: 16,
+    /**
+     * Esri has no 2x tile, and Leaflet's detectRetina does not simply ask for
+     * one: it requests the next zoom down and draws it at half size. That put
+     * every request one level past the cache, so the empty tiles started at
+     * zoom 16 rather than 17. Off, the cap above means exactly what it says.
+     */
+    retina: false,
   },
 };
 
