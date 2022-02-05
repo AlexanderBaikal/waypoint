@@ -159,7 +159,7 @@ that mocks all of that proves nothing. Playwright covers it against the producti
 
 ## Security model
 
-`firestore.rules` and `storage.rules` are in the repository, reviewed like any other change, and
+`firestore.rules` is in the repository, reviewed like any other change, and
 deployed by CI on every push to `master` — before the app itself, so a release cannot go out
 assuming an access model that failed to land. What is committed here is what the database
 enforces.

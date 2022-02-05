@@ -2,7 +2,6 @@ export interface FirebaseConfig {
   apiKey: string;
   authDomain: string;
   projectId: string;
-  storageBucket: string;
   appId: string;
 }
 
@@ -22,13 +21,18 @@ const value = (raw: string | undefined): string | null => {
  * The web API key is a public client identifier — access is decided by
  * firestore.rules. It lives in .env only so the repository is not tied to one
  * Firebase project.
+ *
+ * No storage bucket among these. Photographs are links to images already on the
+ * web, so nothing here talks to Cloud Storage — and a project that never
+ * provisioned a bucket has no bucket name to give, which used to leave four
+ * fields filled, the config rejected as partial, and the app quietly on
+ * fixtures.
  */
 function readFirebaseConfig(): FirebaseConfig | null {
   const config = {
     apiKey: value(env.VITE_FIREBASE_API_KEY),
     authDomain: value(env.VITE_FIREBASE_AUTH_DOMAIN),
     projectId: value(env.VITE_FIREBASE_PROJECT_ID),
-    storageBucket: value(env.VITE_FIREBASE_STORAGE_BUCKET),
     appId: value(env.VITE_FIREBASE_APP_ID),
   };
 

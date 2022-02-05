@@ -20,3 +20,10 @@ test-results
 
 .firebase
 firebase-debug.log
+
+# Service-account keys. Unlike the web API key, these are real credentials: they
+# bypass firestore.rules entirely, which is how scripts/seed-firestore.mjs can
+# write a collection no browser may touch.
+*service-account*.json
+serviceAccount*.json
+*-firebase-adminsdk-*.json
