@@ -47,6 +47,33 @@
   border-bottom: 1px solid var(--line);
 }
 
+.mastheadActions {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+/* Quiet until wanted: contributing is something this map allows, not what it
+   is for. It sits beside the account it depends on. */
+.addButton {
+  height: 1.75rem;
+  padding: 0 0.5625rem;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-control);
+  color: var(--ink-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.addButton:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
 .wordmark {
   display: flex;
   align-items: center;

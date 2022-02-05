@@ -3,19 +3,25 @@ import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { useListPlacesQuery } from "./app/placesApi";
 import {
   categoryToggled,
+  editorOpened,
   filtersCleared,
   listExpandedChanged,
   placeSelected,
   queryChanged,
   themeToggled,
 } from "./app/uiSlice";
+import { INITIAL_VIEW } from "./config";
 import { presentCategories } from "./domain/categories";
 import { filterPlaces } from "./domain/search";
+import { mayEdit } from "./data/repository";
 import { AccountButton } from "./features/auth/AccountButton";
 import { useAuthSession } from "./features/auth/useAuthSession";
+import { useWriteIdentity } from "./features/auth/useAuthor";
 import { MapView } from "./features/map/MapView";
+import { PlaceForm } from "./features/places/PlaceForm";
 import { PlaceList } from "./features/places/PlaceList";
 import { PlacePanel } from "./features/places/PlacePanel";
+import { ReviewForm } from "./features/places/ReviewForm";
 import { savedToggled } from "./features/saved/savedSlice";
 import { CategoryChips } from "./features/search/CategoryChips";
 import { SearchBar } from "./features/search/SearchBar";
@@ -49,10 +55,10 @@ export function App() {
 
   const dispatch = useAppDispatch();
   const { data: places = [], isLoading, isError, error, refetch } = useListPlacesQuery();
-  const { query, categories, selectedPlaceId, listExpanded, theme } = useAppSelector(
-    (s) => s.ui,
-  );
+  const { query, categories, selectedPlaceId, listExpanded, theme, editor } =
+    useAppSelector((s) => s.ui);
   const savedIds = useAppSelector((state) => state.saved.ids);
+  const { author } = useWriteIdentity();
 
   // On the document element rather than on our own root, because the theme has
   // to reach things React does not render inside it: Leaflet's controls, its
@@ -90,6 +96,9 @@ export function App() {
   // reframes and whether the panel lists results at all.
   const filtering = deferredQuery.trim() !== "" || categories.length > 0;
 
+  const knownTypes = useMemo(() => places.map((place) => place.type), [places]);
+  const editing = editor?.mode === "edit" ? selected : null;
+
   return (
     <div className={styles.app}>
       {/* The map is painted first and fills the window; the panel floats over
@@ -112,7 +121,20 @@ export function App() {
             <Mark />
             Waypoint
           </h1>
-          <AccountButton />
+          <div className={styles.mastheadActions}>
+            {/* Hidden while a form is already open: there is nowhere for a
+                second one to go, and the panel is the only place it fits. */}
+            {author && !editor ? (
+              <button
+                type="button"
+                className={styles.addButton}
+                onClick={() => dispatch(editorOpened({ mode: "create" }))}
+              >
+                + Add
+              </button>
+            ) : null}
+            <AccountButton />
+          </div>
         </header>
 
         <button
@@ -125,7 +147,7 @@ export function App() {
         {/* Outside the scroller on purpose. The field is how you get anything
             out of this panel, so it does not get to scroll away with the
             results it produces. */}
-        {selected ? null : (
+        {selected || editor ? null : (
           <div className={styles.filters}>
             <SearchBar
               value={query}
@@ -141,12 +163,27 @@ export function App() {
         )}
 
         <div className={styles.panelBody}>
-          {selected ? (
+          {editor?.mode === "review" && selected ? (
+            <ReviewForm placeId={selected.id} placeName={selected.name} />
+          ) : editor?.mode === "create" || editing ? (
+            <PlaceForm
+              place={editing}
+              origin={selected?.coords ?? INITIAL_VIEW.center}
+              knownTypes={knownTypes}
+            />
+          ) : selected ? (
             <PlacePanel
               place={selected}
               saved={savedIds.includes(selected.id)}
               onBack={() => dispatch(placeSelected(null))}
               onToggleSaved={(id) => dispatch(savedToggled(id))}
+              canEdit={mayEdit(selected, author?.uid ?? null)}
+              onEdit={() =>
+                dispatch(editorOpened({ mode: "edit", placeId: selected.id }))
+              }
+              onReview={() =>
+                dispatch(editorOpened({ mode: "review", placeId: selected.id }))
+              }
             />
           ) : (
             <>

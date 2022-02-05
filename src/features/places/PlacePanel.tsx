@@ -12,6 +12,10 @@ interface PlacePanelProps {
   saved: boolean;
   onBack: () => void;
   onToggleSaved: (placeId: string) => void;
+  /** False when this place is someone else's, or when nobody is signed in. */
+  canEdit: boolean;
+  onEdit: () => void;
+  onReview: () => void;
 }
 
 /** Websites were entered without a scheme, so build one rather than link to a
@@ -75,7 +79,15 @@ function Icon({ name }: { name: keyof typeof PATHS }) {
   );
 }
 
-export function PlacePanel({ place, saved, onBack, onToggleSaved }: PlacePanelProps) {
+export function PlacePanel({
+  place,
+  saved,
+  onBack,
+  onToggleSaved,
+  canEdit,
+  onEdit,
+  onReview,
+}: PlacePanelProps) {
   const { data: reviews = [], isFetching } = useListReviewsQuery(place.id);
   // The cover already appears as the hero above; the strip is for the rest.
   const photos = place.photos.filter((photo) => photo !== place.cover);
@@ -105,16 +117,26 @@ export function PlacePanel({ place, saved, onBack, onToggleSaved }: PlacePanelPr
         </div>
       </header>
 
-      <button
-        type="button"
-        className={styles.saveButton}
-        onClick={() => {
-          onToggleSaved(place.id);
-        }}
-        aria-pressed={saved}
-      >
-        {saved ? "✦ Saved" : "✧ Save"}
-      </button>
+      <div className={styles.panelActions}>
+        <button
+          type="button"
+          className={styles.saveButton}
+          onClick={() => {
+            onToggleSaved(place.id);
+          }}
+          aria-pressed={saved}
+        >
+          {saved ? "✦ Saved" : "✧ Save"}
+        </button>
+
+        {/* Only offered where it would work. A button that exists to tell you
+            afterwards that you may not is worse than no button. */}
+        {canEdit ? (
+          <button type="button" className={styles.saveButton} onClick={onEdit}>
+            Edit
+          </button>
+        ) : null}
+      </div>
 
       {place.about ? <p className={styles.about}>{place.about}</p> : null}
 
@@ -223,7 +245,12 @@ export function PlacePanel({ place, saved, onBack, onToggleSaved }: PlacePanelPr
       )}
 
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Reviews</h3>
+        <div className={styles.sectionHead}>
+          <h3 className={styles.sectionTitle}>Reviews</h3>
+          <button type="button" className={styles.textButton} onClick={onReview}>
+            Write a review
+          </button>
+        </div>
         <ReviewList reviews={reviews} loading={isFetching} />
       </section>
     </article>

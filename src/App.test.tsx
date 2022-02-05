@@ -2,7 +2,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
 import { setRepositoryForTesting } from "./data";
-import type { PlacesRepository } from "./data/repository";
+import { NotAllowedError, type PlacesRepository } from "./data/repository";
 import type { Place, Review } from "./domain/place";
 import { renderWithStore } from "./test/renderWithStore";
 
@@ -30,6 +30,15 @@ jest.mock("./features/map/MapView", () => ({
         </button>
       ))}
     </div>
+  ),
+}));
+
+// The form's location picker is a second Leaflet map, for the same reason.
+// A place opens the form already carrying coordinates, so a readout is enough
+// to prove the form is wired to them.
+jest.mock("./features/places/LocationPicker", () => ({
+  LocationPicker: ({ value }: { value: { lat: number; lng: number } }) => (
+    <div data-testid="location-picker">{`${String(value.lat)},${String(value.lng)}`}</div>
   ),
 }));
 
@@ -203,5 +212,155 @@ describe("App", () => {
 
     expect(await screen.findByText("Firestore is unreachable")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /try again/i })).toBeInTheDocument();
+  });
+});
+
+/**
+ * The write path, exercised through the panel rather than against the
+ * components in isolation — what is worth pinning down is that a filled form
+ * reaches the repository with the right arguments, and that a refused write
+ * leaves nothing behind.
+ */
+describe("App: writing", () => {
+  const openPlace = async (user: ReturnType<typeof userEvent.setup>, name: string) => {
+    await user.click(screen.getByRole("button", { name: `marker: ${name}` }));
+    return screen.findByRole("heading", { name });
+  };
+
+  it("adds a place and opens it", async () => {
+    const user = userEvent.setup();
+    const createPlace = jest.fn((input: { name: string }) =>
+      Promise.resolve({ ...place("new-cafe", input.name, "Cafe"), authorId: "local" }),
+    );
+    setRepositoryForTesting(stubRepository({ createPlace }));
+
+    renderWithStore(<App />);
+    await loaded();
+
+    await user.click(screen.getByRole("button", { name: /^\+ Add$/ }));
+    await user.type(screen.getByLabelText(/^name$/i), "New Cafe");
+    await user.type(screen.getByLabelText(/^type$/i), "Cafe");
+    await user.click(screen.getByRole("button", { name: /add place/i }));
+
+    expect(createPlace).toHaveBeenCalledOnce();
+    expect(createPlace.mock.calls[0]?.[0]).toMatchObject({
+      name: "New Cafe",
+      type: "Cafe",
+    });
+    // The panel lands on what was just added rather than back in the list.
+    expect(await screen.findByRole("heading", { name: "New Cafe" })).toBeInTheDocument();
+  });
+
+  it("will not submit a place with nothing in it", async () => {
+    const user = userEvent.setup();
+    const createPlace = jest.fn();
+    setRepositoryForTesting(stubRepository({ createPlace }));
+
+    renderWithStore(<App />);
+    await loaded();
+
+    await user.click(screen.getByRole("button", { name: /^\+ Add$/ }));
+    await user.click(screen.getByRole("button", { name: /add place/i }));
+
+    expect(await screen.findByText(/a place needs a name/i)).toBeInTheDocument();
+    expect(createPlace).not.toHaveBeenCalled();
+  });
+
+  it("edits a place that has no owner", async () => {
+    const user = userEvent.setup();
+    const updatePlace = jest.fn((id: string, input: { name: string }) =>
+      Promise.resolve(place(id, input.name, "Fast food")),
+    );
+    setRepositoryForTesting(stubRepository({ updatePlace }));
+
+    renderWithStore(<App />);
+    await loaded();
+    await openPlace(user, "Subway");
+
+    // Imported places carry no author, which is what makes them community-editable.
+    await user.click(screen.getByRole("button", { name: /^edit$/i }));
+    const name = screen.getByLabelText(/^name$/i);
+    await user.clear(name);
+    await user.type(name, "Subway on Lenin");
+    await user.click(screen.getByRole("button", { name: /save changes/i }));
+
+    expect(updatePlace).toHaveBeenCalledOnce();
+    expect(updatePlace.mock.calls[0]?.[1]).toMatchObject({ name: "Subway on Lenin" });
+  });
+
+  it("does not offer to edit someone else's place", async () => {
+    const user = userEvent.setup();
+    setRepositoryForTesting(
+      stubRepository({
+        listPlaces: () =>
+          Promise.resolve([
+            { ...place("theirs", "Theirs", "Cafe"), authorId: "someone" },
+          ]),
+      }),
+    );
+
+    renderWithStore(<App />);
+    await user.click(await screen.findByRole("button", { name: "marker: Theirs" }));
+    await screen.findByRole("heading", { name: "Theirs" });
+
+    expect(screen.queryByRole("button", { name: /^edit$/i })).not.toBeInTheDocument();
+    // Reviewing is still open to everyone.
+    expect(screen.getByRole("button", { name: /write a review/i })).toBeInTheDocument();
+  });
+
+  it("posts a review and shows it without refetching", async () => {
+    const user = userEvent.setup();
+    const addReview = jest.fn((placeId: string, input: { rating: number; text: string }) =>
+      Promise.resolve({
+        id: "new",
+        placeId,
+        author: { name: "You", photoUrl: null },
+        rating: input.rating,
+        text: input.text,
+        date: "2024-01-07T12:00:00.000Z",
+        photos: [],
+      }),
+    );
+    setRepositoryForTesting(stubRepository({ addReview }));
+
+    renderWithStore(<App />);
+    await loaded();
+    await openPlace(user, "Kinomoll");
+
+    await user.click(screen.getByRole("button", { name: /write a review/i }));
+    await user.click(screen.getByRole("radio", { name: /4 stars/i }));
+    await user.type(screen.getByLabelText(/what was it like/i), "Good seats");
+    await user.click(screen.getByRole("button", { name: /post review/i }));
+
+    expect(addReview).toHaveBeenCalledOnce();
+    expect(addReview.mock.calls[0]?.[1]).toMatchObject({ rating: 4, text: "Good seats" });
+    expect(await screen.findByText("Good seats")).toBeInTheDocument();
+  });
+
+  it("takes back an optimistic review when the write is refused", async () => {
+    const user = userEvent.setup();
+    setRepositoryForTesting(
+      stubRepository({
+        addReview: () => Promise.reject(new NotAllowedError()),
+      }),
+    );
+
+    renderWithStore(<App />);
+    await loaded();
+    await openPlace(user, "Kinomoll");
+
+    await user.click(screen.getByRole("button", { name: /write a review/i }));
+    await user.click(screen.getByRole("radio", { name: /5 stars/i }));
+    await user.type(screen.getByLabelText(/what was it like/i), "Briefly here");
+    await user.click(screen.getByRole("button", { name: /post review/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/permission/i);
+
+    // The form stays open so the attempt is not thrown away. Leaving it should
+    // reveal a reviews list with no trace of the optimistic entry — the rules
+    // are the authority, and the screen has to agree with them.
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+    await screen.findByRole("heading", { name: /reviews/i });
+    expect(screen.queryByText("Briefly here")).not.toBeInTheDocument();
   });
 });

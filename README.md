@@ -152,7 +152,7 @@ tilt, rotation or data-driven styling. None of that is on this map.
 | App     | Jest + Testing Library | Filtering, selection, deep links, saved places, load failures                         |
 | Browser | Playwright               | Leaflet actually rendering, clustering, marker/list sync, mobile sheet                |
 
-68 unit tests and 24 browser tests, run on desktop and mobile viewports in CI.
+107 unit tests and 40 browser tests, run on desktop and mobile viewports in CI.
 
 The map is stubbed in the jsdom tests — Leaflet needs real layout and a real canvas, and a test
 that mocks all of that proves nothing. Playwright covers it against the production build instead.
@@ -164,14 +164,27 @@ deployed by CI on every push to `master` — before the app itself, so a release
 assuming an access model that failed to land. What is committed here is what the database
 enforces.
 
-| Collection                           | Read   | Write                                      |
-| ------------------------------------ | ------ | ------------------------------------------ |
-| `places`, `descriptions`, `comments` | anyone | nobody                                     |
-| `users/{uid}`                        | owner  | owner, shape-validated, list capped at 500 |
+| Path                       | Read   | Write                                           |
+| -------------------------- | ------ | ----------------------------------------------- |
+| `places/{id}`              | anyone | its author, or anyone signed in if it has none  |
+| `places/{id}/reviews/{id}` | anyone | anyone signed in; never edited or deleted after |
+| `users/{uid}`              | owner  | owner, shape-validated, list capped at 500      |
 
-Reference data is maintained out-of-band and is immutable from a browser. Signing in does not
-unlock editing anything; it carries a saved list, which lives in `localStorage` when signed out
-and merges into the user's document on sign-in.
+A place someone created belongs to them. A place with no author — every one of the 1,600
+imported from OpenStreetMap — is community-maintained and correctable by anyone signed in, which
+is the bargain the data came under. `src/domain/placeInput.ts` checks the same lengths the rules
+do, but only to say so before a round trip; the rules are the copy that is enforced.
+
+Two limits worth stating rather than hiding:
+
+- posting a review moves the place's average, so the review and the average are written in one
+  transaction. The rules can check the count rose by exactly one and the average stayed in range;
+  they cannot recompute it without reading every review. Closing that gap properly means writing
+  it somewhere the client is not — a Cloud Function, which needs a billing plan this project does
+  not use.
+- a cover photo is a link to an image, not an upload. That is a deliberate trade: no bucket, no
+  billing plan, and a link that rots looks exactly like a place that never had one. The rules
+  hold it to `https://` and 500 characters.
 
 > The previous revision shipped **no rules file at all**, which left every collection
 > world-writable by anyone who found the endpoint.
@@ -189,11 +202,33 @@ and merges into the user's document on sign-in.
   compute-bound. The heaviest interaction measured, clearing a search and putting all 1,620
   places back, takes 48 ms; Chrome's threshold for a responsive interaction is 200 ms.
 
+## Writing
+
+Adding a place, correcting one, and reviewing one all happen in the panel, in the column the
+list came from — a modal over the map would cover the thing the form is about. It is one form
+rather than the five separate modals the old version used.
+
+Three decisions in there:
+
+- **It works with no backend at all.** The fixture repository implements the same write methods
+  as the Firestore one, and stores what you add in `localStorage`. A write feature nobody can
+  try is not a feature, and the published demo has no database behind it.
+- **Position by moving the map under a crosshair,** not by dragging a marker — on a phone your
+  thumb covers the marker exactly when you need to see where it is going. The picker is its own
+  small Leaflet map, mounted only while the form is open.
+- **The photo field validates by showing you the photo.** Every string test for an image URL
+  either rejects a working link or accepts a dead one, and the browser settles the question in a
+  moment anyway.
+
+Mutations patch the RTK Query cache rather than invalidating it. Invalidating `listPlaces` would
+re-read the whole collection — sixteen hundred document reads against a fifty-thousand-a-day
+quota — to learn about one row already in hand. A write the rules refuse is rolled back, because
+the rules are the authority and the screen has to agree with them.
+
 ## What is next
 
-Place editing — create and edit a place, drag its pin, upload a cover photo, post a review — as a
-single schema-driven form rather than the five separate modals the old version used. That work
-extends the rules above with authenticated, owner-scoped writes.
+Photographs beyond the one cover link, and a way to report a place that should not be on the map.
+Neither needs anything the access model above does not already have.
 
 ## History
 

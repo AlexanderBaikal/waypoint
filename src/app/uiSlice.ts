@@ -2,6 +2,15 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Theme } from "../config";
 import { CATEGORIES, type Category } from "../domain/categories";
 
+/**
+ * The panel shows one of three things, and which one is a single piece of
+ * state rather than a pair of booleans that could both be true.
+ */
+export type Editor =
+  | { mode: "create" }
+  | { mode: "edit"; placeId: string }
+  | { mode: "review"; placeId: string };
+
 export interface UiState {
   query: string;
   categories: Category[];
@@ -9,6 +18,8 @@ export interface UiState {
   /** Mobile only: whether the results sheet covers the map. */
   listExpanded: boolean;
   theme: Theme;
+  /** Null when the panel is reading rather than writing. */
+  editor: Editor | null;
 }
 
 function isCategory(value: string): value is Category {
@@ -49,6 +60,10 @@ export function initialUiState(search = window.location.search): UiState {
     selectedPlaceId: params.get("place"),
     listExpanded: false,
     theme: readTheme(),
+    // Deliberately not in the URL: a half-written form is not a view worth
+    // sending anyone, and restoring one from a link would be a lie about what
+    // has been saved.
+    editor: null,
   };
 }
 
@@ -72,6 +87,15 @@ const uiSlice = createSlice({
     placeSelected(state, action: PayloadAction<string | null>) {
       state.selectedPlaceId = action.payload;
       if (action.payload) state.listExpanded = false;
+      // Walking away from a place closes whatever was being written about it.
+      state.editor = null;
+    },
+    editorOpened(state, action: PayloadAction<Editor>) {
+      state.editor = action.payload;
+      state.listExpanded = true;
+    },
+    editorClosed(state) {
+      state.editor = null;
     },
     listExpandedChanged(state, action: PayloadAction<boolean>) {
       state.listExpanded = action.payload;
@@ -90,6 +114,8 @@ export const {
   placeSelected,
   listExpandedChanged,
   themeToggled,
+  editorOpened,
+  editorClosed,
 } = uiSlice.actions;
 
 export const uiReducer = uiSlice.reducer;

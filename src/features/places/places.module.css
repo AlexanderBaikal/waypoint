@@ -483,6 +483,31 @@
   margin-bottom: 0.75rem;
 }
 
+/* A heading with an action on its right. The rule under it belongs to the
+   pair, so it moves from the title to the row. */
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 0.75rem;
+}
+
+.sectionHead .sectionTitle {
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* Save and Edit side by side, sharing the margin that Save used to carry
+   alone. */
+.panelActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .photoStrip {
   display: flex;
   gap: 0.5rem;

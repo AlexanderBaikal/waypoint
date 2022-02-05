@@ -1,0 +1,395 @@
+/* The form lives in the panel, in the same column as the list it replaced, so
+   it inherits the panel's width and scrolls with it. A modal over the map would
+   hide the thing the form is about. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.75rem 0.75rem 2.5rem;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.linkButton {
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.linkButton:hover {
+  color: var(--ink);
+}
+
+/* Says where the writing goes. Only shown on the build with no database, where
+   the honest answer is "this browser". */
+.notice {
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--r-tile);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 0.75rem;
+  text-wrap: pretty;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+/* Two fields that fit side by side above a phone, and stack below it. */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.label {
+  color: var(--ink-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0;
+}
+
+.optional {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+.hint {
+  color: var(--ink-3);
+  font-size: 0.6875rem;
+  text-wrap: pretty;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  padding: 0.4375rem 0.5625rem;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 3.5rem;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible,
+.field select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+/* The field says what is wrong beneath it, so the border only has to draw the
+   eye there rather than carry the message alone. */
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
+  border-color: var(--bad);
+}
+
+.error {
+  color: var(--bad);
+  font-size: 0.6875rem;
+  text-wrap: pretty;
+}
+
+.failure {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--bad);
+  border-radius: var(--r-tile);
+  color: var(--bad);
+  font-size: 0.75rem;
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.primary {
+  height: 2.25rem;
+  padding: 0 1rem;
+  border-radius: var(--r-control);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: filter 120ms ease;
+}
+
+.primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.primary:disabled {
+  opacity: 0.6;
+}
+
+.secondary {
+  align-self: flex-start;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-control);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.secondary:hover {
+  background: var(--surface-2);
+}
+
+/* ---- location ---- */
+
+.picker {
+  position: relative;
+  height: 11rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-tile);
+  overflow: hidden;
+}
+
+.pickerCanvas {
+  height: 100%;
+  width: 100%;
+}
+
+/* Leaflet's own zoom control, scaled to a control inside a form field rather
+   than one on a full-window map. Global selectors because the buttons are
+   Leaflet's markup, not ours. */
+.picker :global(.leaflet-control-zoom) {
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-control);
+  overflow: hidden;
+}
+
+.picker :global(.leaflet-control-zoom a) {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.picker :global(.leaflet-control-zoom a:hover) {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+/* Sits over the map's centre and takes no clicks, so dragging still reaches
+   Leaflet underneath. */
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 500;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  /* A white casing under the stroke, so the crosshair survives whatever colour
+     of roof it lands on. */
+  paint-order: stroke;
+  filter: drop-shadow(0 0 2px rgb(255 255 255 / 90%));
+}
+
+.locate {
+  position: absolute;
+  right: 0.375rem;
+  bottom: 0.375rem;
+  z-index: 500;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.locate:hover {
+  color: var(--ink);
+}
+
+.coords {
+  color: var(--ink-3);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- cover ---- */
+
+.preview {
+  margin-top: 0.25rem;
+  border-radius: var(--r-tile);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  height: 8rem;
+  object-fit: cover;
+}
+
+/* A link that has not resolved should not be shown as though it had. */
+.preview[data-status="broken"] img {
+  display: none;
+}
+
+.previewNote {
+  padding: 0.5rem 0.625rem;
+  color: var(--bad);
+  font-size: 0.6875rem;
+  text-wrap: pretty;
+}
+
+/* ---- hours ---- */
+
+.hoursHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.hours {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Tight because the row has to hold a day, a state and two times inside a
+   23rem panel — and a native time input is wider than it looks, since some
+   locales render it as "09:00 AM" with a picker button beside it. */
+.hoursRow {
+  display: grid;
+  grid-template-columns: 2rem 4.75rem 1fr;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.hoursDay {
+  color: var(--ink-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.hoursTimes {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  color: var(--ink-3);
+  font-size: 0.75rem;
+}
+
+/* min-width: 0 because a form control's default intrinsic minimum is wider
+   than its content, and a grid track will honour that over the track size —
+   which is how the closing time ended up past the edge of the panel. */
+.hoursTimes input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem 0.375rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.field .hoursState {
+  padding: 0.25rem 0.375rem;
+  font-size: 0.75rem;
+}
+
+/* ---- rating ---- */
+
+.stars {
+  display: flex;
+  gap: 0.125rem;
+}
+
+/* The star is drawn by the label; the radio is a transparent sheet over it.
+   Collapsing the input to nothing instead would make it unclickable and
+   invisible to anything driving the page — a control you can only reach with a
+   mouse aimed at a glyph is not a control. */
+.star {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--r-tile);
+  color: var(--star);
+  font-size: 1.375rem;
+  line-height: 1;
+}
+
+.star input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.star:hover {
+  background: var(--surface-2);
+}
+
+.star:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (width <= 30rem) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
