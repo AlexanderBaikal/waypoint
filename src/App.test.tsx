@@ -251,6 +251,30 @@ describe("App: writing", () => {
     expect(await screen.findByRole("heading", { name: "New Cafe" })).toBeInTheDocument();
   });
 
+  it("suggests a type by the category it belongs to", async () => {
+    const user = userEvent.setup();
+    renderWithStore(<App />);
+    await loaded();
+
+    await user.click(screen.getByRole("button", { name: /^\+ Add$/ }));
+
+    // Nothing about the word "Bank" says it is a service. The category is what
+    // connects the two, and being able to search it is the reason this list is
+    // ours rather than the browser's.
+    const type = screen.getByLabelText(/^type$/i);
+    await user.type(type, "services");
+
+    const options = screen.getAllByRole("option");
+    expect(options).toHaveLength(1);
+    expect(options[0]).toHaveTextContent("Bank");
+
+    // Enter takes the highlighted suggestion. The form it sits in must not
+    // read that as a submission.
+    await user.keyboard("{Enter}");
+    expect(type).toHaveValue("Bank");
+    expect(screen.getByRole("heading", { name: /add a place/i })).toBeInTheDocument();
+  });
+
   it("will not submit a place with nothing in it", async () => {
     const user = userEvent.setup();
     const createPlace = jest.fn();

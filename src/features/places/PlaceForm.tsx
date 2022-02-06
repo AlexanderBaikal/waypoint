@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useId, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useCreatePlaceMutation, useUpdatePlaceMutation } from "../../app/placesApi";
 import { editorClosed, placeSelected } from "../../app/uiSlice";
@@ -17,6 +17,7 @@ import { useWriteIdentity, writesAreLocal } from "../auth/useAuthor";
 import { CoverField } from "./CoverField";
 import { HoursEditor } from "./HoursEditor";
 import { LocationPicker } from "./LocationPicker";
+import { TypeCombobox } from "./TypeCombobox";
 import styles from "./placeForm.module.css";
 
 interface PlaceFormProps {
@@ -62,11 +63,6 @@ export function PlaceForm({ place, origin, knownTypes }: PlaceFormProps) {
     // Clear this field's complaint as soon as it is being addressed.
     setErrors((previous) => ({ ...previous, [key]: undefined }));
   };
-
-  const suggestions = useMemo(
-    () => [...new Set(knownTypes)].sort((a, b) => a.localeCompare(b)).slice(0, 200),
-    [knownTypes],
-  );
 
   const submit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -130,25 +126,21 @@ export function PlaceForm({ place, origin, knownTypes }: PlaceFormProps) {
         <label className={styles.label} htmlFor={field("type")}>
           Type
         </label>
-        <input
-          id={field("type")}
-          value={input.type}
-          list={field("types")}
-          maxLength={LIMITS.type}
-          autoComplete="off"
-          placeholder="Cafe, Pharmacy, Bookshop…"
-          aria-invalid={errors.type ? true : undefined}
-          onChange={(event) => {
-            set("type", event.target.value);
-          }}
-        />
         {/* Suggestions, not a closed list: the taxonomy in categories.ts maps
             whatever is typed, and an unrecognised type is still a place. */}
-        <datalist id={field("types")}>
-          {suggestions.map((type) => (
-            <option key={type} value={type} />
-          ))}
-        </datalist>
+        <TypeCombobox
+          id={field("type")}
+          value={input.type}
+          types={knownTypes}
+          maxLength={LIMITS.type}
+          invalid={Boolean(errors.type)}
+          onChange={(type) => {
+            set("type", type);
+          }}
+        />
+        <p className={styles.hint}>
+          Search by type, or by category — “food” finds the bakeries.
+        </p>
         {errors.type ? <p className={styles.error}>{errors.type}</p> : null}
       </div>
 

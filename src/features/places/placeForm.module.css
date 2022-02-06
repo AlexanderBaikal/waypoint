@@ -168,6 +168,93 @@
   background: var(--surface-2);
 }
 
+/* ---- type ---- */
+
+.combo {
+  position: relative;
+}
+
+.combo input {
+  /* Clear of the chevron. */
+  padding-right: 1.75rem;
+}
+
+.chevron {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  transform: translateY(-50%);
+  /* The field underneath owns the click. */
+  pointer-events: none;
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.comboList {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  left: 0;
+  /* The fields below are positioned too, and the location picker is one of
+     them, so DOM order alone would put the map over a list opening onto it. */
+  z-index: 1;
+  max-height: 13rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  /* The one shadow in the form. Everything else here is flat on the panel, but
+     this floats over the fields below it and has to say so. */
+  box-shadow: 0 6px 20px rgb(0 0 0 / 22%);
+}
+
+.comboOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3125rem 0.4375rem;
+  border-radius: var(--r-tile);
+  cursor: pointer;
+}
+
+/* Hover and the keyboard's highlight are the same state, so they are one rule
+   rather than two that can disagree about which row is next. */
+.comboOption[data-active="true"] {
+  background: var(--surface-2);
+}
+
+/* The category legend, at the size of a bullet: same hue as the chip and the
+   map pin, so the list says what kind of place a type is without a word. */
+.comboDot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.comboType {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comboCategory {
+  flex: none;
+  color: var(--ink-3);
+  font-size: 0.6875rem;
+}
+
 /* ---- location ---- */
 
 .picker {
@@ -176,6 +263,12 @@
   border: 1px solid var(--line);
   border-radius: var(--r-tile);
   overflow: hidden;
+  /* Leaflet puts its controls at z-index 1000, which is above anything the
+     form would sensibly bid. Isolating the picker keeps its zoom buttons
+     inside it, so the type field's list can open over the map without having
+     to outbid a number that belongs to another library. The main map is held
+     back the same way — see .map in App.module.css. */
+  isolation: isolate;
 }
 
 .pickerCanvas {
