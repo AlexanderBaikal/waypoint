@@ -8,8 +8,21 @@
       name="description"
       content="A map client for exploring points of interest, built on Leaflet and OpenStreetMap."
     />
-    <meta name="theme-color" content="#eef0f2" />
+    <meta name="theme-color" content="#14171b" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      // Settles the theme before the first paint. Dark is the default, so
+      // without this every load would show the light interface for as long as
+      // it takes React to mount and put the attribute on. The key is
+      // THEME_KEY in src/app/uiSlice.ts, which makes the same choice again
+      // once the store is built.
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("waypoint:theme") === "light" ? "light" : "dark";
+      } catch {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -33,12 +33,18 @@ const THEME_KEY = "waypoint:theme";
  * screen, so it lives in localStorage rather than in the deep link — a URL you
  * send someone should carry the place you are looking at, not how bright you
  * like your map. Blocked storage throws; a preference is not worth a crash.
+ *
+ * Dark is the default and only an explicit "light" turns it off, so an
+ * unreadable value falls to dark rather than to the other theme. The inline
+ * script in index.html makes the same decision before React mounts, to save a
+ * flash of the light interface on every load — it reads THEME_KEY too, so the
+ * two have to agree.
  */
 function readTheme(): Theme {
   try {
-    return localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
+    return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
   } catch {
-    return "light";
+    return "dark";
   }
 }
 
