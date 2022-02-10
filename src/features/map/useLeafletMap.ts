@@ -1,27 +1,12 @@
 import L from "leaflet";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { INITIAL_VIEW, tileOptions, tiles, type Theme } from "../../config";
+import { INITIAL_VIEW, type Theme } from "../../config";
+import { tileLayer } from "./tileLayer";
 
 export interface LeafletBinding {
   /** Attach to the element that should host the map. */
   ref: (element: HTMLDivElement | null) => void;
   map: L.Map | null;
-}
-
-/**
- * The two sources differ in more than their URL — how deep their cache goes and
- * whether they have a 2x tile — and those are construction-time options, which
- * is why switching builds a layer rather than repointing one.
- */
-function tileLayer(theme: Theme): L.TileLayer {
-  const source = tiles[theme];
-  return L.tileLayer(source.url, {
-    attribution: source.attribution,
-    subdomains: tileOptions.subdomains,
-    maxZoom: tileOptions.maxZoom,
-    maxNativeZoom: source.maxNativeZoom,
-    detectRetina: source.retina,
-  });
 }
 
 /**

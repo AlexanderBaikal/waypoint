@@ -1,8 +1,15 @@
 /* The interface is chrome around a map, so it is built to stay out of the map's
    way: a cool neutral scale, one blue that means "you can act on this", and no
    other saturated colour except the category hues in CATEGORY_META — which are
-   a legend, not decoration. Anything that reads as brand here is a mistake. */
-:root {
+   a legend, not decoration. Anything that reads as brand here is a mistake.
+
+   The second selector is for a subtree that stays light while the interface
+   around it is dark — the location picker, which is always on the light
+   basemap. Declaring the tokens on that element beats what it would otherwise
+   inherit from the root, so everything inside is written against the palette
+   as usual and none of these values are spelled out twice. */
+:root,
+[data-theme="light"] {
   --bg: #eef0f2;
   --surface: #fff;
   --surface-2: #f4f6f8;

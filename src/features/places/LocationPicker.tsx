@@ -1,13 +1,12 @@
 import L from "leaflet";
 import { useCallback, useEffect, useRef } from "react";
-import { tileOptions, tiles, type Theme } from "../../config";
+import { tileLayer } from "../map/tileLayer";
 import type { Coords } from "../../domain/place";
 import styles from "./placeForm.module.css";
 
 interface LocationPickerProps {
   value: Coords;
   onChange: (coords: Coords) => void;
-  theme: Theme;
 }
 
 const round = (value: number) => Math.round(value * 1e6) / 1e6;
@@ -20,10 +19,16 @@ const round = (value: number) => Math.round(value * 1e6) / 1e6;
  * Its own Leaflet instance rather than a mode on the main map: the picker is
  * mounted only while the form is open, and keeping it separate means the map
  * behind the panel does not have to know that a form exists.
+ *
+ * Always the light basemap, whatever the interface is wearing. Placing a pin is
+ * the one task here that is about the map's detail rather than its mood, and
+ * the light source is the better map for it: CARTO holds native tiles to zoom
+ * 19 and serves a 2x, where the dark source runs out at 16 and gets stretched.
+ * A dark map that goes soft at exactly the zoom you place a pin at is worse
+ * than a bright rectangle in a dark form.
  */
-export function LocationPicker({ value, onChange, theme }: LocationPickerProps) {
+export function LocationPicker({ value, onChange }: LocationPickerProps) {
   const map = useRef<L.Map | null>(null);
-  const layer = useRef<L.TileLayer | null>(null);
   // What we last told the parent. Re-centring on our own value would fight the
   // gesture that produced it.
   const emitted = useRef<Coords>(value);
@@ -50,11 +55,7 @@ export function LocationPicker({ value, onChange, theme }: LocationPickerProps) 
       scrollWheelZoom: false,
     });
 
-    const source = tiles[theme];
-    layer.current = L.tileLayer(source.url, {
-      ...tileOptions,
-      detectRetina: true,
-    }).addTo(instance);
+    tileLayer("light").addTo(instance);
 
     const report = () => {
       const centre = instance.getCenter();
@@ -76,15 +77,8 @@ export function LocationPicker({ value, onChange, theme }: LocationPickerProps) 
       instance.off("moveend", report);
       instance.remove();
       map.current = null;
-      layer.current = null;
     };
-    // The theme is read once, at creation; the effect below switches it after.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    layer.current?.setUrl(tiles[theme].url);
-  }, [theme]);
 
   // Follows the value only when it moved somewhere other than here — typing
   // into the coordinate fields, or the form opening on an existing place.
@@ -94,8 +88,12 @@ export function LocationPicker({ value, onChange, theme }: LocationPickerProps) 
     map.current?.setView([value.lat, value.lng], map.current.getZoom());
   }, [value]);
 
+  // `data-theme` pins the subtree to the light palette. The tiles under this
+  // chrome are the light basemap whatever the interface is wearing, so the zoom
+  // buttons and the crosshair have to read against those rather than against a
+  // dark panel that is not underneath them.
   return (
-    <div className={styles.picker}>
+    <div className={styles.picker} data-theme="light">
       <div ref={ref} className={styles.pickerCanvas} data-testid="location-picker" />
 
       {/* Purely decorative: the coordinates below are the accessible readout. */}

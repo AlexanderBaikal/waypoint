@@ -1,5 +1,5 @@
 import { useId, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch } from "../../app/hooks";
 import { useCreatePlaceMutation, useUpdatePlaceMutation } from "../../app/placesApi";
 import { editorClosed, placeSelected } from "../../app/uiSlice";
 import type { Place } from "../../domain/place";
@@ -40,7 +40,6 @@ function failureMessage(error: unknown): string {
 
 export function PlaceForm({ place, origin, knownTypes }: PlaceFormProps) {
   const dispatch = useAppDispatch();
-  const theme = useAppSelector((state) => state.ui.theme);
   const { author } = useWriteIdentity();
 
   const [create, creating] = useCreatePlaceMutation();
@@ -148,7 +147,6 @@ export function PlaceForm({ place, origin, knownTypes }: PlaceFormProps) {
         <span className={styles.label}>Where it is</span>
         <LocationPicker
           value={input.coords}
-          theme={theme}
           onChange={(coords) => {
             set("coords", coords);
           }}
