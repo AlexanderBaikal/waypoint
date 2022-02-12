@@ -24,8 +24,11 @@ test("the panel waits to be asked before it lists anything", async ({ page }) =>
   await expect(results(page)).toHaveCount(0);
   await expect(page.getByText(/search for one, or pick a category/i)).toBeVisible();
 
+  // Retrying, not a single count: the query is deferred on purpose, so the
+  // rows arrive a frame or two after the keystroke and a one-shot read races
+  // them. Under a loaded machine it loses.
   await search(page).fill("museum");
-  expect(await results(page).count()).toBeGreaterThan(0);
+  await expect(results(page)).not.toHaveCount(0);
 });
 
 test("clusters the full dataset instead of drawing every pin", async ({ page }) => {
@@ -71,6 +74,9 @@ test("search narrows the list and the markers together", async ({ page }) => {
 test("a small result set is drawn pin by pin, with no clusters", async ({ page }) => {
   await search(page).fill("museum");
 
+  // Settle first, then read: the deferred render means the count is not final
+  // the instant the field changes.
+  await expect(results(page)).not.toHaveCount(0);
   const count = await results(page).count();
   expect(count).toBeGreaterThan(1);
   await expect(clusters(page)).toHaveCount(0);
@@ -82,8 +88,7 @@ test("a category chip filters to that category", async ({ page }) => {
   await filters.getByRole("button", { name: /education/i }).click();
 
   await expect(page.getByText(/^\d+ places$/)).toBeVisible();
-  const count = await results(page).count();
-  expect(count).toBeGreaterThan(0);
+  await expect(results(page)).not.toHaveCount(0);
   await expect(page.getByText(/education/i).first()).toBeVisible();
 });
 
