@@ -1,4 +1,4 @@
-import type { Place, Review } from "../domain/place";
+import { byName, type Place, type Review } from "../domain/place";
 import { uniqueSlug } from "../domain/slug";
 import {
   NotAllowedError,
@@ -10,9 +10,8 @@ import {
 import placesJson from "./fixtures/places.json";
 import reviewsJson from "./fixtures/reviews.json";
 
-// These files are produced by scripts/import-osm.mjs and are checked in, so
-// their shape is ours rather than a third party's. That is why they are cast
-// instead of validated the way the Firestore adapter validates what it reads.
+// Produced by scripts/import-osm.mjs and checked in, so the shape is ours.
+// Hence the cast, where the Firestore adapter validates what it reads.
 const basePlaces = placesJson as Place[];
 const baseReviews = reviewsJson as Review[];
 
@@ -24,17 +23,16 @@ interface Overlay {
   reviews: Review[];
 }
 
-/** A fresh one every time: the caller mutates what it gets back, and a shared
- *  constant would carry one session's edits into the next. */
+/** A fresh one every time: the caller mutates what it gets back. */
 const empty = (): Overlay => ({ places: {}, reviews: [] });
 
 /**
- * Without Firebase configured the app still has to demonstrate writing — it is
- * how anyone reviewing this repository sees the feature at all. Edits go to
- * localStorage, so they survive a reload and belong to this browser alone.
+ * Writing still works without Firebase configured, which is how the published
+ * demo shows the feature. Edits go to localStorage, so they survive a reload
+ * and belong to this browser alone.
  *
  * Private browsing and blocked storage both throw on access; an edit that
- * cannot be persisted still applies for the session rather than crashing.
+ * cannot be persisted still applies for the session.
  */
 function readOverlay(): Overlay {
   try {
@@ -64,7 +62,6 @@ export function createFixtureRepository(): PlacesRepository {
   const merged = new Map(basePlaces.map((place) => [place.id, place]));
   for (const [id, place] of Object.entries(overlay.places)) merged.set(id, place);
 
-  const byName = (a: Place, b: Place) => a.name.localeCompare(b.name, "ru");
   let places = [...merged.values()].sort(byName);
   let reviews = [...baseReviews, ...overlay.reviews];
 
@@ -107,6 +104,7 @@ export function createFixtureRepository(): PlacesRepository {
         website: input.website,
         about: input.about,
         cover: input.cover,
+        coverCredit: null,
         photos: [],
         rating: null,
         schedule: input.schedule,
@@ -130,6 +128,9 @@ export function createFixtureRepository(): PlacesRepository {
         website: input.website,
         about: input.about,
         cover: input.cover,
+        // A different link is a different photograph; the credit stored with
+        // the old one names an author who did not take this one.
+        coverCredit: input.cover === existing.cover ? existing.coverCredit : null,
         schedule: input.schedule,
       };
       commit(place);

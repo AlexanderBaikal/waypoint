@@ -1,95 +1,108 @@
-/* The interface is chrome around a map, so it is built to stay out of the map's
-   way: a cool neutral scale, one blue that means "you can act on this", and no
-   other saturated colour except the category hues in CATEGORY_META — which are
-   a legend, not decoration. Anything that reads as brand here is a mistake.
+/* The palette is Google Maps': the set of neutrals and the blue that readers
+   already parse as map chrome. Greys are Google's own scale (#202124 through
+   #dadce0 light, #202124 up through #9aa0a6 dark), blue is #1a73e8 / #8ab4f8.
+   Layout, type, marks and the category hues in CATEGORY_META are this
+   application's own.
 
-   The second selector is for a subtree that stays light while the interface
-   around it is dark — the location picker, which is always on the light
-   basemap. Declaring the tokens on that element beats what it would otherwise
-   inherit from the root, so everything inside is written against the palette
-   as usual and none of these values are spelled out twice. */
+   The second selector covers a subtree that stays light while the interface
+   around it is dark: the location picker, which always uses the light basemap.
+   Declaring the tokens there beats what it would inherit from the root, so
+   nothing inside has to spell these values out twice. */
 :root,
 [data-theme="light"] {
-  --bg: #eef0f2;
+  --bg: #e8eaed;
   --surface: #fff;
-  --surface-2: #f4f6f8;
-  --surface-3: #e8ebf0;
+  --surface-2: #f1f3f4;
+  --surface-3: #e8eaed;
 
-  --ink: #14171c;
-  --ink-2: #4a505b;
-  --ink-3: #6d7480;
+  /* 16.1:1, 12.6:1, 7.0:1 on white. The previous third grey sat at 4.6 while
+     carrying most of the panel's small print, read at 13px over a moving map. */
+  --ink: #202124;
+  --ink-2: #3c4043;
+  --ink-3: #5f6368;
 
-  --line: #e2e5ea;
-  --line-2: #cfd4dc;
+  --line: #e8eaed;
+  --line-2: #dadce0;
 
-  /* 5.95:1 against white in both directions, which is the reason for this
-     particular blue: one token carries white text on a filled button and blue
-     text on a white row. --on-accent is what rides a filled one. */
-  --accent: #1b5fc9;
-  --accent-wash: #eaf1fc;
+  /* Google's blue: 4.6:1 against white as text, and white on it reads at the
+     same figure, so one token carries both a filled button and a blue label.
+     --on-accent is what rides a filled one. */
+  --accent: #1a73e8;
+  --accent-strong: #174ea6;
+  --accent-wash: #e8f0fe;
   --on-accent: #fff;
 
   /* Open / closing soon / closed. Their job is to be read without the label,
      so they are the three colours everyone already knows. */
-  --ok: #17794a;
-  --warn: #9a5b08;
-  --bad: #c02626;
+  --ok: #188038;
+  --warn: #b06000;
+  --bad: #d93025;
 
-  /* Ratings only. Darker than the amber a star usually gets, because it has to
-     hold 3:1 against white to read as a shape rather than a smudge. */
-  --star: #c9821b;
+  /* Ratings only, and always beside the figure it decorates. The number
+     carries the meaning, so this can be the amber a star actually is rather
+     than a darkened one that reads as brown. */
+  --star: #f9ab00;
 
-  /* Marker chrome — the pin's ring and the cluster's plate. Deliberately NOT
-     themed: these sit on tiles, not on the panel, and the tiles are near-white
-     under one basemap and mid-grey under the other, so white reads on both.
-     Flipping them with the interface would put a dark disc on a dark map. */
+  /* The ring that lifts a pin off the tiles. Deliberately not themed: it sits
+     on tiles rather than on the panel, and those are near-white under one
+     basemap and near-black under the other, so white reads on both. */
   --marker-plate: #fff;
-  --marker-ink: #14171c;
 
-  --panel-width: 23rem;
+  /* Elevation rather than outline. A floating sheet over a drawn map cannot
+     separate itself with a hairline, because the map has hairlines of its own
+     in the same greys. Two steps: a control, and the sidebar holding them. */
+  --shadow-1: 0 1px 2px rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
+  --shadow-2: 0 1px 2px rgb(60 64 67 / 30%), 0 2px 6px 2px rgb(60 64 67 / 15%);
 
-  /* Three sizes of object — a control, a card, a tile — so three judgements,
-     rather than one number multiplied about. */
+  --panel-width: 25rem;
+
+  /* Three sizes of object (control, card, tile) plus the pill the filter chips
+     are cut to. */
   --r-control: 8px;
-  --r-card: 12px;
-  --r-tile: 7px;
+  --r-card: 8px;
+  --r-tile: 8px;
+  --r-pill: 999px;
 
   --font: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   color-scheme: light;
 }
 
-/* The dark theme is this interface with its values turned over, not a second
-   design: every token here answers one above, and nothing else in the
-   application is told which is in force.
-   It rides the same switch as the basemap because the white panel was the
-   uncomfortable part of the dark map — one bright rectangle in a dim field,
-   which is the light a dark map exists to avoid. */
+/* The dark theme is this interface with its values turned over rather than a
+   second design: every token here answers one above, and nothing else in the
+   application is told which is in force. It rides the same switch as the
+   basemap, since a white panel on a dark map is one bright rectangle in a dim
+   field. */
 :root[data-theme="dark"] {
-  --bg: #14171b;
-  --surface: #1c2026;
-  --surface-2: #252a31;
-  --surface-3: #2f353d;
+  --bg: #17181a;
+  --surface: #202124;
+  --surface-2: #292a2d;
+  --surface-3: #35363a;
 
-  --ink: #e9ecef;
-  --ink-2: #b4bac3;
-  --ink-3: #8b929c;
+  --ink: #e8eaed;
+  --ink-2: #bdc1c6;
+  --ink-3: #9aa0a6;
 
-  --line: #2b313a;
-  --line-2: #3b424c;
+  --line: #35363a;
+  --line-2: #3c4043;
 
-  /* The blue has to travel the other way here. Light enough to read as text on
-     a dark row (5.8:1), which drops white on a filled one to 2.8:1 — so a
-     filled accent takes dark ink instead, and --on-accent is why that is one
-     token to change rather than a hunt through the sheet. */
-  --accent: #5b9bf5;
-  --accent-wash: #1b2b41;
-  --on-accent: #10161f;
+  /* The blue travels the other way here: light enough to read as text on a
+     dark row (8.6:1), which drops white on a filled one to 2.0:1. So a filled
+     accent takes dark ink, which --on-accent makes one token to change. */
+  --accent: #8ab4f8;
+  --accent-strong: #aecbfa;
+  --accent-wash: #283b58;
+  --on-accent: #202124;
 
-  --ok: #45b877;
-  --warn: #d59a3f;
-  --bad: #ef6f6f;
-  --star: #d9a13c;
+  --ok: #81c995;
+  --warn: #fdd663;
+  --bad: #f28b82;
+  --star: #fdd663;
+
+  /* Grey shadows are invisible on a near-black map; these are black and deeper,
+     which is the only way an elevated surface reads as raised in the dark. */
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 60%), 0 1px 3px 1px rgb(0 0 0 / 40%);
+  --shadow-2: 0 1px 2px rgb(0 0 0 / 60%), 0 2px 6px 2px rgb(0 0 0 / 45%);
 
   color-scheme: dark;
 }
@@ -115,18 +128,19 @@ body {
   color: var(--ink);
   font-family: var(--font);
   font-size: 0.875rem;
-  line-height: 1.45;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Two weights in the whole application: 400 reads, 600 labels. A third would
-   only ever be someone reaching for emphasis they could get from colour. */
+/* Two weights in the whole application: 400 reads, 500 labels. At the previous
+   600, every name, chip and heading was semibold, which leaves no emphasis to
+   give and is harder to scan at 13px. */
 h1,
 h2,
 h3 {
   font-size: inherit;
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
 button,
@@ -142,11 +156,10 @@ button {
   padding: 0;
 }
 
-/* Controls are not prose. Dragging across the panel — which is a thing people
-   do on a map, on the way to dragging the map — used to leave chip labels, row
-   names and the hours summary highlighted in blue. Anything you press stops
-   taking a selection; an address, a phone number or a review is content and
-   still selects normally. */
+/* Controls are not prose. Dragging across the panel, which people do on the
+   way to dragging the map, used to leave chip labels, row names and the hours
+   summary highlighted. Anything pressable stops taking a selection; an address,
+   a phone number or a review is content and still selects normally. */
 button,
 summary,
 [role="img"] {
@@ -169,8 +182,8 @@ img {
   max-width: 100%;
 }
 
-/* Figures are compared down a column — ratings against ratings, closing times
-   against closing times — so they are set on a fixed advance everywhere. */
+/* Figures are compared down a column (ratings against ratings, closing times
+   against closing times) so they are set on a fixed advance everywhere. */
 :where(time, output, .tnum) {
   font-variant-numeric: tabular-nums;
 }
@@ -178,6 +191,14 @@ img {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
+}
+
+/* The results scroll beside a map you are dragging, so the scrollbar has to be
+   findable without becoming furniture: thin, in the same grey as the rules
+   between rows, on no track at all. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-2) transparent;
 }
 
 /* Leaflet ships opinionated chrome; only the attribution is kept, restyled to
@@ -192,13 +213,13 @@ img {
      grey through and the credit sat at about 4:1 on its own background. */
   background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
   border-radius: var(--r-tile) 0 0 0;
-  color: var(--ink-3);
+  color: var(--ink-3) !important;
   font-size: 0.6875rem;
   padding: 0.15rem 0.5rem;
 }
 
 .leaflet-control-attribution a {
-  color: var(--ink-2);
+  color: var(--ink-2) !important;
 }
 
 .leaflet-tooltip {
@@ -206,8 +227,8 @@ img {
   border: none;
   border-radius: var(--r-tile);
   box-shadow: none;
-  /* Ink on surface, inverted — so the tooltip flips with the theme instead of
-     becoming white-on-white when --ink goes light. */
+  /* Ink on surface, inverted, so the tooltip flips with the theme instead of
+     going white-on-white when --ink turns light. */
   color: var(--surface);
   font-size: 0.75rem;
   font-weight: 600;

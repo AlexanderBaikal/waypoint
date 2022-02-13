@@ -15,12 +15,12 @@
   border: none;
 }
 
-/* A pin is a filled disc in its category's colour with the category's mark on
-   it. Before this they were all the same white circle, which meant the map
-   could tell you where things were but not what they were — the one question a
-   map of a city is for.
-   The white ring is what lifts it off the tiles. A drop shadow would do the
-   same job, sixty times a frame, and leave a grey smudge on every pin. */
+/* A filled disc in the category's colour, carrying the category's mark, so the
+   map says what things are and not only where they are.
+
+   The white ring lifts the pin off the tiles and the shadow keeps it lifted
+   over a drawn basemap: over a park, a disc without one sits in the green
+   rather than on it. */
 .pin {
   display: grid;
   place-items: center;
@@ -28,7 +28,9 @@
   width: 100%;
   border-radius: 50%;
   background: var(--cat);
-  box-shadow: 0 0 0 2px var(--marker-plate);
+  box-shadow:
+    0 0 0 2px var(--marker-plate),
+    0 1px 3px rgb(0 0 0 / 35%);
   color: #fff;
   font-size: 0.6875rem;
   line-height: 1;
@@ -39,69 +41,59 @@
   transform: scale(1.15);
 }
 
-/* The open place has to be findable at a glance in a field of its own kind, so
-   it grows and takes a second ring in the interface's blue. It keeps its
-   category colour: selection is not a change of what the place is. */
+/* The open place grows and takes a second ring in the interface's blue. It
+   keeps its category colour: selection does not change what the place is. */
 .pin[data-selected="true"] {
   font-size: 1rem;
   box-shadow:
     0 0 0 3px var(--marker-plate),
-    0 0 0 5px var(--accent);
+    0 0 0 5px var(--accent),
+    0 2px 6px rgb(0 0 0 / 35%);
 }
 
-/* A cluster is a count, not a place, so it stays out of the legend entirely —
-   white with black figures, the one thing on the map that carries no hue. */
-.cluster {
-  display: grid;
-  place-items: center;
-  height: 100%;
-  width: 100%;
-  border: 1.5px solid color-mix(in srgb, var(--marker-ink) 14%, transparent);
-  border-radius: 50%;
-  background: var(--marker-plate);
-  box-shadow: 0 0 0 2px rgb(255 255 255 / 55%);
-  color: var(--marker-ink);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  line-height: 1;
-  transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    color 140ms ease;
-}
-
-.cluster:hover {
-  background: var(--marker-ink);
-  border-color: var(--marker-ink);
-  color: var(--marker-plate);
-}
-
+/* Bottom right, lifted off the tiles the same way the panel is: a plate with a
+   shadow under it. Sharing one bordered box, as they used to, read as a form
+   control left lying on the map. */
 .controls {
   position: absolute;
-  right: 0.75rem;
-  bottom: 1.75rem;
+  right: 0.875rem;
+  bottom: 1.5rem;
   z-index: 500;
   display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+/* Zoom is one object with two ends, so it stays one plate. */
+.zoom {
+  display: grid;
   background: var(--surface);
-  border: 1px solid var(--line-2);
   border-radius: var(--r-control);
+  box-shadow: var(--shadow-1);
   overflow: hidden;
 }
 
 .controls button {
-  height: 2rem;
-  width: 2rem;
+  height: 2.5rem;
+  width: 2.5rem;
   color: var(--ink-2);
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
   line-height: 1;
   transition: background-color 100ms ease;
 }
 
 /* One rule rather than a 1px grid gap: a gap paints the container's background
    between the buttons, which meant a stray line above the first one. */
-.controls button + button {
+.zoom button + button {
   border-top: 1px solid var(--line);
+}
+
+/* Everything that is not zoom gets its own round button: a different shape for
+   a different kind of action. */
+.round {
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
 }
 
 .controls button:hover {
@@ -123,20 +115,23 @@
 }
 
 .glyph {
-  width: 1rem;
-  height: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
-/* What shows through until a tile arrives. Esri serves from a slower origin
-   than CARTO's CDN, so on the dark map the default light ground was a second
-   of flashbulb in a checkerboard; this is Dark Gray Canvas's own ground tone,
-   sampled from a tile, so the map now assembles instead of flashing. */
+/* What shows through until a tile arrives, per basemap: the ground tone of the
+   tiles themselves, sampled from one. Without it the map assembles out of a
+   white checkerboard, which on the dark theme is a second of flashbulb. */
+.root :global(.leaflet-container) {
+  background: #f2efe9;
+}
+
 :root[data-theme="dark"] .root :global(.leaflet-container) {
-  background: #4d4d4f;
+  background: #21262b;
 }
 
 @media (width <= 48rem) {
   .controls {
-    bottom: 45vh;
+    bottom: 47vh;
   }
 }

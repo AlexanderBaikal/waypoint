@@ -1,15 +1,12 @@
 import { categoryOf, type Category } from "./categories";
-import type { Place } from "./place";
+import { byName, type Place } from "./place";
 
 export interface PlaceFilter {
   query: string;
   categories: readonly Category[];
 }
 
-/**
- * Lowercase, strip accents, collapse whitespace. The dataset mixes Latin and
- * Cyrillic names, so "Дикая" and "dikaya" both need to behave predictably.
- */
+/** Lowercase, strip accents, collapse whitespace. */
 export function normaliseForSearch(value: string): string {
   return value
     .normalize("NFD")
@@ -25,11 +22,10 @@ interface Searchable {
 }
 
 /**
- * Normalising is the expensive half of a search — NFD plus two regexes per
- * field — and the dataset runs to a few thousand places while the query
- * changes on every keystroke. The result depends only on the place, so it is
- * computed once and held against the object itself. A WeakMap means a place
- * dropped from the dataset takes its entry with it.
+ * Normalising is the expensive half of a search (NFD plus two regexes per
+ * field) and the query changes on every keystroke, so the result is computed
+ * once per place. A WeakMap lets a place dropped from the dataset take its
+ * entry with it.
  */
 const searchableCache = new WeakMap<Place, Searchable>();
 
@@ -70,12 +66,14 @@ export function scorePlace(place: Place, query: string): number {
 
 /**
  * Separates places that score the same. With no query every place scores 1, so
- * without this the panel opens on whatever the alphabet puts first — which, in
- * a dataset of sixteen hundred imported places, is a row of names beginning
- * with digits. Rated and photographed places lead instead: they are the ones
- * with a detail page worth opening.
+ * without this the panel opens on whatever the alphabet puts first, which in
+ * this dataset is a run of names beginning with digits. Rated and photographed
+ * places lead instead, being the ones with a detail page worth opening.
+ *
+ * Distinct from `prominence` in features/map: that one drives marker thinning
+ * and weighs far more fields. This is only a tie-break.
  */
-function prominence(place: Place): number {
+function detailRank(place: Place): number {
   return (place.rating ? 4 : 0) + (place.cover ? 2 : 0) + (place.about ? 1 : 0);
 }
 
@@ -94,8 +92,10 @@ export function filterPlaces(places: readonly Place[], filter: PlaceFilter): Pla
     .sort(
       (a, b) =>
         b.score - a.score ||
-        prominence(b.place) - prominence(a.place) ||
-        a.place.name.localeCompare(b.place.name),
+        detailRank(b.place) - detailRank(a.place) ||
+        // The same comparison the repositories list by, so an unfiltered search
+        // and the stored order do not disagree about two equally good places.
+        byName(a.place, b.place),
     )
     .map(({ place }) => place);
 }

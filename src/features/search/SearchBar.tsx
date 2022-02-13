@@ -16,6 +16,23 @@ export function SearchBar({ value, resultCount, onChange }: SearchBarProps) {
         Search places
       </label>
 
+      <input
+        id={id}
+        className={styles.input}
+        type="search"
+        value={value}
+        placeholder="Search places"
+        autoComplete="off"
+        // Not debounced: the caller defers the filtering pass instead, which
+        // keeps the field responsive without a fixed delay on the results.
+        onChange={(event) => {
+          onChange(event.target.value);
+        }}
+        aria-describedby={`${id}-count`}
+      />
+
+      {/* After the field in the DOM, in front of it on screen, so a sibling
+          selector can tint the magnifier while the field has the caret. */}
       <svg
         className={styles.icon}
         viewBox="0 0 16 16"
@@ -28,21 +45,6 @@ export function SearchBar({ value, resultCount, onChange }: SearchBarProps) {
         <circle cx="7" cy="7" r="4.75" />
         <path d="M10.5 10.5 14 14" />
       </svg>
-
-      <input
-        id={id}
-        className={styles.input}
-        type="search"
-        value={value}
-        placeholder="Search places"
-        autoComplete="off"
-        // Not debounced: the caller defers the filtering pass instead, so the
-        // field stays responsive without holding results back by a fixed delay.
-        onChange={(event) => {
-          onChange(event.target.value);
-        }}
-        aria-describedby={`${id}-count`}
-      />
 
       {value ? (
         <button

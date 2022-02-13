@@ -10,7 +10,7 @@ rules_version = '2';
 // The previous revision of this project shipped with no rules file at all,
 // which left every collection world-writable. Rules live in version control so
 // that a change to the access model shows up in review like any other change,
-// and .github/workflows/ci.yml deploys this file on every push to master —
+// and .github/workflows/ci.yml deploys this file on every push to master:
 // what is committed here is what the database enforces.
 
 service cloud.firestore {
@@ -85,7 +85,7 @@ service cloud.firestore {
     }
 
     /**
-     * A place with no author is community-maintained — anyone signed in may
+     * A place with no author is community-maintained: anyone signed in may
      * correct it, which is the bargain OpenStreetMap makes and where most of
      * this data came from. A place someone created belongs to them.
      */
@@ -94,11 +94,18 @@ service cloud.firestore {
         && (resource.data.authorId == null || resource.data.authorId == request.auth.uid);
     }
 
-    /** An edit may not touch ownership, ratings or provenance. */
+    /**
+     * An edit may not touch ownership, ratings or provenance.
+     *
+     * `coverCredit` is the exception that proves it: a client may not write a
+     * credit, but replacing the photograph has to clear the one attached to the
+     * photograph it replaced, or the panel would name the wrong photographer.
+     * isWellFormedPlace holds it to null on the way through.
+     */
     function isEdit() {
       return request.resource.data.diff(resource.data).affectedKeys()
         .hasOnly(['name', 'type', 'coords', 'address', 'phone', 'website',
-                  'about', 'cover', 'schedule', 'updatedAt']);
+                  'about', 'cover', 'coverCredit', 'schedule', 'updatedAt']);
     }
 
     /**
@@ -110,8 +117,9 @@ service cloud.firestore {
      * up by one and that the average stayed inside 1–5; they cannot recompute
      * the average, because that would mean reading every review. A determined
      * client can therefore push the average around within those bounds. Closing
-     * that gap properly needs the write to happen somewhere the client is not —
-     * a Cloud Function — which requires the Blaze plan this project does not use.
+     * that gap properly needs the write to happen somewhere the client is not,
+     * in a Cloud Function, which requires a billing plan this project does not
+     * use.
      */
     function isRatingBump() {
       return request.resource.data.diff(resource.data).affectedKeys()
@@ -139,6 +147,10 @@ service cloud.firestore {
         && (data.cover == null || (data.cover is string
               && data.cover.size() <= 500
               && data.cover.matches('^https://.*')))
+        // Where a photograph came from is stated by whoever imported it, never
+        // by a browser: a client that could write a credit could put someone
+        // else's name under its own picture.
+        && (!('coverCredit' in data) || data.coverCredit == null)
         && (data.schedule == null || data.schedule is map);
     }
 

@@ -65,14 +65,16 @@ jobs:
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          # Unset, the deployed map falls back to the keyless basemaps rather
+          # than failing to build.
+          VITE_MAPTILER_KEY: ${{ secrets.VITE_MAPTILER_KEY }}
 
-      # Rules go out before the app, and separately from it. They decide who
-      # may write to live data, so a failure here has to stop the release
-      # rather than be buried in a combined deploy — if the access model did
-      # not land, the build that assumes it must not go live either.
+      # Rules go out before the app and separately from it, so a failure here
+      # stops the release rather than being buried in a combined deploy: if the
+      # access model did not land, the build that assumes it must not go live.
       #
-      # This needs a service account with the Firebase Rules Admin role
-      # (roles/firebaserules.admin); a hosting-only key will get a 403 here.
+      # Needs a service account with the Firebase Rules Admin role
+      # (roles/firebaserules.admin); a hosting-only key gets a 403 here.
       - name: Deploy security rules
         uses: w9jds/firebase-action@master
         with:

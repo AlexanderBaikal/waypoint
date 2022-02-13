@@ -2,13 +2,12 @@
  * A deliberately partial reader for OpenStreetMap `opening_hours`.
  *
  * The full grammar covers seasons, school holidays, sunset offsets and week
- * numbers. Waypoint's Schedule can express exactly one span per weekday, so
- * anything richer than that cannot be represented honestly and is rejected
- * rather than approximated — a place whose hours we cannot state is better off
- * showing nothing than showing something plausible and wrong.
+ * numbers. Schedule can express exactly one span per weekday, so anything
+ * richer is rejected rather than approximated: a place whose hours cannot be
+ * stated exactly shows none.
  *
- * Kept out of src/ on purpose: this runs at import time, so none of it belongs
- * in the bundle the browser downloads.
+ * Kept out of src/ because it runs at import time and does not belong in the
+ * bundle the browser downloads.
  */
 
 const DAYS = [
@@ -97,8 +96,8 @@ function readHours(spec) {
 }
 
 /**
- * A comma separates two rules when it follows a completed one — a time or an
- * `off` — and starts a new day name. Inside a day list ("Mo-Th,Su") it follows
+ * A comma separates two rules when it follows a completed one (a time or an
+ * `off`) and starts a new day name. Inside a day list ("Mo-Th,Su") it follows
  * a day, and inside a time list ("08:00-13:00,14:00-20:00") it precedes a
  * digit, so neither is split here.
  */

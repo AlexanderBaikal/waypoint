@@ -6,30 +6,36 @@
 }
 
 .avatar {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
   object-fit: cover;
 }
 
+/* A button rather than an underlined word: the masthead's two controls should
+   look like the same kind of thing, and an underline reads as a link away. */
 .link {
-  color: var(--ink-3);
-  border-bottom: 1px solid var(--line-2);
+  height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: var(--r-pill);
+  color: var(--accent);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
   transition:
-    color 140ms ease,
-    border-color 140ms ease;
+    background-color 120ms ease,
+    color 120ms ease;
 }
 
 .link:hover:not(:disabled) {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  background: var(--accent-wash);
 }
 
 .link:disabled {
   cursor: default;
-  opacity: 0.6;
+  color: var(--ink-3);
 }
 
 .error {
-  color: var(--accent);
+  color: var(--bad);
 }

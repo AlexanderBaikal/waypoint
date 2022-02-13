@@ -21,17 +21,16 @@ interface Suggestion {
 const VISIBLE = 40;
 
 /**
- * The type field, with its suggestions rendered by us rather than by the
- * browser.
+ * The type field, rendering its own suggestion list.
  *
- * A `<datalist>` was doing this job and had to go: its popup is drawn by the
- * browser's own UI layer, so on the dark interface it arrived white with dark
- * text and no stylesheet could reach it. Owning the list also buys the thing a
- * datalist cannot do — matching on the category a type belongs to, so typing
- * "food" answers with the bakeries and cafes rather than nothing.
+ * A `<datalist>` did this job first, but its popup is drawn by the browser's UI
+ * layer: on the dark interface it arrived white with dark text and no
+ * stylesheet could reach it. Owning the list also allows matching on the
+ * category a type belongs to, so typing "food" answers with the bakeries and
+ * cafes.
  *
- * Still free text: the list narrows to nothing and whatever was typed stands.
- * categories.ts maps an unrecognised type to `other`, which is a real answer.
+ * Still free text. The list can narrow to nothing and whatever was typed
+ * stands; categories.ts maps an unrecognised type to `other`.
  */
 export function TypeCombobox({
   id,
@@ -58,8 +57,7 @@ export function TypeCombobox({
       const type = raw.trim();
       if (!type) continue;
 
-      // Case-insensitively unique: the dataset has both "Cafe" and "cafe", and
-      // offering the same suggestion twice is noise.
+      // Case-insensitively unique: the dataset holds both "Cafe" and "cafe".
       const key = type.toLowerCase();
       if (seen.has(key)) continue;
       seen.add(key);
@@ -74,9 +72,9 @@ export function TypeCombobox({
     const query = value.trim().toLowerCase();
     if (!query) return all.slice(0, VISIBLE);
 
-    // Three tiers: what starts with the query, then what merely contains it,
-    // then the rest of a category someone named. Sorting is stable, so each
-    // tier keeps the alphabetical order it arrived in.
+    // Three tiers: types starting with the query, types containing it, then
+    // the rest of a named category. Sorting is stable, so each tier keeps the
+    // alphabetical order it arrived in.
     const ranked: { suggestion: Suggestion; tier: number }[] = [];
 
     for (const suggestion of all) {
@@ -98,9 +96,8 @@ export function TypeCombobox({
     return ranked.slice(0, VISIBLE).map((entry) => entry.suggestion);
   }, [all, value]);
 
-  // The highlight is stored as an index but read as a clamped one: the list
-  // narrows under it as the query grows, and the row that is actually
-  // highlighted has to be one that exists.
+  // Stored as an index, read clamped: the list narrows under the highlight as
+  // the query grows, and the highlighted row has to be one that exists.
   const row = matches.length === 0 ? -1 : Math.min(active, matches.length - 1);
 
   // Pointer rather than click, so the list is gone by the time whatever was
@@ -148,8 +145,8 @@ export function TypeCombobox({
       const suggestion = matches[row];
       if (!suggestion) return;
 
-      // Enter is taking the highlighted suggestion here. Without this it would
-      // also submit the form the field is sitting in.
+      // Enter takes the highlighted suggestion; without this it would also
+      // submit the surrounding form.
       event.preventDefault();
       choose(suggestion);
       return;
@@ -185,8 +182,8 @@ export function TypeCombobox({
         onKeyDown={onKeyDown}
       />
 
-      {/* Decorative. The field itself opens the list, so a second control here
-          would only be a tab stop that repeats what the caret already does. */}
+      {/* Decorative: the field itself opens the list, so a real control here
+          would only add a tab stop that repeats it. */}
       <svg className={styles.chevron} viewBox="0 0 24 24" aria-hidden="true">
         <path d="m7 10 5 5 5-5" />
       </svg>
@@ -201,7 +198,7 @@ export function TypeCombobox({
               aria-selected={index === row}
               data-active={index === row}
               className={styles.comboOption}
-              // Down rather than click: it lands before the input would lose
+              // Mouse down rather than click: it lands before the input loses
               // focus, so preventing the default keeps the caret in the field.
               onMouseDown={(event) => {
                 event.preventDefault();

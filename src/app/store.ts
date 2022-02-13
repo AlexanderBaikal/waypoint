@@ -31,8 +31,8 @@ listener.startListening({
 });
 
 // The address bar mirrors the current view so a result can be linked or
-// reloaded. replaceState, not pushState: typing in a search box should not
-// bury the back button under one entry per keystroke.
+// reloaded. replaceState rather than pushState, so typing in the search box
+// does not bury the back button under one entry per keystroke.
 listener.startListening({
   matcher: isAnyOf(queryChanged, categoryToggled, placeSelected, filtersCleared),
   effect: (_action, api) => {

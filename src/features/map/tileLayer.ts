@@ -2,14 +2,10 @@ import L from "leaflet";
 import { tileOptions, tiles, type Theme } from "../../config";
 
 /**
- * The two sources differ in more than their URL — how deep their cache goes and
- * whether they have a 2x tile — and those are construction-time options, which
- * is why switching builds a layer rather than repointing one.
- *
- * Both maps in the application build theirs here so a source's quirks are
- * declared once. The location picker used to spell its own layer out and left
- * the dark source's depth cap off it, which is exactly how a form field ended
- * up full of Esri's "Map data not yet available".
+ * Builds the tile layer for a theme. Cache depth and retina support are
+ * construction-time options, so switching themes builds a new layer rather than
+ * repointing an existing one. Both maps in the app go through here, which keeps
+ * each source's quirks declared in one place.
  */
 export function tileLayer(theme: Theme): L.TileLayer {
   const source = tiles[theme];
@@ -19,5 +15,10 @@ export function tileLayer(theme: Theme): L.TileLayer {
     maxZoom: tileOptions.maxZoom,
     maxNativeZoom: source.maxNativeZoom,
     detectRetina: source.retina,
+    // Spread rather than named: Leaflet merges options with a plain `for…in`,
+    // so a key present but undefined replaces the default instead of falling
+    // back to it, and a layer with no tile size draws nothing.
+    ...(source.tileSize === undefined ? {} : { tileSize: source.tileSize }),
+    ...(source.zoomOffset === undefined ? {} : { zoomOffset: source.zoomOffset }),
   });
 }

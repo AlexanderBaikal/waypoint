@@ -18,96 +18,97 @@ interface CategoryMeta {
   /** Single glyph drawn inside the map pin, where an icon would not survive. */
   glyph: string;
   /**
-   * The category's icon, as the `d` of a single path on a 24×24 grid, stroked
-   * rather than filled. One string rather than a component so the same drawing
-   * can go into React and into the raw HTML string a Leaflet divIcon takes.
+   * The category's icon, as the `d` of a single stroked path on a 24×24 grid.
+   * A string rather than a component so the same drawing can go into React and
+   * into the raw HTML a Leaflet divIcon takes.
    */
   path: string;
   /**
-   * The category's colour wherever it appears — filter chip, list row, map
-   * pin. This is the only saturated colour in the application, and it is a
-   * legend: two things sharing a hue are the same kind of place.
+   * The category's colour wherever it appears: filter chip, list row, map pin.
+   * The only saturated colour in the app, and it acts as a legend: two things
+   * sharing a hue are the same kind of place.
    */
   colour: string;
 }
 
 /**
- * Hues follow what a reader already expects from a map — food warm, leisure
- * green, services a neutral slate — with two forced moves. Shopping is teal
- * rather than the blue maps usually give it, because blue is the interface's
- * "you can act on this" and a category must never look clickable. Other is
- * grey on purpose: it is the bucket for a type we failed to classify, and it
- * should not advertise itself next to seven real categories.
+ * Google's place-icon colours, as the Places API returns them in
+ * `iconBackgroundColor`. Eight buckets here, eight colours there, so no ninth
+ * had to be invented.
  *
- * Every one of these clears 3:1 against white, which is what the white glyph
- * sitting on top of it needs.
+ * Two are reused for a purpose Google does not have: education takes the
+ * transport blue and lodging the emergency pink, since this map splits both out
+ * of the generic bucket. `other` keeps the generic blue-grey.
+ *
+ * The white mark on these reads at about 2:1 rather than 3:1. It is a drawing
+ * rather than text, and every pin and tile carrying one has the place's name
+ * and type beside it.
  */
 export const CATEGORY_META: Record<Category, CategoryMeta> = {
   food: {
     label: "Food",
     glyph: "◆",
-    colour: "#e2582a",
+    colour: "#ff9e67",
     // Fork and knife.
     path: "M7 4v5a2 2 0 0 0 4 0V4M9 11v9M16.5 4c1.6 1.6 1.6 5.4 0 7v9",
   },
   nightlife: {
     label: "Nightlife",
     glyph: "✦",
-    colour: "#8b46c4",
+    colour: "#13b5c7",
     // Cocktail glass.
     path: "M5 5h14l-7 7zM12 12v7M8.5 19h7",
   },
   shopping: {
     label: "Shopping",
     glyph: "▲",
-    colour: "#0f8a8a",
+    colour: "#4b96f3",
     // Shopping bag.
     path: "M5.5 8h13l-1 12h-11zM9 8V6a3 3 0 0 1 6 0v2",
   },
   services: {
     label: "Services",
     glyph: "■",
-    colour: "#5b6674",
+    colour: "#909ce1",
     // Briefcase: banks, post offices and repair shops have no one shape.
     path: "M4 8h16v11H4zM9 8V5h6v3M4 13h16",
   },
   leisure: {
     label: "Leisure",
     glyph: "●",
-    colour: "#2f9e44",
-    // A ticket. Nothing fits this bucket — it holds parks, gyms, museums,
-    // cinemas and war memorials — so the mark says "somewhere you go" and
-    // leaves the specifics to the type written beside it. A tree was tried
-    // first and read as a mistake on everything that was not a park.
+    colour: "#4db546",
+    // A ticket. The bucket holds parks, gyms, museums, cinemas and memorials,
+    // so the mark says "somewhere you go" and leaves the specifics to the type
+    // written beside it. A tree read as a mistake on everything but parks.
     path: "M20 9.5V6H4v3.5a2.5 2.5 0 0 1 0 5V18h16v-3.5a2.5 2.5 0 0 1 0-5z",
   },
   education: {
     label: "Education",
     glyph: "▮",
-    colour: "#b8790c",
+    colour: "#10bdff",
     // Graduation cap.
     path: "M12 4 2.5 8.5 12 13l9.5-4.5zM6.5 10.7V16c0 1.7 2.5 3 5.5 3s5.5-1.3 5.5-3v-5.3",
   },
   lodging: {
     label: "Stay",
     glyph: "▼",
-    colour: "#d1477a",
+    colour: "#f88181",
     // Bed: headboard, mattress, a rounded foot, and a pillow on top.
     path: "M3 6v12M3 12h15a3 3 0 0 1 3 3v3M3 18h18M6.5 9.5h4",
   },
   other: {
     label: "Other",
     glyph: "×",
-    colour: "#7b8290",
+    colour: "#7b9eb0",
     // Three dots: the bucket for a type we could not name.
     path: "M6.5 12h.01M12 12h.01M17.5 12h.01",
   },
 };
 
-// The `type` field is free text — typed by whoever added the place, or derived
-// from an OpenStreetMap tag by scripts/import-osm.mjs — so this is a lookup
-// with a sensible fallback rather than an exhaustive taxonomy. Keys are
-// lowercased on both sides.
+// The `type` field is free text, typed by whoever added the place or derived
+// from an OpenStreetMap tag by scripts/import-osm.mjs, so this is a lookup with
+// a fallback rather than an exhaustive taxonomy. Keys are lowercased on both
+// sides.
 const TYPE_TO_CATEGORY: Record<string, Category> = {
   bakery: "food",
   cafe: "food",
@@ -180,6 +181,10 @@ const TYPE_TO_CATEGORY: Record<string, Category> = {
   museum: "leisure",
   park: "leisure",
   "park and garden": "leisure",
+  // Filed with the museums and memorials rather than given a category of their
+  // own: there are four such places in the dataset, and one filter chip for
+  // four rows is a filter nobody needs.
+  "place of worship": "leisure",
   planetarium: "leisure",
   playground: "leisure",
   "public artwork": "leisure",
@@ -203,10 +208,10 @@ const TYPE_TO_CATEGORY: Record<string, Category> = {
 };
 
 /**
- * Retail types the map data has a long tail of — "tile shop", "toy shop",
- * "variety store" — all belong in one bucket. A suffix rule covers the tail
- * without a hundred more table rows, and the table still wins where a shop is
- * really a service (a barber shop is not shopping).
+ * The map data has a long tail of retail types ("tile shop", "toy shop",
+ * "variety store") that all belong in one bucket. A suffix rule covers it
+ * without a hundred more table rows. The table above still wins, which is how
+ * a barber shop stays a service.
  */
 const RETAIL_SUFFIX = /\b(shop|store|boutique)$/;
 
@@ -218,9 +223,8 @@ export function categoryOf(place: Pick<Place, "type">): Category {
 }
 
 /**
- * Categories actually represented in a dataset, in CATEGORIES order.
- * Filter chips are built from this so we never render a filter that matches
- * nothing.
+ * Categories actually represented in a dataset, in CATEGORIES order. Filter
+ * chips are built from this so no chip matches nothing.
  */
 export function presentCategories(places: readonly Place[]): Category[] {
   const present = new Set(places.map(categoryOf));

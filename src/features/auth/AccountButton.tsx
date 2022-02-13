@@ -4,8 +4,8 @@ import { signIn, signOutUser } from "./authSlice";
 import styles from "./auth.module.css";
 
 /**
- * Hidden entirely when Firebase is not configured — offering a sign-in button
- * that cannot work is worse than not offering one.
+ * Hidden entirely when Firebase is not configured, rather than offering a
+ * sign-in button that cannot work.
  */
 export function AccountButton() {
   const dispatch = useAppDispatch();

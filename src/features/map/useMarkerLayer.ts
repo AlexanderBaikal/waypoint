@@ -1,62 +1,36 @@
 import L from "leaflet";
-import Supercluster from "supercluster";
 import { useEffect, useMemo, useRef } from "react";
 import type { Place } from "../../domain/place";
-import { clusterIcon, markerIcon } from "./markerIcon";
+import { markerIcon } from "./markerIcon";
+import { revealZooms } from "./prominence";
 
 /**
- * Below this many places, every one gets its own pin. Clustering a handful of
- * results would hide them behind a number for no gain, and a filtered list
- * should read literally: five results, five pins.
+ * Below this many places every one gets its own pin. A filtered list should
+ * read literally: five results, five pins.
  */
-const CLUSTER_THRESHOLD = 60;
+const THINNING_THRESHOLD = 60;
 
 /**
- * `radius` sets how crowded the map may get before pins collapse into a count.
- * It is measured against `extent`, which defaults to 512 — the size of a vector
- * tile. Leaflet draws 256-pixel tiles, so leaving the default would silently
- * halve every radius on screen. Setting extent to 256 makes the number mean
- * screen pixels, which is what it is being tuned against.
- *
- * Past zoom 16 a city block fills the screen and there is nothing left to
- * collapse.
+ * How far past the edge of the screen a pin is still built, as a fraction of
+ * the viewport. Without it a pin would appear the instant its coordinate
+ * crossed the edge, which is where the eye already is.
  */
-const CLUSTER_OPTIONS = { radius: 70, extent: 256, maxZoom: 16, minPoints: 4 };
-
-interface PointProps {
-  placeId: string;
-}
-
-type Feature =
-  | Supercluster.ClusterFeature<Supercluster.AnyProps>
-  | Supercluster.PointFeature<PointProps>;
-
-const isCluster = (
-  feature: Feature,
-): feature is Supercluster.ClusterFeature<Supercluster.AnyProps> =>
-  "cluster" in feature.properties;
-
-type Entry =
-  | { kind: "place"; place: Place; selected: boolean }
-  | { kind: "cluster"; clusterId: number; count: number; lat: number; lng: number };
+const OVERSCAN = 0.2;
 
 interface Live {
   marker: L.Marker;
-  entry: Entry;
+  selected: boolean;
 }
-
-const keyOf = (entry: Entry) =>
-  entry.kind === "place" ? entry.place.id : `cluster:${String(entry.clusterId)}`;
 
 /**
  * Keeps a Leaflet layer in step with a list of places.
  *
- * Two things stop the map falling over on the full dataset. Supercluster
- * decides what to draw: it answers with the clusters and loose points for the
- * current viewport, so the DOM holds a marker per *visible* pin rather than one
- * per place — a few hundred instead of sixteen hundred. Then the markers are
- * diffed by key rather than rebuilt, so panning touches only the pins that
- * entered or left, and changing the selection repaints exactly two icons.
+ * Two things keep this cheap on the full dataset. `revealZooms` gives each
+ * place the zoom at which it first has room, so a crowded neighbourhood shows
+ * its most prominent place and holds the rest back; the DOM then holds a marker
+ * per drawn pin rather than one per place. Markers are also diffed by id rather
+ * than rebuilt, so panning touches only the pins that entered or left, and
+ * changing the selection repaints two icons.
  */
 export function useMarkerLayer(
   map: L.Map | null,
@@ -78,121 +52,41 @@ export function useMarkerLayer(
   const selectedRef = useRef(selectedId);
   const renderRef = useRef<(() => void) | null>(null);
 
-  const byId = useMemo(() => {
-    const index = new Map<string, Place>();
-    for (const place of places) index.set(place.id, place);
-    return index;
-  }, [places]);
-
-  /** Null below the threshold, where clustering is not worth its cost. */
-  const clusters = useMemo(() => {
-    if (places.length < CLUSTER_THRESHOLD) return null;
-
-    const index = new Supercluster<PointProps>(CLUSTER_OPTIONS);
-    index.load(
-      places.map((place) => ({
-        type: "Feature" as const,
-        properties: { placeId: place.id },
-        geometry: {
-          type: "Point" as const,
-          coordinates: [place.coords.lng, place.coords.lat],
-        },
-      })),
-    );
-    return index;
-  }, [places]);
+  /** Null below the threshold, where thinning is not worth its cost. */
+  const reveal = useMemo(
+    () => (places.length < THINNING_THRESHOLD ? null : revealZooms(places)),
+    [places],
+  );
 
   useEffect(() => {
     if (!map) return;
     const current = live.current;
 
     /** What should be on the map right now, given the viewport. */
-    const wanted = (): Entry[] => {
-      const selectedId = selectedRef.current;
+    const wanted = (): readonly Place[] => {
+      if (!reveal) return places;
 
-      if (!clusters) {
-        return places.map((place) => ({
-          kind: "place",
-          place,
-          selected: place.id === selectedId,
-        }));
-      }
+      const bounds = map.getBounds().pad(OVERSCAN);
+      const zoom = map.getZoom();
 
-      const bounds = map.getBounds();
-      const found = clusters.getClusters(
-        [
-          bounds.getWest(),
-          Math.max(bounds.getSouth(), -85),
-          bounds.getEast(),
-          Math.min(bounds.getNorth(), 85),
-        ],
-        Math.round(map.getZoom()),
-      );
-
-      const entries: Entry[] = [];
-      for (const feature of found) {
-        // GeoJSON positions are typed as a bare number[]; a Point always has
-        // the two we need.
-        const [lng, lat] = feature.geometry.coordinates;
-        if (lng === undefined || lat === undefined) continue;
-
-        if (isCluster(feature)) {
-          entries.push({
-            kind: "cluster",
-            clusterId: feature.properties.cluster_id,
-            count: feature.properties.point_count,
-            lat,
-            lng,
-          });
-          continue;
-        }
-
-        const place = byId.get(feature.properties.placeId);
-        if (place) {
-          entries.push({ kind: "place", place, selected: place.id === selectedId });
-        }
-      }
-
-      // The open place keeps its pin even when the viewport or a cluster would
-      // have swallowed it — the panel and the map must agree on what is open.
-      const selected = selectedId === null ? null : byId.get(selectedId);
-      if (
-        selected &&
-        !entries.some((e) => e.kind === "place" && e.place.id === selectedId)
-      ) {
-        entries.push({ kind: "place", place: selected, selected: true });
-      }
-
-      return entries;
+      return places.filter((place) => {
+        // The open place keeps its pin wherever the map is pointing and however
+        // crowded its corner: the panel and the map have to agree on what is
+        // open.
+        if (place.id === selectedRef.current) return true;
+        if ((reveal.get(place.id) ?? 0) > zoom) return false;
+        return bounds.contains([place.coords.lat, place.coords.lng]);
+      });
     };
 
-    const build = (entry: Entry): L.Marker => {
-      if (entry.kind === "cluster") {
-        return L.marker([entry.lat, entry.lng], {
-          icon: clusterIcon(entry.count),
-          title: `${String(entry.count)} places`,
-          // No `alt` here: Leaflet drops it for divIcons, so the accessible
-          // name is written into the icon markup by clusterIcon instead.
-          keyboard: true,
-        }).on("click", () => {
-          // Zoom to where this cluster comes apart, which is what a user
-          // clicking a count is asking for.
-          map.flyTo(
-            [entry.lat, entry.lng],
-            clusters?.getClusterExpansionZoom(entry.clusterId) ?? map.getZoom() + 2,
-            { duration: 0.4 },
-          );
-        });
-      }
-
-      const { place } = entry;
-      return L.marker([place.coords.lat, place.coords.lng], {
-        icon: markerIcon(place, entry.selected),
+    const build = (place: Place, selected: boolean): L.Marker =>
+      L.marker([place.coords.lat, place.coords.lng], {
+        icon: markerIcon(place, selected),
         title: place.name,
-        // Leaflet stacks markers by latitude. The open place has to sit above
-        // whatever it shares a corner with — often a cluster badge, since it is
-        // pinned into view whether or not the cluster came apart.
-        zIndexOffset: entry.selected ? 1000 : 0,
+        // Leaflet stacks markers by latitude, and the open place has to sit
+        // above whatever shares its corner. The selection is drawn whether or
+        // not the thinning left room for it.
+        zIndexOffset: selected ? 1000 : 0,
         keyboard: true,
         riseOnHover: true,
       })
@@ -203,46 +97,35 @@ export function useMarkerLayer(
         .on("keypress", (event: L.LeafletKeyboardEvent) => {
           if (event.originalEvent.key === "Enter") selectRef.current(place.id);
         });
-    };
 
     const render = () => {
-      const entries = wanted();
-      const keys = new Set(entries.map(keyOf));
+      const drawn = wanted();
+      const selectedId = selectedRef.current;
+      const keys = new Set(drawn.map((place) => place.id));
 
-      for (const [key, existing] of current) {
-        if (!keys.has(key)) {
+      for (const [id, existing] of current) {
+        if (!keys.has(id)) {
           existing.marker.remove();
-          current.delete(key);
+          current.delete(id);
         }
       }
 
-      for (const entry of entries) {
-        const key = keyOf(entry);
-        const existing = current.get(key);
+      for (const place of drawn) {
+        const selected = place.id === selectedId;
+        const existing = current.get(place.id);
 
         if (!existing) {
-          const marker = build(entry).addTo(map);
-          current.set(key, { marker, entry });
+          current.set(place.id, { marker: build(place, selected).addTo(map), selected });
           continue;
         }
 
-        // Same key, changed content: repaint in place instead of churning the
-        // DOM node. This is the path a selection change takes.
-        const before = existing.entry;
-        if (before.kind === "place" && entry.kind === "place") {
-          if (before.selected !== entry.selected) {
-            existing.marker.setIcon(markerIcon(entry.place, entry.selected));
-            existing.marker.setZIndexOffset(entry.selected ? 1000 : 0);
-          }
-        } else if (before.kind === "cluster" && entry.kind === "cluster") {
-          if (before.count !== entry.count) {
-            existing.marker.setIcon(clusterIcon(entry.count));
-          }
-          if (before.lat !== entry.lat || before.lng !== entry.lng) {
-            existing.marker.setLatLng([entry.lat, entry.lng]);
-          }
+        // Same place, changed selection: repaint in place instead of churning
+        // the DOM node.
+        if (existing.selected !== selected) {
+          existing.marker.setIcon(markerIcon(place, selected));
+          existing.marker.setZIndexOffset(selected ? 1000 : 0);
+          existing.selected = selected;
         }
-        existing.entry = entry;
       }
     };
 
@@ -256,7 +139,7 @@ export function useMarkerLayer(
       for (const { marker } of current.values()) marker.remove();
       current.clear();
     };
-  }, [map, places, byId, clusters]);
+  }, [map, places, reveal]);
 
   useEffect(() => {
     selectedRef.current = selectedId;

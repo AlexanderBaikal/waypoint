@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { useAppDispatch } from "../../app/hooks";
-import { useAddReviewMutation } from "../../app/placesApi";
+import { errorMessage, useAddReviewMutation } from "../../app/placesApi";
 import { editorClosed } from "../../app/uiSlice";
 import {
   LIMITS,
@@ -18,14 +18,6 @@ interface ReviewFormProps {
 }
 
 const SCORES = [1, 2, 3, 4, 5] as const;
-
-function failureMessage(error: unknown): string {
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const { message } = error as { message?: unknown };
-    if (typeof message === "string" && message) return message;
-  }
-  return "Could not post the review. Please try again.";
-}
 
 export function ReviewForm({ placeId, placeName }: ReviewFormProps) {
   const dispatch = useAppDispatch();
@@ -120,7 +112,7 @@ export function ReviewForm({ placeId, placeName }: ReviewFormProps) {
 
       {failure ? (
         <p className={styles.failure} role="alert">
-          {failureMessage(failure)}
+          {errorMessage(failure, "Could not post the review. Please try again.")}
         </p>
       ) : null}
 

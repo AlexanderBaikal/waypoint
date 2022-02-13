@@ -1,9 +1,10 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
+import { savedOnlyToggled } from "./app/uiSlice";
 import { setRepositoryForTesting } from "./data";
 import { NotAllowedError, type PlacesRepository } from "./data/repository";
-import type { Place, Review } from "./domain/place";
+import type { PhotoCredit, Place, Review } from "./domain/place";
 import { renderWithStore } from "./test/renderWithStore";
 
 // Leaflet needs real layout and a real canvas, neither of which jsdom provides.
@@ -53,6 +54,7 @@ function place(id: string, name: string, type: string): Place {
     website: null,
     about: null,
     cover: null,
+    coverCredit: null,
     photos: [],
     rating: null,
     schedule: null,
@@ -144,7 +146,7 @@ describe("App", () => {
     await loaded();
 
     // Scoped to the chips: list rows also carry their category in the label.
-    const filters = screen.getByRole("group", { name: /filter by category/i });
+    const filters = screen.getByRole("group", { name: /filter places/i });
     await user.click(within(filters).getByRole("button", { name: /services/i }));
 
     expect(await screen.findByText("1 place")).toBeInTheDocument();
@@ -201,6 +203,45 @@ describe("App", () => {
     expect(window.localStorage.getItem("waypoint:saved")).toBe('["subway"]');
   });
 
+  /**
+   * The saved list has no screen of its own; it is a chip in the filter row.
+   * The chip has to arrive with the first bookmark, since before that it could
+   * only ever produce an empty list.
+   */
+  it("offers the saved chip once something is saved, and filters to it", async () => {
+    const user = userEvent.setup();
+    renderWithStore(<App />);
+    await loaded();
+
+    const chips = () => screen.getByRole("group", { name: /filter places/i });
+    expect(within(chips()).queryByRole("button", { name: "Saved" })).toBeNull();
+
+    await user.click(screen.getByRole("button", { name: "marker: Subway" }));
+    await user.click(await screen.findByRole("button", { name: /save/i }));
+    await user.click(screen.getByRole("button", { name: /all places/i }));
+
+    await user.click(await within(chips()).findByRole("button", { name: "Saved" }));
+
+    expect(await screen.findByText("1 place")).toBeInTheDocument();
+    expect(within(list()).getByText("Subway")).toBeInTheDocument();
+    expect(within(list()).queryByText("Sberbank")).toBeNull();
+    // The map narrows with the list rather than staying on all three.
+    expect(screen.queryByRole("button", { name: "marker: Sberbank" })).toBeNull();
+  });
+
+  it("says what an empty saved list means rather than blaming the filter", async () => {
+    const user = userEvent.setup();
+    const { store } = renderWithStore(<App />);
+    await loaded();
+
+    store.dispatch(savedOnlyToggled());
+
+    expect(await screen.findByText(/nothing saved yet/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /clear filters/i }));
+    expect(await loaded()).toBeInTheDocument();
+  });
+
   it("shows the failure and allows a retry when loading breaks", async () => {
     setRepositoryForTesting(
       stubRepository({
@@ -217,7 +258,7 @@ describe("App", () => {
 
 /**
  * The write path, exercised through the panel rather than against the
- * components in isolation — what is worth pinning down is that a filled form
+ * components in isolation. What is worth pinning down is that a filled form
  * reaches the repository with the right arguments, and that a refused write
  * leaves nothing behind.
  */
@@ -381,10 +422,89 @@ describe("App: writing", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(/permission/i);
 
     // The form stays open so the attempt is not thrown away. Leaving it should
-    // reveal a reviews list with no trace of the optimistic entry — the rules
+    // reveal a reviews list with no trace of the optimistic entry: the rules
     // are the authority, and the screen has to agree with them.
     await user.click(screen.getByRole("button", { name: /cancel/i }));
     await screen.findByRole("heading", { name: /reviews/i });
     expect(screen.queryByText("Briefly here")).not.toBeInTheDocument();
+  });
+
+  /**
+   * Almost every photograph on this map was borrowed from Wikimedia Commons,
+   * and most of them are of the street the place is on rather than of the
+   * place. Both facts are the panel's to state: the distance because the
+   * reader is owed it, the author and licence because the licence requires it.
+   */
+  describe("a borrowed photograph", () => {
+    const credit = {
+      source: "Wikimedia Commons",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:House.jpg",
+      author: "Ann",
+      licence: "CC BY-SA 4.0",
+      nearbyMetres: 41,
+      generic: false,
+    };
+
+    const open = async (
+      user: ReturnType<typeof userEvent.setup>,
+      coverCredit: PhotoCredit,
+    ) => {
+      const photographed = places.map((place, index) =>
+        index === 0
+          ? { ...place, cover: "https://example.test/house.jpg", coverCredit }
+          : place,
+      );
+      setRepositoryForTesting(
+        stubRepository({ listPlaces: () => Promise.resolve(photographed) }),
+      );
+
+      const view = renderWithStore(<App />);
+      await loaded();
+      await user.click(screen.getByRole("button", { name: "marker: Subway" }));
+      await screen.findByRole("heading", { name: "Subway" });
+      return view;
+    };
+
+    it("says how far away a photograph of the surroundings was taken", async () => {
+      await open(userEvent.setup(), credit);
+
+      expect(screen.getByText(/41 m away/)).toBeInTheDocument();
+      expect(screen.getByText(/Ann, CC BY-SA 4.0/)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Wikimedia Commons" })).toHaveAttribute(
+        "href",
+        credit.sourceUrl,
+      );
+    });
+
+    it("claims no distance for a photograph of the place itself", async () => {
+      await open(userEvent.setup(), { ...credit, nearbyMetres: null });
+
+      expect(screen.queryByText(/away/)).not.toBeInTheDocument();
+      expect(screen.getByText(/Ann, CC BY-SA 4.0/)).toBeInTheDocument();
+    });
+
+    it("says a stock photograph is not of this place", async () => {
+      await open(userEvent.setup(), { ...credit, nearbyMetres: null, generic: true });
+
+      expect(screen.queryByText(/away/)).not.toBeInTheDocument();
+      expect(screen.getByText(/Generic photo, not of this place/)).toBeInTheDocument();
+    });
+
+    it("takes the credit down with a photograph that fails to load", async () => {
+      const { container } = await open(userEvent.setup(), credit);
+
+      // Queried through the DOM because the cover is decorative and carries no
+      // accessible name, being the place's picture rather than information.
+      const cover = container.querySelector("figure img");
+      expect(cover).not.toBeNull();
+      fireEvent.error(cover as HTMLImageElement);
+
+      // A line of attribution standing under the coloured placeholder would be
+      // crediting a photograph nobody can see.
+      await waitFor(() => {
+        expect(screen.queryByText(/41 m away/)).not.toBeInTheDocument();
+      });
+      expect(screen.queryByRole("link", { name: "Wikimedia Commons" })).toBeNull();
+    });
   });
 });

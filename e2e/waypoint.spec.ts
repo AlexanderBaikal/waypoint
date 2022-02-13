@@ -1,22 +1,36 @@
 import { expect, test, type Page } from "@playwright/test";
+import places from "../src/data/fixtures/places.json" with { type: "json" };
+import { revealZooms } from "../src/features/map/prominence";
+import type { Place } from "../src/domain/place";
 
 /**
  * Runs against the production build with no .env, so the dataset is the
- * bundled fixtures: 1,620 places, of which 20 are the hand-entered ones that
- * carry photos and reviews. What is worth testing here rather than in jsdom is
- * the part that needs a real browser — Leaflet rendering tiles, clusters and
- * markers, and the marker layer staying in step with the list.
+ * bundled fixtures, the same file this reads, which is why the totals below
+ * are counted rather than written down. Twenty of the places are hand-entered
+ * and carry reviews. What is worth testing here rather than in jsdom is the
+ * part that needs a real browser: Leaflet rendering tiles and markers, the
+ * thinning that decides which of them are drawn, and the marker layer staying
+ * in step with the list.
  */
+const TOTAL = places.length;
+const total = new RegExp(`${TOTAL.toLocaleString("en-US")} places`);
+
+/** The place the thinning keeps off the map for longest. */
+const HIDDEN_LONGEST = (() => {
+  const zooms = revealZooms(places as unknown as Place[]);
+  return (places as unknown as Place[]).reduce((deepest, place) =>
+    (zooms.get(place.id) ?? 0) > (zooms.get(deepest.id) ?? 0) ? place : deepest,
+  );
+})();
 
 const markers = (page: Page) => page.locator(".leaflet-marker-icon");
-const clusters = (page: Page) => page.getByRole("img", { name: /^Cluster of/ });
 const results = (page: Page) => page.getByRole("listitem");
 
 const search = (page: Page) => page.getByRole("searchbox", { name: /search places/i });
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText(/1,620 places/)).toBeVisible();
+  await expect(page.getByText(total)).toBeVisible();
 });
 
 test("the panel waits to be asked before it lists anything", async ({ page }) => {
@@ -31,36 +45,43 @@ test("the panel waits to be asked before it lists anything", async ({ page }) =>
   await expect(results(page)).not.toHaveCount(0);
 });
 
-test("clusters the full dataset instead of drawing every pin", async ({ page }) => {
+test("thins the full dataset instead of drawing every pin", async ({ page }) => {
   await expect(page.locator(".leaflet-tile-loaded").first()).toBeVisible();
-  await expect(clusters(page).first()).toBeVisible();
+  await expect(markers(page).first()).toBeVisible();
 
-  // The point of clustering: the DOM holds a marker per visible symbol, not
-  // one per place in the dataset. The exact number moves with the viewport, so
-  // what is asserted is the order of magnitude.
-  expect(await markers(page).count()).toBeLessThan(1620 / 8);
+  // The whole city fits on screen at the opening zoom, so what is drawn is
+  // what the thinning let through rather than what happens to be in view. The
+  // exact number moves with the viewport, so this asserts the magnitude.
+  expect(await markers(page).count()).toBeLessThan(TOTAL / 3);
 });
 
 test("the panel lists a readable page of a large result set", async ({ page }) => {
-  // Services is the biggest category in the city by some way, so it is well
-  // past the sixty the panel will draw.
-  await page
-    .getByRole("group", { name: /filter by category/i })
-    .getByRole("button", { name: /services/i })
-    .click();
+  // Addresses are searched along with names, and most of this city is on a
+  // "улица", so this matches well past the sixty rows the panel will draw. No
+  // category is that large now that the map ships two hundred places.
+  await search(page).fill("улица");
 
   await expect(results(page)).toHaveCount(60);
   await expect(page.getByText(/more on the map/i)).toBeVisible();
 });
 
-test("clicking a cluster opens it up", async ({ page }) => {
-  const before = await clusters(page).count();
-  await clusters(page).first().click();
+test("zooming out leaves only the places that outrank their neighbours", async ({
+  page,
+}) => {
+  await expect(markers(page).first()).toBeVisible();
+  const atCity = await markers(page).count();
 
-  // Zooming in splits that cluster, so the map ends up showing more symbols.
-  await expect
-    .poll(async () => (await clusters(page).count()) + (await markers(page).count()))
-    .toBeGreaterThan(before);
+  const zoomOut = page.getByRole("button", { name: "Zoom out" });
+  await zoomOut.click();
+  await zoomOut.click();
+  await expect.poll(() => markers(page).count()).toBeLessThan(atCity);
+
+  // And zooming back in hands the rest their pins back: coming in never takes
+  // away something that was already on screen.
+  const zoomIn = page.getByRole("button", { name: "Zoom in" });
+  await zoomIn.click();
+  await zoomIn.click();
+  await expect.poll(() => markers(page).count()).toBeGreaterThanOrEqual(atCity);
 });
 
 test("search narrows the list and the markers together", async ({ page }) => {
@@ -71,7 +92,9 @@ test("search narrows the list and the markers together", async ({ page }) => {
   await expect(markers(page)).toHaveCount(1);
 });
 
-test("a small result set is drawn pin by pin, with no clusters", async ({ page }) => {
+test("a small result set is drawn pin by pin, with nothing thinned out", async ({
+  page,
+}) => {
   await search(page).fill("museum");
 
   // Settle first, then read: the deferred render means the count is not final
@@ -79,12 +102,11 @@ test("a small result set is drawn pin by pin, with no clusters", async ({ page }
   await expect(results(page)).not.toHaveCount(0);
   const count = await results(page).count();
   expect(count).toBeGreaterThan(1);
-  await expect(clusters(page)).toHaveCount(0);
   await expect(markers(page)).toHaveCount(count);
 });
 
 test("a category chip filters to that category", async ({ page }) => {
-  const filters = page.getByRole("group", { name: /filter by category/i });
+  const filters = page.getByRole("group", { name: /filter places/i });
   await filters.getByRole("button", { name: /education/i }).click();
 
   await expect(page.getByText(/^\d+ places$/)).toBeVisible();
@@ -109,18 +131,23 @@ test("a shared link opens straight into the place", async ({ page }) => {
   await expect(page.getByText(/movie theater/i)).toBeVisible();
 });
 
-test("an imported place keeps its pin even inside a cluster", async ({ page }) => {
-  // Deep-linking to a place the cluster would have swallowed must still leave
-  // something selected on the map.
-  await page.goto("/?place=osm-n2918849719");
+test("an imported place keeps its pin even where the map has thinned it out", async ({
+  page,
+}) => {
+  // Deep-linking to a place that loses its corner to a more prominent
+  // neighbour must still leave something selected on the map. The place is the
+  // one the thinning holds back longest, read from the same rule the map uses.
+  // Writing an id down here would mean re-importing the fixture silently turns
+  // this into a test of a place that is drawn anyway.
+  await page.goto(`/?place=${encodeURIComponent(HIDDEN_LONGEST.id)}`);
 
-  await expect(page.getByRole("heading", { name: /Биг Бен/ })).toBeVisible();
-  await expect(page.getByRole("img", { name: /Биг Бен/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: HIDDEN_LONGEST.name })).toBeVisible();
+  await expect(page.getByRole("img", { name: HIDDEN_LONGEST.name })).toBeVisible();
 });
 
 test("saving a place survives a reload", async ({ page }) => {
   await page.goto("/?place=inrtu");
-  await page.getByRole("button", { name: /^✧ Save$/ }).click();
+  await page.getByRole("button", { name: /^save$/i }).click();
   await expect(page.getByRole("button", { name: /saved/i })).toBeVisible();
 
   await page.reload();
@@ -139,5 +166,5 @@ test("no results offers a way back", async ({ page }) => {
   await expect(page.getByText(/nothing here matches/i)).toBeVisible();
 
   await page.getByRole("button", { name: /clear filters/i }).click();
-  await expect(page.getByText(/1,620 places/)).toBeVisible();
+  await expect(page.getByText(total)).toBeVisible();
 });

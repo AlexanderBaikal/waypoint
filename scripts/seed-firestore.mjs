@@ -7,20 +7,17 @@
  *   --dry-run   report what would be written and stop
  *   --wipe      delete existing documents in the target collections first
  *
- * The service-account key comes from the Firebase console:
- * Project settings → Service accounts → Generate new private key. It is a
- * secret and must not be committed; .gitignore already covers *-service-account
- * and the file the README suggests.
+ * The service-account key comes from the Firebase console: Project settings ->
+ * Service accounts -> Generate new private key. It is a secret and must not be
+ * committed; .gitignore already covers the usual file names.
  *
- * ## Why this writes a different shape than src/data/firestoreLegacy.ts reads
- *
- * The 2021 database split a place across `places` (map pins) and
- * `descriptions` (detail pages), and the two drifted apart. A new project is a
- * chance to not inherit that: one document per place, reviews as a
- * subcollection under the place they belong to. Reading a place's reviews is
- * then one query on one collection with no composite index and no join key —
- * where the legacy schema needed `comments.forPlace` to match a *storage folder
- * name*, which is why four places had lost their reviews entirely.
+ * This writes a different shape than src/data/firestoreLegacy.ts reads. The
+ * 2021 database split a place across `places` (map pins) and `descriptions`
+ * (detail pages) and the two drifted apart, so the new schema is one document
+ * per place with reviews as a subcollection beneath it. Reading a place's
+ * reviews is then a single query with no composite index and no join key, where
+ * the legacy schema matched `comments.forPlace` against a storage folder name
+ * and had lost the reviews of four places in the process.
  */
 import { readFileSync } from "node:fs";
 import { cert, initializeApp } from "firebase-admin/app";
@@ -62,6 +59,11 @@ const toDocument = (place) => ({
   website: place.website,
   about: place.about,
   cover: place.cover,
+  // Travels with the photograph rather than staying behind in the fixture: the
+  // licences most of these covers come under require the author and the licence
+  // to be named wherever the picture is shown, and a Firestore deployment shows
+  // the same pictures.
+  coverCredit: place.coverCredit ?? null,
   photos: place.photos,
   // Stored flat rather than as a nested map: a null rating and a rating of
   // zero are different things, and flat fields keep that legible in the console.
@@ -126,7 +128,7 @@ async function commitAll(operations, label) {
 
 if (wipe) {
   // recursiveDelete takes the subcollections with it, which a plain delete
-  // would orphan — Firestore keeps subcollections of a deleted document.
+  // would orphan: Firestore keeps subcollections of a deleted document.
   await db.recursiveDelete(db.collection("places"));
   console.log("wiped: places");
 }
@@ -151,7 +153,7 @@ await commitAll(
 );
 
 // A single document the client can read to know what it is looking at without
-// counting the collection — and a cheap check that the seed actually landed.
+// counting the collection, and a cheap check that the seed actually landed.
 await db.collection("meta").doc("dataset").set({
   placeCount: places.length,
   reviewCount: reviews.length,

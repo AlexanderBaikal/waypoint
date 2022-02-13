@@ -1,6 +1,10 @@
 import { useId, useState } from "react";
 import { useAppDispatch } from "../../app/hooks";
-import { useCreatePlaceMutation, useUpdatePlaceMutation } from "../../app/placesApi";
+import {
+  errorMessage,
+  useCreatePlaceMutation,
+  useUpdatePlaceMutation,
+} from "../../app/placesApi";
 import { editorClosed, placeSelected } from "../../app/uiSlice";
 import type { Place } from "../../domain/place";
 import {
@@ -27,15 +31,6 @@ interface PlaceFormProps {
   origin: { lat: number; lng: number };
   /** Types already in the dataset, offered as suggestions rather than a list. */
   knownTypes: readonly string[];
-}
-
-/** RTK Query hands back either our QueryError or a SerializedError. */
-function failureMessage(error: unknown): string {
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const { message } = error as { message?: unknown };
-    if (typeof message === "string" && message) return message;
-  }
-  return "Could not save. Please try again.";
 }
 
 export function PlaceForm({ place, origin, knownTypes }: PlaceFormProps) {
@@ -138,7 +133,7 @@ export function PlaceForm({ place, origin, knownTypes }: PlaceFormProps) {
           }}
         />
         <p className={styles.hint}>
-          Search by type, or by category — “food” finds the bakeries.
+          Search by type, or by category: “food” finds the bakeries.
         </p>
         {errors.type ? <p className={styles.error}>{errors.type}</p> : null}
       </div>
@@ -241,7 +236,7 @@ export function PlaceForm({ place, origin, knownTypes }: PlaceFormProps) {
 
       {failure ? (
         <p className={styles.failure} role="alert">
-          {failureMessage(failure)}
+          {errorMessage(failure, "Could not save. Please try again.")}
         </p>
       ) : null}
 

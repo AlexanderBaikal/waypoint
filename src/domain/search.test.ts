@@ -12,6 +12,7 @@ function place(name: string, type: string, address: string | null = null): Place
     website: null,
     about: null,
     cover: null,
+    coverCredit: null,
     photos: [],
     rating: null,
     schedule: null,

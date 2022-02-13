@@ -4,9 +4,9 @@ import type { PlacesRepository } from "./repository";
 let pending: Promise<PlacesRepository> | null = null;
 
 /**
- * Picks the adapter once per session. All three are dynamically imported so
- * the Firebase SDK never reaches the bundle of someone running on fixtures,
- * and the schema nobody selected never reaches it either.
+ * Picks the adapter once per session. All three are dynamically imported, so
+ * the Firebase SDK stays out of the bundle on a fixtures build and the
+ * unselected schema stays out of it either way.
  */
 export function getRepository(): Promise<PlacesRepository> {
   // Bound to a local so the null check still holds inside the callback.

@@ -1,22 +1,25 @@
-import { WEEKDAYS, type Coords, type Schedule } from "../domain/place";
+import { WEEKDAYS, type Coords, type PhotoCredit, type Schedule } from "../domain/place";
 
 /**
- * Readers for the 2021 Firestore schema.
- *
- * Everything here exists because the stored data is messier than its nominal
- * shape: the old editor saved its input placeholders as real values, opening
- * times were free text, and coordinates were written two different ways. These
- * are pure functions so the awkward cases can be pinned down in tests rather
- * than discovered in production.
+ * Readers for the 2021 Firestore schema, where the stored data is messier than
+ * its nominal shape: the old editor saved its input placeholders as real
+ * values, opening times were free text, and coordinates were written two
+ * different ways. Pure functions, so the awkward cases are pinned by tests.
  */
 
-/** Values the old editor wrote when a field was left untouched. */
+/**
+ * Values the old editor wrote when a field was left untouched. The list grew
+ * as the inherited rows turned them up; scripts/curate.mjs holds the same set
+ * for the bundled fixture, which came out of the same database.
+ */
 const PLACEHOLDERS = new Set([
   "add name",
   "add address",
   "add website",
   "add phone number",
   "no website yet",
+  "no phone number yet",
+  "no data yet",
 ]);
 
 export function readString(value: unknown): string | null {
@@ -32,8 +35,8 @@ export function readNumber(value: unknown): number | null {
 
 /**
  * Most rows hold a Firestore GeoPoint, but a couple were written as a plain
- * [lat, lng] array. The old client read both with Object.values(), which
- * flattened them by accident; this is explicit about it.
+ * [lat, lng] array. The old client read both with Object.values(), flattening
+ * them by accident; this handles the two shapes explicitly.
  */
 export function readCoords(value: unknown): Coords | null {
   if (typeof value !== "object" || value === null) return null;
@@ -76,13 +79,38 @@ export function readSchedule(value: unknown): Schedule | null {
     const open = readTime(hours.open);
     const close = readTime(hours.close);
 
-    // A day that claims to be open but has no usable times makes the whole
-    // schedule untrustworthy, so we show nothing rather than something wrong.
+    // A day that claims to be open but carries no usable times makes the whole
+    // schedule untrustworthy, so show nothing rather than something wrong.
     if (!closed && !allDay && (open === null || close === null)) return null;
 
     schedule[day] = { open: open ?? "00:00", close: close ?? "00:00", allDay, closed };
   }
   return schedule;
+}
+
+/**
+ * A cover photograph's provenance. Only the seed script writes this, so the
+ * shape is ours, but it is read defensively rather than cast: a half-written
+ * credit would print "undefined" under a photograph. A malformed credit becomes
+ * no credit, so the photograph appears bare rather than mis-attributed.
+ */
+export function readPhotoCredit(value: unknown): PhotoCredit | null {
+  if (typeof value !== "object" || value === null) return null;
+  const raw = value as Record<string, unknown>;
+
+  const source = readString(raw.source);
+  if (!source) return null;
+
+  const metres = readNumber(raw.nearbyMetres);
+  const generic = raw.generic === true;
+  return {
+    source,
+    sourceUrl: readString(raw.sourceUrl),
+    author: readString(raw.author),
+    licence: readString(raw.licence),
+    nearbyMetres: !generic && metres !== null && metres >= 0 ? Math.round(metres) : null,
+    generic,
+  };
 }
 
 export function readDate(value: unknown): string | null {

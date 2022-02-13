@@ -9,16 +9,14 @@ interface CoverFieldProps {
 }
 
 /**
- * A photograph is given as a link to one, so the only honest check is to
- * fetch it and look. Every string test — extension, host, content type — either
- * rejects a working link or accepts a dead one, and the browser will settle the
- * question in a moment anyway. So the field shows the picture, and that preview
- * is the validation.
+ * The field validates by showing the picture. Every string test for an image
+ * URL (extension, host, content type) either rejects a working link or
+ * accepts a dead one, and the browser settles the question in a moment anyway.
  */
 export function CoverField({ value, onChange, error }: CoverFieldProps) {
   const id = useId();
-  // The outcome is recorded against the address it belongs to, so a new address
-  // is "loading" by derivation rather than by an effect resetting the old one.
+  // Recorded against the address it belongs to, so a new address derives as
+  // "loading" rather than needing an effect to reset the old outcome.
   const [outcome, setOutcome] = useState<{ url: string; ok: boolean } | null>(null);
 
   // Only try to load something that could be an image address; otherwise the
@@ -53,9 +51,9 @@ export function CoverField({ value, onChange, error }: CoverFieldProps) {
       />
 
       <p className={styles.hint}>
-        A link to a picture already on the web — right-click an image and copy its
-        address. Nothing is uploaded, and a link that stops working falls back to the
-        category tile.
+        A link to a picture already on the web: right-click an image and copy its address.
+        Nothing is uploaded, and a link that stops working falls back to the category
+        tile.
       </p>
 
       {candidate ? (

@@ -1,5 +1,5 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { Place, Review } from "../domain/place";
+import { byName, type Place, type Review } from "../domain/place";
 import type { Author, PlaceInput, ReviewInput } from "../domain/placeInput";
 import { getRepository } from "../data";
 import { NotAllowedError, RepositoryError, foldRating } from "../data/repository";
@@ -18,6 +18,19 @@ function toQueryError(error: unknown): QueryError {
   return { message: "Something went wrong" };
 }
 
+/**
+ * Reads the message off whatever a query or mutation rejected with. RTK Query
+ * hands back either our QueryError or its own SerializedError, so this narrows
+ * structurally rather than by type.
+ */
+export function errorMessage(error: unknown, fallback: string): string {
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const { message } = error as { message?: unknown };
+    if (typeof message === "string" && message) return message;
+  }
+  return fallback;
+}
+
 /** Runs a repository call and maps whatever it throws into a QueryError. */
 async function attempt<T>(
   run: (repository: Awaited<ReturnType<typeof getRepository>>) => Promise<T>,
@@ -29,17 +42,15 @@ async function attempt<T>(
   }
 }
 
-const byName = (a: Place, b: Place) => a.name.localeCompare(b.name, "ru");
-
 /**
- * There is no HTTP endpoint to point a baseQuery at — the repository talks to
- * the Firestore SDK or to a local array. fakeBaseQuery lets us keep RTK Query's
+ * There is no HTTP endpoint to point a baseQuery at: the repository talks to
+ * the Firestore SDK or to a local array. fakeBaseQuery keeps RTK Query's
  * caching, deduplication and request lifecycle over an arbitrary async source.
  *
- * None of the mutations below invalidate `listPlaces`. Invalidating it would
- * re-read the whole collection — sixteen hundred document reads on Firestore's
- * counter — to learn about one changed row we are already holding. They patch
- * the cache instead, which is also what makes the change appear instantly.
+ * None of the mutations invalidate `listPlaces`. Doing so would re-read the
+ * whole collection, one document read per row, to learn about a single row
+ * already in hand. They patch the cache instead, which also makes the change
+ * appear immediately.
  */
 export const placesApi = createApi({
   reducerPath: "placesApi",
@@ -66,9 +77,8 @@ export const placesApi = createApi({
       queryFn: ({ input, author }) =>
         attempt((repository) => repository.createPlace(input, author)),
 
-      // Not optimistic: the id is assigned by the store, and a row that
-      // appears under a guessed id would have to be moved when the real one
-      // arrives. Waiting one round trip is honest and imperceptible.
+      // Not optimistic: the store assigns the id, and a row inserted under a
+      // guessed one would have to be moved when the real id arrives.
       onQueryStarted: async (_argument, { dispatch, queryFulfilled }) => {
         const { data: created } = await queryFulfilled;
         dispatch(
@@ -106,8 +116,8 @@ export const placesApi = createApi({
           }),
         );
 
-        // A rejected write has to leave no trace: the rules are the authority,
-        // and the screen must agree with them rather than with our optimism.
+        // A rejected write leaves no trace. The rules are the authority, and
+        // the screen has to agree with them.
         try {
           await queryFulfilled;
         } catch {

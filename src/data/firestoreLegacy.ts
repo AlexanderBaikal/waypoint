@@ -8,7 +8,7 @@ import {
   type Firestore,
 } from "firebase/firestore";
 import type { FirebaseConfig } from "../config";
-import type { Place, Review } from "../domain/place";
+import { byName, type Place, type Review } from "../domain/place";
 import { firebaseApp } from "./firebaseApp";
 import {
   readCoords,
@@ -21,17 +21,15 @@ import {
 import { RepositoryError, type PlacesRepository } from "./repository";
 
 /**
- * Adapter over the 2021 schema.
- *
- * Two things make this more than a `map()`:
+ * Adapter over the 2021 schema. Two things make it more than a `map()`:
  *
  * 1. Place data is split across `places` (map pins) and `descriptions` (detail
- *    pages), and the two drifted — each holds rows the other lacks. We read the
- *    union and merge by document id.
- * 2. The stored values are messier than their nominal shape; src/data/normalise.ts
- *    holds the readers that deal with that.
+ *    pages), and the two drifted apart, each holding rows the other lacks. This
+ *    reads the union and merges by document id.
+ * 2. The stored values are messier than their nominal shape; normalise.ts holds
+ *    the readers that deal with that.
  *
- * Nothing above leaks past this file; the rest of the app sees domain types.
+ * None of it leaks past this file: the rest of the app sees domain types.
  */
 
 interface MergedPlace {
@@ -69,6 +67,9 @@ function mergeDocs(
         website: readString(detail.website),
         about: readString(detail.about),
         cover,
+        // The 2021 schema recorded where a photograph was stored, never who
+        // took it, so there is nothing to credit.
+        coverCredit: null,
         photos: cover ? [cover] : [],
         rating:
           ratingCount > 0 && ratingValue !== null
@@ -84,7 +85,7 @@ function mergeDocs(
       };
     })
     .filter((entry): entry is MergedPlace => entry !== null)
-    .sort((a, b) => a.place.name.localeCompare(b.place.name));
+    .sort((a, b) => byName(a.place, b.place));
 }
 
 async function readCollection(
@@ -118,8 +119,8 @@ export function createLegacyFirestoreRepository(
   };
 
   // The 2021 database is read-only from here. Writing into a schema whose two
-  // halves have already drifted apart would deepen the drift, and there is
-  // nowhere sane to put an owner: its rows predate the idea of one.
+  // halves have already drifted would deepen the drift, and there is nowhere to
+  // record an owner: its rows predate the idea of one.
   const readOnly = () =>
     Promise.reject(
       new RepositoryError(

@@ -7,11 +7,9 @@ export default defineConfig({
   // dynamic imports (src/data/index.ts, authService), so Rollup already splits
   // it out and a manual grouping would pull it back into the initial bundle.
   build: {
-    // Two chunks sit over the default threshold, both lazily loaded and only
-    // one of them ever fetched: the Firestore SDK on a configured build, the
-    // fixture dataset otherwise. The fixture is ~1.2 MB of JSON that gzips to
-    // under 100 kB. Raised so a real regression in the entry bundle is not lost
-    // among expected noise.
-    chunkSizeWarningLimit: 1300,
+    // Raised just past the one chunk that exceeds the default: the Firestore
+    // SDK, which is lazily imported and fetched only by a configured build.
+    // Anything else crossing this line is a real regression.
+    chunkSizeWarningLimit: 600,
   },
 });

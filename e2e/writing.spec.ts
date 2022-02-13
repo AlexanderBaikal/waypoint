@@ -1,19 +1,30 @@
 import { expect, test, type Page } from "@playwright/test";
+import places from "../src/data/fixtures/places.json" with { type: "json" };
 
 /**
- * The write vertical, against the production build with no .env — so the
+ * The write vertical, against the production build with no .env, so the
  * repository behind it is the bundled fixtures, edits land in localStorage, and
  * the run needs no credentials. What is worth a real browser here is the part
  * jsdom cannot host: the location picker is a second Leaflet map, and the
  * cover preview is an actual image load.
  */
 
+/** Counted from the file the build bundles, not written down beside it. */
+const total = new RegExp(`${places.length.toLocaleString("en-US")} places`);
+
+/**
+ * An imported place, taken from the fixture for the same reason: it carries no
+ * author, which is what makes it community-editable, and which of them the
+ * import ships changes every time it runs.
+ */
+const IMPORTED = places.find((place) => place.authorId === null)!;
+
 const panel = (page: Page) => page.locator("aside");
 const field = (page: Page, name: RegExp) => page.getByLabel(name);
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText(/1,620 places/)).toBeVisible();
+  await expect(page.getByText(total)).toBeVisible();
 });
 
 test("adds a place and lands on it", async ({ page }) => {
@@ -79,8 +90,8 @@ test("previews a photo link, and says so when one is broken", async ({ page }) =
 });
 
 test("edits a place that has no owner", async ({ page }) => {
-  await page.goto("/?place=osm-n2918849719");
-  await expect(page.getByRole("heading", { name: /Биг Бен/ })).toBeVisible();
+  await page.goto(`/?place=${encodeURIComponent(IMPORTED.id)}`);
+  await expect(page.getByRole("heading", { name: IMPORTED.name })).toBeVisible();
 
   await page.getByRole("button", { name: /^edit$/i }).click();
   const name = field(page, /^name$/i);

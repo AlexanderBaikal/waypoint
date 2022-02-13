@@ -14,9 +14,9 @@ const initialState = (): SavedState => ({
 });
 
 /**
- * Signing in on a second device should not lose either list, and there is no
+ * Signing in on a second device must not lose either list, and there is no
  * sensible way to order "saved on phone" against "saved on laptop", so the two
- * are unioned. Unsaving after signing in then propagates normally.
+ * are unioned. Unsaving after signing in propagates normally.
  */
 export const syncWithAccount = createAsyncThunk(
   "saved/sync",

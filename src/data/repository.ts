@@ -5,13 +5,11 @@ export type RepositorySource = "firestore" | "fixtures";
 
 /**
  * Everything the UI knows about persistence. Swapping Firestore for another
- * backend means writing one more implementation of this, not touching
- * components — see src/data/firestore.ts and src/data/fixtures.ts for the two
- * that exist.
+ * backend means writing one more implementation of this rather than touching
+ * components; see firestore.ts and fixtures.ts for the two that exist.
  *
- * Writes take their author explicitly rather than reaching for the session.
- * The caller already knows who is signed in, and a repository that reads
- * ambient state cannot be tested without one.
+ * Writes take their author explicitly rather than reading the session, so the
+ * implementations stay testable without one.
  */
 export interface PlacesRepository {
   readonly source: RepositorySource;
@@ -37,8 +35,8 @@ export class RepositoryError extends Error {
 
 /**
  * Thrown when the store accepted the request but the access model rejected it.
- * Separate from RepositoryError because the UI says something different: not
- * "try again" but "this is not yours to edit".
+ * Separate from RepositoryError because the UI says "this is not yours to edit"
+ * rather than "try again".
  */
 export class NotAllowedError extends RepositoryError {
   constructor(message = "You do not have permission to change this") {
@@ -48,9 +46,9 @@ export class NotAllowedError extends RepositoryError {
 }
 
 /**
- * A place with no author is community-maintained: anyone signed in may edit it,
- * which is the same bargain OpenStreetMap makes and where most of this data
- * came from. A place someone created belongs to them.
+ * A place with no author is community-maintained and editable by anyone signed
+ * in, matching the terms most of this data arrived under. A place someone
+ * created belongs to them.
  */
 export function mayEdit(place: Pick<Place, "authorId">, uid: string | null): boolean {
   if (!uid) return false;

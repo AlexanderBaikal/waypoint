@@ -31,7 +31,7 @@ describe("categoryOf", () => {
   /**
    * scripts/import-osm.mjs invents type names from OpenStreetMap tags, and this
    * table has to keep up with it. When it does not, the symptom is a map full
-   * of "other" pins with no filter chip behind them — so that is what is
+   * of "other" pins with no filter chip behind them, so that is what is
    * measured, rather than the two tables being compared row by row.
    */
   it("recognises all but a fraction of the shipped dataset", () => {

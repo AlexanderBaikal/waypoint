@@ -14,6 +14,8 @@ export type Editor =
 export interface UiState {
   query: string;
   categories: Category[];
+  /** Narrows the list to this browser's bookmarks. */
+  savedOnly: boolean;
   selectedPlaceId: string | null;
   /** Mobile only: whether the results sheet covers the map. */
   listExpanded: boolean;
@@ -29,16 +31,14 @@ function isCategory(value: string): value is Category {
 const THEME_KEY = "waypoint:theme";
 
 /**
- * Which theme is a preference about this browser, not about what is on
- * screen, so it lives in localStorage rather than in the deep link — a URL you
- * send someone should carry the place you are looking at, not how bright you
- * like your map. Blocked storage throws; a preference is not worth a crash.
+ * The theme is a preference about this browser rather than about what is on
+ * screen, so it lives in localStorage rather than in the deep link. Blocked
+ * storage throws, and a preference is not worth a crash.
  *
  * Dark is the default and only an explicit "light" turns it off, so an
- * unreadable value falls to dark rather than to the other theme. The inline
- * script in index.html makes the same decision before React mounts, to save a
- * flash of the light interface on every load — it reads THEME_KEY too, so the
- * two have to agree.
+ * unreadable value falls to dark. The inline script in index.html makes the
+ * same decision before React mounts, to avoid a flash of the light interface;
+ * it reads THEME_KEY too, so the two have to agree.
  */
 function readTheme(): Theme {
   try {
@@ -52,7 +52,7 @@ function writeTheme(theme: Theme): void {
   try {
     localStorage.setItem(THEME_KEY, theme);
   } catch {
-    // Nothing useful to do — the choice still holds for this session.
+    // Nothing useful to do; the choice still holds for this session.
   }
 }
 
@@ -63,12 +63,15 @@ export function initialUiState(search = window.location.search): UiState {
   return {
     query: params.get("q") ?? "",
     categories: (params.get("cat") ?? "").split(",").filter(isCategory),
+    // Deliberately not in the URL either: the saved list belongs to a browser,
+    // so a shared link carrying this filter would open on the recipient's own
+    // bookmarks, which is not what the sender was looking at.
+    savedOnly: false,
     selectedPlaceId: params.get("place"),
     listExpanded: false,
     theme: readTheme(),
-    // Deliberately not in the URL: a half-written form is not a view worth
-    // sending anyone, and restoring one from a link would be a lie about what
-    // has been saved.
+    // Deliberately not in the URL: restoring a half-written form from a link
+    // would misrepresent what has actually been saved.
     editor: null,
   };
 }
@@ -86,14 +89,18 @@ const uiSlice = createSlice({
         ? state.categories.filter((entry) => entry !== category)
         : [...state.categories, category];
     },
+    savedOnlyToggled(state) {
+      state.savedOnly = !state.savedOnly;
+    },
     filtersCleared(state) {
       state.query = "";
       state.categories = [];
+      state.savedOnly = false;
     },
     placeSelected(state, action: PayloadAction<string | null>) {
       state.selectedPlaceId = action.payload;
       if (action.payload) state.listExpanded = false;
-      // Walking away from a place closes whatever was being written about it.
+      // Leaving a place closes whatever was being written about it.
       state.editor = null;
     },
     editorOpened(state, action: PayloadAction<Editor>) {
@@ -116,6 +123,7 @@ const uiSlice = createSlice({
 export const {
   queryChanged,
   categoryToggled,
+  savedOnlyToggled,
   filtersCleared,
   placeSelected,
   listExpandedChanged,

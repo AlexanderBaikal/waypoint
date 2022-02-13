@@ -2,9 +2,9 @@
  * Fills the map with real places.
  *
  * Pulls named points of interest for the demo city out of OpenStreetMap via
- * Overpass and rewrites src/data/fixtures/places.json. Anything already in that
- * file that did not come from OSM is kept: the twenty hand-entered places carry
- * the photos, ratings and reviews, and this must not wash them away.
+ * Overpass and rewrites src/data/fixtures/places.json. Anything in that file
+ * that did not come from OSM is preserved: the hand-entered places carry the
+ * ratings and reviews.
  *
  *   node scripts/import-osm.mjs              fetch and rewrite
  *   node scripts/import-osm.mjs --raw f.json use a saved Overpass response
@@ -14,7 +14,10 @@
  * OpenStreetMap, which is what that licence asks of us.
  */
 import { readFileSync, writeFileSync } from "node:fs";
+import { asLink, curate } from "./curate.mjs";
+import { metres } from "./geo.mjs";
 import { parseOpeningHours } from "./opening-hours.mjs";
+import { popularity, selectPopular } from "./popularity.mjs";
 
 const PLACES = new URL("../src/data/fixtures/places.json", import.meta.url);
 
@@ -22,12 +25,34 @@ const PLACES = new URL("../src/data/fixtures/places.json", import.meta.url);
 const BBOX = "52.20,104.15,52.36,104.42";
 
 /**
- * How many places the fixture ships. Everything over the line is dropped
- * lowest-quality-first. The fixture is a demo dataset compiled into a lazily
- * loaded chunk, so its size is a download every visitor pays for; a Firestore
- * deployment has no such ceiling and can take the whole import.
+ * How many places the fixture imports. The box holds about 3,600 named ones,
+ * and everything under the line is dropped least-popular-first by the ranking
+ * in popularity.mjs. With the hand-entered places that survive curate.mjs,
+ * this is the 199 the map shows.
+ *
+ * The number is a judgement about legibility rather than about bytes: 200 pins
+ * is a city somebody can read. A Firestore deployment can take the whole
+ * import.
  */
-const LIMIT = Number(process.env.WAYPOINT_IMPORT_LIMIT ?? 1600);
+const LIMIT = Number(process.env.WAYPOINT_IMPORT_LIMIT ?? 180);
+
+/**
+ * No one kind may take more than a fifteenth of the map, twelve places at the
+ * shipped limit. Without it the top of the ranking is cafés and hotels all the
+ * way down; see selectPopular.
+ */
+const kindCap = (limit) => Math.max(1, Math.ceil(limit / 15));
+
+/** And no chain more than this many branches. See selectPopular. */
+const MAX_BRANCHES = 2;
+
+/**
+ * The middle of town, taken as the middle of the box drawn around it. That is
+ * within a few hundred metres of Kirov Square, and the ranking only asks how
+ * far out a place is in kilometres.
+ */
+const [SOUTH, WEST, NORTH, EAST] = BBOX.split(",").map(Number);
+const CENTRE = { lat: (SOUTH + NORTH) / 2, lng: (WEST + EAST) / 2 };
 
 /** Two places this close together with the same name are the same place. */
 const DUPLICATE_METRES = 150;
@@ -232,11 +257,7 @@ function addressOf(tags) {
 }
 
 function websiteOf(tags) {
-  const raw = clean(tags.website) ?? clean(tags["contact:website"]);
-  if (!raw) return null;
-  if (/^https?:\/\//i.test(raw)) return raw;
-  // Bare hostnames are common in the data and are still usable as links.
-  return /^[\w-]+(\.[\w-]+)+/.test(raw) ? `https://${raw}` : null;
+  return asLink(clean(tags.website) ?? clean(tags["contact:website"]));
 }
 
 const normaliseName = (name) =>
@@ -246,25 +267,6 @@ const normaliseName = (name) =>
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
-
-/** Metres between two points; a flat approximation is plenty at city scale. */
-function distance(a, b) {
-  const latMetres = (a.lat - b.lat) * 111_320;
-  const lngMetres =
-    (a.lng - b.lng) * 111_320 * Math.cos(((a.lat + b.lat) / 2) * (Math.PI / 180));
-  return Math.hypot(latMetres, lngMetres);
-}
-
-/** More filled-in fields means a detail page worth opening. */
-function quality(place) {
-  return (
-    (place.schedule ? 2 : 0) +
-    (place.phone ? 1 : 0) +
-    (place.website ? 1 : 0) +
-    (place.address ? 1 : 0) +
-    (place.about ? 1 : 0)
-  );
-}
 
 function toPlace(element) {
   const tags = element.tags ?? {};
@@ -278,7 +280,7 @@ function toPlace(element) {
   const lng = element.lon ?? element.center?.lon;
   if (typeof lat !== "number" || typeof lng !== "number") return null;
 
-  return {
+  const place = {
     id: `osm-${element.type[0]}${element.id}`,
     name,
     kind,
@@ -289,6 +291,7 @@ function toPlace(element) {
     website: websiteOf(tags),
     about: clean(tags.description) ?? clean(tags["description:en"]),
     cover: null,
+    coverCredit: null,
     photos: [],
     // Ratings are earned by reviews. OSM has none, and inventing them would
     // make every other number in this app suspect.
@@ -296,9 +299,13 @@ function toPlace(element) {
     schedule: parseOpeningHours(tags.opening_hours),
     authorId: null,
   };
+
+  // Scored here, where the raw tags are still in hand; `score` and `kind` are
+  // import bookkeeping and come off again before the fixture is written.
+  return { ...place, score: popularity(place, tags, CENTRE) };
 }
 
-/** Six decimals is roughly 10cm — far past what any of this data justifies. */
+/** Six decimals is roughly 10cm, far past what any of this data justifies. */
 const round = (value) => Math.round(value * 1e6) / 1e6;
 
 async function fetchOverpass() {
@@ -343,19 +350,21 @@ const response =
     : JSON.parse(readFileSync(args[rawFlag + 1], "utf8"));
 
 const existing = JSON.parse(readFileSync(PLACES, "utf8"));
-const curated = existing.filter((place) => !place.id.startsWith("osm-"));
+const { curated, rejected } = curate(
+  existing.filter((place) => !place.id.startsWith("osm-")),
+  { south: SOUTH, west: WEST, north: NORTH, east: EAST },
+);
 
 const imported = (response.elements ?? []).map(toPlace).filter(Boolean);
 
-// OSM often holds the same place twice — a node for the entrance and a way for
+// OSM often holds the same place twice: a node for the entrance and a way for
 // the building. Keep the better-described copy of each.
 const seen = [];
 const deduped = [];
-for (const place of imported.sort((a, b) => quality(b) - quality(a))) {
+for (const place of imported.sort((a, b) => b.score - a.score)) {
   const key = normaliseName(place.name);
   const twin = seen.find(
-    (other) =>
-      other.key === key && distance(other.coords, place.coords) < DUPLICATE_METRES,
+    (other) => other.key === key && metres(other.coords, place.coords) < DUPLICATE_METRES,
   );
   if (twin) continue;
   seen.push({ key, coords: place.coords });
@@ -369,64 +378,35 @@ const withoutCurated = deduped.filter(
     !curated.some(
       (own) =>
         normaliseName(own.name) === normaliseName(place.name) &&
-        distance(own.coords, place.coords) < DUPLICATE_METRES,
+        metres(own.coords, place.coords) < DUPLICATE_METRES,
     ),
 );
 
+const kept = selectPopular(withoutCurated, {
+  limit: LIMIT,
+  cap: kindCap(LIMIT),
+  perName: MAX_BRANCHES,
+});
+
 /**
- * Trimming to the limit by quality alone would hand the fixture to whoever
- * fills in their opening hours: shops would grow from 48% of the city to 57%,
- * and schools would all but vanish. So each kind keeps its share of the limit
- * and competes only against its own kind — the mix survives the cut, and the
- * category filter still has something behind every chip.
+ * Photographs are found by scripts/import-photos.mjs in a second pass, against
+ * databases this one does not read. A re-import that dropped them would send
+ * anyone re-running this to run that too, so a place that keeps its id keeps
+ * its picture.
  */
-function selectProportionally(candidates, limit) {
-  if (candidates.length <= limit) return candidates;
+const photographed = new Map(
+  existing.filter((place) => place.cover).map((place) => [place.id, place]),
+);
+const withPhotos = kept.map((place) => {
+  const before = photographed.get(place.id);
+  if (!before) return place;
+  return { ...place, cover: before.cover, coverCredit: before.coverCredit ?? null };
+});
 
-  const byKind = new Map();
-  for (const place of candidates) {
-    const group = byKind.get(place.kind) ?? [];
-    group.push(place);
-    byKind.set(place.kind, group);
-  }
-
-  const ranked = [...byKind.values()].map((group) =>
-    group.sort((a, b) => quality(b) - quality(a) || a.name.localeCompare(b.name)),
-  );
-
-  const share = limit / candidates.length;
-  const quotas = ranked.map((group) =>
-    Math.min(group.length, Math.round(group.length * share)),
-  );
-
-  // Rounding leaves the total a little under or over; settle it by walking the
-  // groups in size order, which keeps the drift off the smallest kinds.
-  const order = ranked
-    .map((_, index) => index)
-    .sort((a, b) => ranked[b].length - ranked[a].length);
-
-  let total = quotas.reduce((sum, quota) => sum + quota, 0);
-  for (let pass = 0; total !== limit; pass += 1) {
-    // Every group is either full or empty, so no further adjustment is possible.
-    if (pass > candidates.length) break;
-    const index = order[pass % order.length];
-    if (total < limit && quotas[index] < ranked[index].length) {
-      quotas[index] += 1;
-      total += 1;
-    } else if (total > limit && quotas[index] > 0) {
-      quotas[index] -= 1;
-      total -= 1;
-    }
-  }
-
-  return ranked.flatMap((group, index) => group.slice(0, quotas[index]));
-}
-
-const kept = selectProportionally(withoutCurated, LIMIT);
-
-const places = [...curated, ...kept]
-  // `kind` is import bookkeeping, not part of the shape the app reads.
-  .map(({ kind: _kind, ...place }) => place)
+const places = [...curated, ...withPhotos]
+  // `kind` and `score` are import bookkeeping, not part of the shape the app
+  // reads.
+  .map(({ kind: _kind, score: _score, ...place }) => place)
   .sort((a, b) => a.name.localeCompare(b.name, "ru"));
 
 const json = `${JSON.stringify(places)}\n`;
@@ -437,7 +417,8 @@ process.stderr.write(
     `usable:     ${imported.length}`,
     `deduped:    ${deduped.length}`,
     `kept:       ${kept.length} (limit ${LIMIT})`,
-    `curated:    ${curated.length}`,
+    `curated:    ${curated.length}${rejected.length ? ` (${rejected.length} rejected)` : ""}`,
+    ...rejected.map((line) => `  dropped:  ${line}`),
     `total:      ${places.length}`,
     `with hours: ${places.filter((place) => place.schedule).length}`,
     `with phone: ${places.filter((place) => place.phone).length}`,

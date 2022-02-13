@@ -18,7 +18,7 @@ export function writeLocal(ids: readonly string[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
   } catch {
-    // Nothing useful to do — the list still works for this session.
+    // Nothing useful to do; the list still works for this session.
   }
 }
 

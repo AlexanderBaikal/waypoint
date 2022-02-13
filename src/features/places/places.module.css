@@ -4,11 +4,11 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  padding: 0.4375rem 0.75rem;
+  padding: 0.625rem 1rem;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   color: var(--ink-3);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -18,34 +18,29 @@
 }
 
 .listFooter {
-  padding: 0.75rem;
-  border-top: 1px solid var(--line);
+  padding: 1rem;
   color: var(--ink-3);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   text-wrap: pretty;
 }
 
-/* A 48px row: a 32px tile beside two lines of text. The list is a scanning
-   surface — you are reading down it for a name, not studying one entry — so it
-   is built to fit as many places on screen as stay legible. */
+/* A result is a small card rather than a line in a table: name, score, type,
+   whether it is open, and a photograph. The previous row was 48px of 12px
+   type, which fit more places on screen and said less about any of them. */
 .listItem {
   display: flex;
-  align-items: center;
-  gap: 0.625rem;
+  align-items: flex-start;
+  gap: 0.875rem;
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border-top: 1px solid var(--line);
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--line);
   text-align: left;
   transition: background-color 100ms ease;
 }
 
-.list li:first-child .listItem {
-  border-top: none;
-}
-
 /* Three states, three different things to look at: hover fills, pressing fills
-   harder, and the keyboard ring is inset so the panel's rounded corners cannot
-   clip it. */
+   harder, and the keyboard ring is inset so it cannot be clipped by the panel
+   edge. */
 .listItem:hover {
   background: var(--surface-2);
 }
@@ -62,25 +57,15 @@
 .listItemBody {
   display: flex;
   flex-direction: column;
-  gap: 0.0625rem;
+  gap: 0.125rem;
   flex: 1;
   min-width: 0;
-  /* Tighter than the body default: two lines and a 32px tile have to come out
-     at the same 48px, or the tile ends up floating in a taller row. */
-  line-height: 1.3;
-}
-
-.listItemTop {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
+  line-height: 1.35;
 }
 
 .listItemName {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: -0.005em;
+  font-size: 0.9375rem;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -88,38 +73,37 @@
 
 .savedMark {
   color: var(--accent);
-  margin-left: 0.25rem;
-  font-size: 0.6875rem;
+  margin-left: 0.3125rem;
+  font-size: 0.75rem;
 }
 
-/* One line that clips rather than wraps — a row that grows by a line when a
-   place has a long type would break the rhythm the list is here to provide. */
+/* One line that clips rather than wraps: a row growing by a line for a long
+   type would break the rhythm of the list. */
 .listItemMeta {
   color: var(--ink-3);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* Big enough to recognise a doorway in, and rounded like everything else here
+   that holds a picture. */
 .thumb {
-  width: 2rem;
-  height: 2rem;
+  width: 4.5rem;
+  height: 4.5rem;
   flex: none;
   object-fit: cover;
-  border-radius: var(--r-tile);
+  border-radius: var(--r-card);
   background: var(--surface-2);
 }
 
-/* Stands in for a photo, in the category's own colour — so a place with no
+/* Stands in for a photo in the category's flat colour, so a place with no
    picture still says what kind of place it is, and the tile agrees with the
    chip that filtered it and the pin that marks it.
 
-   Both ends of the gradient are mixed from the one --cat token rather than
-   hand-picked, so adding a category means choosing one colour and nothing
-   else. The lit end stays close to the source: these hues were chosen to clear
-   3:1 against the white mark sitting on them, and lightening them far would
-   spend that. */
+   Flat rather than shaded: the fill was a gradient, which gave a column of
+   empty tiles more sheen than the photographs beside them. */
 .placeholder {
   display: grid;
   place-items: center;
@@ -127,50 +111,46 @@
   color: #fff;
 }
 
-/* Both shapes name themselves here rather than letting `.placeholder` carry the
+/* Both shapes are named here rather than letting `.placeholder` carry the
    background alone. `.thumb` and `.hero` each set a neutral background for the
-   photograph they usually hold, and at equal specificity the winner is whichever
-   rule comes last in the file — which quietly left the hero grey. */
+   photograph they usually hold, and at equal specificity the last rule in the
+   file wins, which was leaving the hero grey. */
 .thumb.placeholder,
 .hero.placeholder {
-  background: linear-gradient(
-    150deg,
-    color-mix(in oklab, var(--cat) 90%, #fff),
-    color-mix(in oklab, var(--cat) 82%, #000)
-  );
+  background: var(--cat);
 }
 
 .placeholder svg {
-  width: 60%;
-  height: 60%;
+  width: 55%;
+  height: 55%;
 }
 
 /* Capped so the mark stays a mark: on the hero it would otherwise grow to the
    size of the picture it is standing in for. */
 .hero.placeholder svg {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 3rem;
+  height: 3rem;
 }
 
-/* The rating is one number and one star, not five glyphs to count. Five stars
-   take a third of the row to say what "4.4" says outright. */
+/* One number, one star, and the count behind it. Five glyphs would round away
+   the difference between 4.4 and 4.6 that the number states outright. */
 .rating {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.1875rem;
+  align-items: center;
+  gap: 0.25rem;
   flex: none;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
 }
 
 .ratingValue {
-  color: var(--ink);
-  font-weight: 600;
+  color: var(--ink-2);
+  font-weight: 500;
 }
 
 .star {
   color: var(--star);
-  font-size: 0.6875rem;
+  font-size: 0.875rem;
 }
 
 .ratingCount {
@@ -178,10 +158,14 @@
 }
 
 .openBadge {
-  font-weight: 600;
+  font-weight: 500;
 }
 
-.listItemMeta .openBadge::before {
+/* Drawn only where there is something on both sides. The meta line always
+   opens with the type, but a place with no rating would otherwise start its
+   stats line with a stray dot. */
+.listItemMeta .openBadge::before,
+.panelStats .rating + .openBadge::before {
   content: " · ";
   color: var(--ink-3);
   font-weight: 400;
@@ -202,26 +186,49 @@
 }
 
 .empty {
-  padding: 2rem 0.75rem;
-  color: var(--ink-3);
+  display: grid;
+  justify-items: start;
+  gap: 0.5rem;
+  padding: 1.75rem 1rem;
+  color: var(--ink-2);
 }
 
-/* What the panel shows before you have asked it anything. */
+/* What the panel shows before you have asked it anything: an invitation, not a
+   status line. */
 .intro {
   display: grid;
-  gap: 0.1875rem;
-  padding: 1.125rem 0.75rem;
+  justify-items: start;
+  gap: 0.25rem;
+  padding: 1.75rem 1rem;
+}
+
+/* The application's mark on the interface's blue wash. The pin's hole is a
+   real hole, so the wash shows through it. */
+.introMark {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: 0.875rem;
+  border-radius: 50%;
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+
+.introPin {
+  width: 1.125rem;
+  height: 1.65rem;
 }
 
 .introCount {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 
 .textButton {
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .textButton:hover {
@@ -231,7 +238,7 @@
 
 .hint {
   color: var(--ink-3);
-  font-size: 0.8125rem;
+  text-wrap: pretty;
 }
 
 .srOnly {
@@ -246,150 +253,215 @@
 
 /* ---- detail panel ---- */
 
+/* One number for the panel's side margin, because three things have to agree
+   with it: the text inset, the bar that sticks to the top, and the photograph
+   that breaks out to both edges. */
 .panel {
-  padding: 0 0.75rem 2.5rem;
+  --pad: 1rem;
+
+  padding: 0 var(--pad) 2.5rem;
 }
 
 /* Rides the top of the scroller: on a place with photos, hours and a page of
-   reviews you should never have to scroll back up to find the way out.
-   The negative margin cancels .panel's padding exactly so the bar reaches both
-   edges — safe here, unlike the note on .hero below, because the scrollbar
-   belongs to the parent and this element's width does not have to guess at it. */
+   reviews you should never have to scroll back up to find the way out. */
 .backBar {
   position: sticky;
   top: 0;
   z-index: 2;
-  margin-inline: -0.75rem;
-  padding-inline: 0.75rem;
+  margin-inline: calc(-1 * var(--pad));
+  padding: 0.5rem var(--pad);
   background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
 
-/* A way back, not a link to somewhere else — so it stays quiet until you look
-   for it rather than sitting in accent blue above the title. */
+/* A way back rather than a link elsewhere, so it stays in the panel's own ink
+   rather than in accent blue above the title. */
 .backButton {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  margin: 0.5rem 0;
-  color: var(--ink-3);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  gap: 0.5rem;
+  height: 2.25rem;
+  padding: 0 0.875rem 0 0.75rem;
+  border-radius: var(--r-pill);
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 120ms ease;
 }
 
 .backButton:hover {
+  background: var(--surface-2);
   color: var(--ink);
 }
 
-/* Inset rather than full-bleed: a negative-margin breakout has to guess the
-   scroll container's width and gets it wrong as soon as a scrollbar appears. */
+/* Edge to edge: inset with rounded corners the hero reads as an oversized
+   thumbnail. The figure is a block, so negative margins on both sides fill the
+   panel's content box however wide the scrollbar leaves it. */
+.heroFigure {
+  display: block;
+  margin-inline: calc(-1 * var(--pad));
+}
+
 .hero {
   width: 100%;
-  height: 11rem;
+  height: 12.5rem;
   object-fit: cover;
-  border-radius: var(--r-tile);
   background: var(--surface-2);
 }
 
+/* Provenance, in the smallest type the interface uses. The licences require the
+   author and licence to be named, but not to compete with the place name
+   underneath. */
+.credit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.375rem;
+  padding: 0.375rem var(--pad) 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+.credit > * + *::before {
+  content: "·";
+  padding-right: 0.375rem;
+  color: var(--line-2);
+}
+
+/* The part of the line that changes what the reader is looking at: a
+   photograph of the surroundings rather than of the place. Given darker ink
+   than the rest of the line. */
+.creditNearby {
+  color: var(--ink-2);
+}
+
+.credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-color: var(--line-2);
+}
+
+.credit a:hover {
+  color: var(--ink);
+}
+
 .panelHead {
-  padding-top: 0.875rem;
+  padding-top: 1rem;
 }
 
+/* 22px and not bold: a name this size does not need weight to read first, and
+   a panel of semibold headings reads like a specification. */
 .panelTitle {
-  font-size: 1.25rem;
-  letter-spacing: -0.015em;
+  font-size: 1.375rem;
+  font-weight: 400;
+  line-height: 1.25;
 }
 
-/* The dot is the category's colour — the same one the pin on the map carries,
-   so the panel and the marker it opened plainly belong together. */
+/* The dot is the category's colour, the same one the pin carries, so the panel
+   and the marker that opened it belong together. */
 .panelType {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding-top: 0.1875rem;
+  gap: 0.4375rem;
+  padding-top: 0.25rem;
   color: var(--ink-3);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
 }
 
 .panelType::before {
   content: "";
   flex: none;
-  width: 0.4375rem;
-  height: 0.4375rem;
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: 50%;
   background: var(--cat);
-}
-
-/* Lifted for the dark panel, the same way and by the same amount as the chip
-   dot it has to agree with. */
-:root[data-theme="dark"] .panelType::before {
-  background: color-mix(in oklab, var(--cat) 70%, #fff);
 }
 
 .panelStats {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
-  padding-top: 0.4375rem;
-  font-size: 0.8125rem;
+  gap: 0.5rem;
+  padding-top: 0.375rem;
+  font-size: 0.875rem;
 }
 
-.saveButton {
-  display: inline-flex;
+/* Save, Edit, Review: a round mark over its own word, spaced like keys rather
+   than stacked like a form. The target is the circle and the word underneath
+   names it. */
+.panelActions {
+  display: flex;
+  gap: 0.25rem;
+  padding-top: 1.125rem;
+}
+
+.actionButton {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  height: 2.25rem;
-  margin-top: 0.875rem;
-  padding: 0 0.9375rem;
-  border: 1px solid var(--line-2);
-  border-radius: var(--r-control);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  gap: 0.4375rem;
+  width: 4.75rem;
+  padding: 0.375rem 0 0.25rem;
+  border-radius: var(--r-card);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: background-color 120ms ease;
+}
+
+.actionButton:hover {
+  background: var(--accent-wash);
+}
+
+.actionIcon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 50%;
   transition:
     background-color 120ms ease,
     border-color 120ms ease,
     color 120ms ease;
 }
 
-.saveButton:hover {
-  background: var(--surface-2);
+.actionIcon svg {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
-/* Saved is a state you should be able to see without reading the label, so it
-   fills rather than just changing the border colour. */
-.saveButton[aria-pressed="true"] {
+/* Saved is a state you should be able to see without reading the label, so the
+   disc fills. */
+.actionButton[aria-pressed="true"] .actionIcon {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--on-accent);
 }
 
-.saveButton[aria-pressed="true"]:hover {
-  filter: brightness(0.94);
-}
-
 .about {
-  padding-top: 0.875rem;
+  padding-top: 1rem;
   color: var(--ink-2);
   text-wrap: pretty;
 }
 
-/* Address, phone, website, hours, coordinates. The labels used to be uppercase
-   words in a 6.5rem column, which spent a third of the panel's width saying
-   things a 16px glyph says faster — and left the values in a gutter too narrow
-   for an address. The label survives for screen readers. */
+/* Address, phone, website, hours, coordinates. A 16px glyph identifies the row
+   faster than a column of uppercase labels and gives the full width back to
+   the value, which for an address matters. The label survives for screen
+   readers. */
 .info {
-  margin-top: 1.125rem;
+  margin-top: 1.25rem;
 }
 
 .info > div,
 .infoRow {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.875rem;
   width: 100%;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   text-align: left;
 }
 
@@ -397,23 +469,20 @@
   flex: none;
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--r-tile);
-  background: var(--surface-2);
+  width: 1.25rem;
   color: var(--ink-3);
 }
 
 .infoIcon svg {
-  width: 1rem;
-  height: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .info dd {
   min-width: 0;
   margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.35;
+  font-size: 0.875rem;
+  line-height: 1.4;
   overflow-wrap: anywhere;
 }
 
@@ -421,12 +490,11 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The week sits behind a disclosure rather than always being open — you nearly
-   always want today, which the row already shows. <details> keeps that working
-   with no JavaScript and no state to get out of step. */
+/* The week sits behind a disclosure, since the row above already shows today.
+   <details> does that with no JavaScript and no state to get out of step. */
 .hours summary {
   cursor: pointer;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   list-style: none;
 }
 
@@ -448,24 +516,21 @@
   transform: rotate(180deg);
 }
 
-/* Indented to sit under the row's text, past the icon tile. Sized to its
-   content rather than to 100%, because a full-width table plus that indent is
-   wider than the panel — which is what was putting a horizontal scrollbar
-   under the whole thing. The week reads better tight anyway: two columns of
-   one phrase, not a day stranded from its hours by 200px of nothing. */
+/* Indented to sit under the row's text, past the icon, and sized to its content
+   rather than to 100%: a full-width table plus that indent is wider than the
+   panel, which put a horizontal scrollbar under the whole thing. */
 .hours table {
   width: auto;
   border-collapse: collapse;
-  margin: 0.125rem 0 0.5rem 2.625rem;
-  font-size: 0.8125rem;
+  margin: 0.25rem 0 0.75rem 2.125rem;
+  font-size: 0.875rem;
 }
 
 .hours th {
   text-align: left;
   font-weight: 400;
   color: var(--ink-3);
-  padding: 0.15rem 0;
-  width: 3.5rem;
+  padding: 0.2rem 1.25rem 0.2rem 0;
 }
 
 .hours td {
@@ -477,10 +542,10 @@
 }
 
 .sectionTitle {
-  font-size: 0.8125rem;
-  padding-bottom: 0.5rem;
+  font-size: 1rem;
+  padding-bottom: 0.625rem;
   border-bottom: 1px solid var(--line);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.875rem;
 }
 
 /* A heading with an action on its right. The rule under it belongs to the
@@ -490,22 +555,15 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.625rem;
   border-bottom: 1px solid var(--line);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.875rem;
 }
 
 .sectionHead .sectionTitle {
   padding-bottom: 0;
   border-bottom: none;
   margin-bottom: 0;
-}
-
-/* Save and Edit side by side, sharing the margin that Save used to carry
-   alone. */
-.panelActions {
-  display: flex;
-  gap: 0.5rem;
 }
 
 .photoStrip {
@@ -516,11 +574,11 @@
 }
 
 .photoStrip img {
-  width: 9rem;
-  height: 6.5rem;
+  width: 9.5rem;
+  height: 7rem;
   flex: none;
   object-fit: cover;
-  border-radius: var(--r-tile);
+  border-radius: var(--r-card);
   background: var(--surface-2);
 }
 
@@ -530,7 +588,7 @@
   list-style: none;
   padding: 0;
   display: grid;
-  gap: 1.25rem;
+  gap: 1.375rem;
 }
 
 .review {
@@ -541,13 +599,13 @@
 .reviewHead {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.75rem;
 }
 
 .avatar,
 .avatarFallback {
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 50%;
   flex: none;
 }
@@ -560,31 +618,29 @@
   display: grid;
   place-items: center;
   background: var(--accent-wash);
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--accent-strong);
+  font-weight: 500;
 }
 
 .reviewAuthor {
-  font-weight: 600;
-  font-size: 0.8125rem;
+  font-weight: 500;
+  font-size: 0.875rem;
 }
 
 .reviewMeta {
   color: var(--ink-3);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
 }
 
-/* A review's score is one of five whole numbers, so here the stars are the
-   honest picture of it — unlike the 4.4 in a list row, which they would round
-   away. */
+/* A review's score is one of five whole numbers, so stars state it exactly,
+   unlike the 4.4 in a list row that they would round away. */
 .reviewStars {
   color: var(--star);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .reviewText {
   color: var(--ink-2);
-  font-size: 0.8125rem;
   text-wrap: pretty;
 }
 
@@ -594,8 +650,8 @@
 }
 
 .reviewPhotos img {
-  width: 5rem;
-  height: 5rem;
+  width: 5.5rem;
+  height: 5.5rem;
   object-fit: cover;
   border-radius: var(--r-tile);
 }
@@ -607,6 +663,6 @@
   }
 
   .panel {
-    padding-inline: 1.25rem;
+    --pad: 1.25rem;
   }
 }

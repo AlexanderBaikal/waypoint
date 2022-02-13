@@ -12,11 +12,18 @@ import {
   type Firestore,
 } from "firebase/firestore";
 import type { FirebaseConfig } from "../config";
-import type { Place, Review } from "../domain/place";
+import { byName, type Place, type Review } from "../domain/place";
 import type { PlaceInput } from "../domain/placeInput";
 import { uniqueSlug } from "../domain/slug";
 import { firebaseApp } from "./firebaseApp";
-import { readCoords, readDate, readNumber, readSchedule, readString } from "./normalise";
+import {
+  readCoords,
+  readDate,
+  readNumber,
+  readPhotoCredit,
+  readSchedule,
+  readString,
+} from "./normalise";
 import {
   NotAllowedError,
   RepositoryError,
@@ -26,18 +33,15 @@ import {
 } from "./repository";
 
 /**
- * Adapter over the schema this project designed for itself, as written by
+ * Adapter over the schema this project seeds for itself in
  * scripts/seed-firestore.mjs: one document per place, reviews as a
- * subcollection of the place they belong to.
+ * subcollection beneath it. The inherited 2021 schema is a different shape and
+ * lives in firestoreLegacy.ts, selected by `VITE_FIREBASE_SCHEMA=legacy`.
  *
- * The inherited 2021 schema is a different shape and lives in
- * firestoreLegacy.ts; `VITE_FIREBASE_SCHEMA=legacy` selects it.
- *
- * Ratings are stored on the place as well as in the reviews. That is a
- * denormalisation with a reason: the results list shows a rating for every row,
- * and reading a subcollection per row to compute it would turn one query into
- * hundreds. Keeping the two consistent is what the transaction in addReview is
- * for.
+ * Ratings are denormalised onto the place as well as living in the reviews,
+ * because the results list shows a rating per row and reading a subcollection
+ * for each would turn one query into hundreds. The transaction in addReview is
+ * what keeps the two consistent.
  */
 
 const PLACES = "places";
@@ -64,6 +68,7 @@ function toPlace(id: string, data: DocumentData): Place | null {
     website: readString(data.website),
     about: readString(data.about),
     cover: readString(data.cover),
+    coverCredit: readPhotoCredit(data.coverCredit),
     photos,
     rating:
       ratingCount > 0 && ratingValue !== null
@@ -134,7 +139,7 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
         snapshot.docs
           .map((entry) => toPlace(entry.id, entry.data()))
           .filter((place): place is Place => place !== null)
-          .sort((a, b) => a.name.localeCompare(b.name, "ru")),
+          .sort(byName),
       )
       .catch((error: unknown) => {
         loaded = null; // let the next attempt retry instead of caching a failure
@@ -202,6 +207,7 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
         website: input.website,
         about: input.about,
         cover: input.cover,
+        coverCredit: null,
         photos: [],
         rating: null,
         schedule: input.schedule,
@@ -215,9 +221,15 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
       // is the copy that matters.
       if (!mayEdit(existing, author.uid)) throw new NotAllowedError();
 
+      // A different link is a different photograph, and the stored credit names
+      // the author of the old one. Kept while the link is untouched, so editing
+      // a phone number does not strip attribution off a borrowed picture.
+      const keepsCover = input.cover === existing.cover;
+
       try {
         await updateDoc(doc(db, PLACES, placeId), {
           ...toDocument(input),
+          ...(keepsCover ? {} : { coverCredit: null }),
           updatedAt: serverTimestamp(),
         });
       } catch (error) {
@@ -235,6 +247,7 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
         website: input.website,
         about: input.about,
         cover: input.cover,
+        coverCredit: keepsCover ? existing.coverCredit : null,
         schedule: input.schedule,
       };
     },
@@ -245,8 +258,8 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
       const text = input.text.trim();
 
       try {
-        // The review and the place's rating have to move together, or the
-        // number under the place stops describing the reviews beneath it.
+        // The review and the place's rating move together, or the average stops
+        // describing the reviews beneath it.
         await runTransaction(db, async (transaction) => {
           const snapshot = await transaction.get(placeRef);
           if (!snapshot.exists())

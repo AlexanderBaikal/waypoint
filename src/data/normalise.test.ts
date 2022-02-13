@@ -1,6 +1,7 @@
 import {
   readCoords,
   readDate,
+  readPhotoCredit,
   readSchedule,
   readString,
   readTime,
@@ -111,6 +112,50 @@ describe("readDate", () => {
   it("passes strings through and rejects the rest", () => {
     expect(readDate("2026-01-05")).toBe("2026-01-05");
     expect(readDate(undefined)).toBeNull();
+  });
+});
+
+describe("readPhotoCredit", () => {
+  const credit = {
+    source: "Wikimedia Commons",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:X.jpg",
+    author: "Ann",
+    licence: "CC BY-SA 4.0",
+    nearbyMetres: 41,
+    generic: false,
+  };
+
+  it("reads a full credit back", () => {
+    expect(readPhotoCredit(credit)).toEqual(credit);
+  });
+
+  it("reads a generic credit, which never keeps a distance", () => {
+    expect(readPhotoCredit({ ...credit, nearbyMetres: 41, generic: true })).toEqual({
+      ...credit,
+      nearbyMetres: null,
+      generic: true,
+    });
+  });
+
+  it("keeps a photograph whose author or licence went unrecorded", () => {
+    // Commons does not always answer with both. The link to the file page is
+    // still the credit the licence asks for, so a partial line beats none.
+    expect(readPhotoCredit({ ...credit, author: null, licence: undefined })).toEqual({
+      ...credit,
+      author: null,
+      licence: null,
+    });
+  });
+
+  it("treats a credit with no source as no credit", () => {
+    expect(readPhotoCredit({ author: "Ann" })).toBeNull();
+    expect(readPhotoCredit(null)).toBeNull();
+    expect(readPhotoCredit("Wikimedia Commons")).toBeNull();
+  });
+
+  it("drops a distance that is not one", () => {
+    expect(readPhotoCredit({ ...credit, nearbyMetres: "41" })?.nearbyMetres).toBeNull();
+    expect(readPhotoCredit({ ...credit, nearbyMetres: -5 })?.nearbyMetres).toBeNull();
   });
 });
 

@@ -11,9 +11,8 @@ interface MapViewProps {
   places: readonly Place[];
   selected: Place | null;
   /**
-   * Whether the current list is the result of a filter. Only then is it worth
-   * reframing the map — the dataset spans two continents, so fitting the
-   * unfiltered set just zooms out to the whole world.
+   * Whether the current list is the result of a filter. Only then is reframing
+   * worthwhile: fitting the unfiltered set just zooms out to the whole city.
    */
   filtered: boolean;
   onSelect: (placeId: string) => void;
@@ -43,11 +42,9 @@ export function MapView({
     });
   }, [map, selected]);
 
-  // When a filter narrows the list, frame what is left so the user is not left
-  // staring at empty streets. `places` is memoised upstream and changes
-  // identity only when its contents do, so comparing the reference is enough —
-  // and unlike joining every id into a string, it stays free as the dataset
-  // grows into the thousands.
+  // When a filter narrows the list, frame what is left. `places` is memoised
+  // upstream and changes identity only when its contents do, so comparing the
+  // reference is enough, and stays free as the dataset grows.
   const lastPlaces = useRef(places);
   useEffect(() => {
     if (!map || selected) return;
@@ -79,33 +76,11 @@ export function MapView({
       <div ref={ref} className={styles.canvas} data-testid="map-canvas" />
 
       <div className={styles.controls}>
+        {/* A half-filled disc rather than a sun and moon: this switches how
+            everything is drawn, not what time it is. */}
         <button
           type="button"
-          onClick={() => {
-            zoomBy(1);
-          }}
-          aria-label="Zoom in"
-        >
-          +
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            zoomBy(-1);
-          }}
-          aria-label="Zoom out"
-        >
-          −
-        </button>
-        <button type="button" onClick={locate} aria-label="Find my location">
-          ⌖
-        </button>
-
-        {/* A half-filled disc rather than a sun and a moon: this switches how
-            everything is drawn, not what time it is. It sits below the zoom
-            pair because it is the one control here you press once and forget. */}
-        <button
-          type="button"
+          className={styles.round}
           onClick={onToggleTheme}
           aria-pressed={dark}
           aria-label={dark ? "Switch to the light theme" : "Switch to the dark theme"}
@@ -123,6 +98,47 @@ export function MapView({
             <path d="M8 2.5a5.5 5.5 0 0 1 0 11Z" fill="currentColor" stroke="none" />
           </svg>
         </button>
+
+        <button
+          type="button"
+          className={styles.round}
+          onClick={locate}
+          aria-label="Find my location"
+          title="Your location"
+        >
+          <svg
+            className={styles.glyph}
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <circle cx="8" cy="8" r="3.1" />
+            <path d="M8 1v2.2M8 12.8V15M1 8h2.2M12.8 8H15" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        <div className={styles.zoom}>
+          <button
+            type="button"
+            onClick={() => {
+              zoomBy(1);
+            }}
+            aria-label="Zoom in"
+          >
+            +
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              zoomBy(-1);
+            }}
+            aria-label="Zoom out"
+          >
+            −
+          </button>
+        </div>
       </div>
     </div>
   );

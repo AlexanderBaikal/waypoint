@@ -1,14 +1,12 @@
 /**
- * Ids for newly created places.
+ * Ids for newly created places. Ids are user-visible, being what `?place=`
+ * carries, so a new place gets a readable one rather than a random string.
+ * Cyrillic is transliterated rather than stripped, since most of this dataset
+ * is Russian and stripping would leave nothing.
  *
- * Ids are user-visible — they are what `?place=` carries — so a new place gets
- * a readable one rather than a random string. Most of this dataset is in
- * Russian, and stripping non-Latin characters would leave nothing at all, so
- * Cyrillic is transliterated rather than dropped.
- *
- * Deliberately separate from `slugify` in src/data/normalise.ts: that one
- * derives ids from the inherited database, and changing what it produces would
- * change the id of every place already linked to.
+ * Kept separate from `slugify` in data/normalise.ts, which derives ids from the
+ * inherited database: changing what that one produces would change the id of
+ * every place already linked to.
  */
 
 const CYRILLIC: Record<string, string> = {
@@ -53,9 +51,9 @@ export function slugFor(name: string): string {
   const slug = name
     .trim()
     .toLowerCase()
-    // Cyrillic first, and only then the accent strip. NFD decomposes й into
-    // и plus a combining breve, so stripping marks beforehand would quietly
-    // turn "Кофейня" into "kofeinya".
+    // Cyrillic first, then the accent strip. NFD decomposes й into и plus a
+    // combining breve, so stripping marks first turns "Кофейня" into
+    // "kofeinya".
     .replace(/[а-яё]/g, (character) => CYRILLIC[character] ?? "")
     // Decompose so accented Latin loses its marks rather than its letters.
     .normalize("NFD")
@@ -71,8 +69,8 @@ export function slugFor(name: string): string {
 }
 
 /**
- * The first free id in the `slug`, `slug-2`, `slug-3` … series. Callers supply
- * the test for "already taken" because only they know where to look.
+ * The first free id in the `slug`, `slug-2`, `slug-3` … series. The caller
+ * supplies the "already taken" test, since only it knows where to look.
  */
 export function uniqueSlug(name: string, taken: (slug: string) => boolean): string {
   const base = slugFor(name);

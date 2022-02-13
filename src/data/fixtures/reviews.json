@@ -1,29 +1,5 @@
 [
   {
-    "id": "1702606882542",
-    "placeId": "parque-omar",
-    "author": {
-      "name": "Alex 38",
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocIif5zcIpKEJnpMVW7FN__rpRkTQsulQMEGr9SBIfDFXDA=s96-c"
-    },
-    "rating": 5,
-    "text": "Helllo",
-    "date": "2023-12-15T02:21:22.542Z",
-    "photos": []
-  },
-  {
-    "id": "1701741283833",
-    "placeId": "parque-omar",
-    "author": {
-      "name": "Aleksandr Baikalov",
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJuL6lC7jlhysXtqBT0GRYqu2qu8JVYHyWM5SxNjtUA=s96-c"
-    },
-    "rating": 0,
-    "text": "wewfeweffwfweweewefw",
-    "date": "2023-12-05T01:54:43.833Z",
-    "photos": []
-  },
-  {
     "id": "1694824868417",
     "placeId": "appetite",
     "author": {
@@ -33,9 +9,7 @@
     "rating": 3,
     "text": "more or less",
     "date": "2023-09-16T00:41:08.417Z",
-    "photos": [
-      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Appetite%2Fblue_check.png?alt=media&token=81d4b07f-f707-4cd8-9527-9def5759bec5"
-    ]
+    "photos": []
   },
   {
     "id": "1691459977287",
@@ -47,18 +21,6 @@
     "rating": 5,
     "text": "Very cool ",
     "date": "2023-08-08T01:59:37.287Z",
-    "photos": []
-  },
-  {
-    "id": "1651160027833",
-    "placeId": "inrtu",
-    "author": {
-      "name": "Alex 38",
-      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gg1upsyB5d_4Js14HdpyoAg1AmobhhOnIWr7X9U5g=s96-c"
-    },
-    "rating": 5,
-    "text": "7970",
-    "date": "2022-04-28T15:33:47.833Z",
     "photos": []
   },
   {
@@ -95,10 +57,7 @@
     "rating": 5,
     "text": "Хорошо отдохнули 👍",
     "date": "2021-09-08T14:42:40.270Z",
-    "photos": [
-      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Dikaya%20Loshad'%2FiVUP_nsB3go.jpg?alt=media&token=91336058-6b9a-448e-9906-7fc9b163620e",
-      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Dikaya%20Loshad'%2F8UCO3uWWYzI.jpg?alt=media&token=17c8b8dd-8497-40ed-801e-9a11f43faf99"
-    ]
+    "photos": []
   },
   {
     "id": "1631084268058",
@@ -110,9 +69,7 @@
     "rating": 4,
     "text": "Great",
     "date": "2021-09-08T06:57:48.059Z",
-    "photos": [
-      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Trud%2FXXL.jpg?alt=media&token=75bac519-d6ed-4bc4-8812-d8ca9eb135a8"
-    ]
+    "photos": []
   },
   {
     "id": "1631020854303",
@@ -124,23 +81,7 @@
     "rating": 2,
     "text": "Неплохие пары",
     "date": "2021-09-07T13:20:54.304Z",
-    "photos": [
-      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Baikal%20State%20Univesity%2FI_yLfheUZio.jpg?alt=media&token=878f5bb2-85d2-4495-a33c-ad67fc07c206"
-    ]
-  },
-  {
-    "id": "1630993903255",
-    "placeId": "subway",
-    "author": {
-      "name": "Alex 38",
-      "photoUrl": "https://lh3.googleusercontent.com/a-/AOh14Gg1upsyB5d_4Js14HdpyoAg1AmobhhOnIWr7X9U5g=s96-c"
-    },
-    "rating": 5,
-    "text": "Fhfhhfhh",
-    "date": "2021-09-07T05:51:43.259Z",
-    "photos": [
-      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/Subway%2F16309937902647839254351381279574.jpg?alt=media&token=311df921-56ab-47a8-ab87-22d610932697"
-    ]
+    "photos": []
   },
   {
     "id": "1630907275978",
@@ -152,8 +93,6 @@
     "rating": 5,
     "text": "Bad",
     "date": "2021-09-06T05:47:55.982Z",
-    "photos": [
-      "https://firebasestorage.googleapis.com/v0/b/g-maps-clone.appspot.com/o/INRTU%2F16309072221441283963493872754162.jpg?alt=media&token=e2125e90-d514-469f-98da-172678af2351"
-    ]
+    "photos": []
   }
 ]

@@ -2,13 +2,13 @@ import { parseTime } from "./hours";
 import { WEEKDAYS, type Coords, type Schedule } from "./place";
 
 /**
- * What a person can supply about a place, as opposed to what a place *is*:
- * no id, no rating, no author. Those are assigned by whoever stores it.
+ * What a person can supply about a place, as opposed to what a place is: no id,
+ * no rating, no author. Those are assigned by whoever stores it.
  *
- * The rules in firestore.rules enforce the same bounds this file checks. That
- * duplication is deliberate and one-directional: this layer exists to give a
- * useful message before a round trip, and the rules exist because a browser
- * cannot be trusted to have run it.
+ * firestore.rules enforces the same bounds this file checks. The duplication is
+ * deliberate and one-directional: this layer gives a useful message before a
+ * round trip, and the rules exist because a browser cannot be trusted to have
+ * run it.
  */
 export interface PlaceInput {
   name: string;
@@ -19,9 +19,8 @@ export interface PlaceInput {
   website: string | null;
   about: string | null;
   /**
-   * A photograph, as a link to one that is already on the web. The app stores
-   * the address and never the bytes: no upload, no bucket, and — since the
-   * link can rot, as this project's own Firebase Storage links did — a
+   * A photograph, as a link to one already on the web. The app stores the
+   * address and never the bytes: no upload and no bucket. Links rot, so the
    * placeholder is the normal state rather than the error state.
    */
   cover: string | null;
@@ -64,12 +63,11 @@ export function optional(value: string): string | null {
 }
 
 /**
- * Parses a web address the way a person types one — usually without a scheme.
+ * Parses a web address the way a person types one, usually without a scheme.
  *
- * Parsed rather than matched against a pattern. A regular expression that
- * looks like it accepts hostnames will also accept `javascript:` with a
- * hostname-shaped tail, and this value ends up in an `href` and an `img src`.
- * Asking the URL parser what the protocol is leaves no room for that.
+ * Parsed rather than pattern-matched. A regular expression that looks like it
+ * accepts hostnames will also accept `javascript:` with a hostname-shaped tail,
+ * and this value ends up in an `href` and an `img src`.
  */
 export function webUrl(value: string): URL | null {
   const trimmed = value.trim();
@@ -142,16 +140,16 @@ export function validatePlace(input: PlaceInput): FieldErrors<PlaceInput> {
   if (input.cover) {
     const url = webUrl(input.cover);
     // A scheme is required here, unlike for `website`. "Copy image address"
-    // always yields one, and a bare "photo.jpg" parses as a hostname — so
-    // guessing would accept a filename and then quietly fail to load it.
+    // always yields one, and a bare "photo.jpg" parses as a hostname, so
+    // guessing would accept a filename that then fails to load.
     const hasScheme = /^https?:\/\//i.test(input.cover.trim());
 
     if (input.cover.length > LIMITS.cover) errors.cover = tooLong("cover");
     else if (!url || !hasScheme) {
       errors.cover = "Paste the image's full address, starting with https://";
     }
-    // A page served over https cannot show an http image — the browser blocks
-    // it — so accepting one here would only produce a silent placeholder.
+    // A page served over https cannot show an http image; the browser blocks
+    // it, so accepting one here would only produce a silent placeholder.
     else if (url.protocol !== "https:") {
       errors.cover = "Use an https:// link; browsers block plain http images";
     }
@@ -180,14 +178,14 @@ export function validateReview(input: ReviewInput): FieldErrors<ReviewInput> {
 export const isValid = (errors: FieldErrors<unknown>): boolean =>
   Object.keys(errors).length === 0;
 
-/** An empty day, which the form starts every weekday from. */
-const CLOSED_DAY = { open: "09:00", close: "18:00", allDay: false, closed: false };
+/** What the form starts every weekday from: open, on ordinary office hours. */
+const DEFAULT_DAY = { open: "09:00", close: "18:00", allDay: false, closed: false };
 
 export function blankSchedule(): Schedule {
-  return Object.fromEntries(WEEKDAYS.map((day) => [day, { ...CLOSED_DAY }])) as Schedule;
+  return Object.fromEntries(WEEKDAYS.map((day) => [day, { ...DEFAULT_DAY }])) as Schedule;
 }
 
-/** A blank form, centred whereever the map is looking. */
+/** A blank form, centred wherever the map is looking. */
 export function blankPlace(coords: Coords): PlaceInput {
   return {
     name: "",

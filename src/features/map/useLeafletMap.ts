@@ -12,20 +12,18 @@ export interface LeafletBinding {
 /**
  * Owns the Leaflet instance for the lifetime of its container element.
  *
- * This hangs off a ref callback rather than an effect: the map's life is tied
- * to the DOM node, not to a render pass, and React 17 runs the returned
- * cleanup when that node goes away. Doing it in an effect would also mean
- * calling setState during the effect, which is exactly the cascading-render
- * pattern the hooks lint warns about.
+ * Hangs off a ref callback rather than an effect, because the map's life is
+ * tied to the DOM node rather than to a render pass and React 17 runs the
+ * returned cleanup when that node goes away. An effect would also mean calling
+ * setState from inside it.
  */
 export function useLeafletMap(theme: Theme): LeafletBinding {
   const [map, setMap] = useState<L.Map | null>(null);
   const layer = useRef<L.TileLayer | null>(null);
 
-  // The ref callback must not depend on the theme — rebuilding it would tear
-  // the map down and put it back on every switch. It reads the current value
-  // through a ref instead, so a map created later still starts on the right
-  // tiles, and the effect below handles switching an existing one.
+  // The ref callback must not depend on the theme: rebuilding it would tear the
+  // map down and recreate it on every switch. It reads the value through a ref
+  // instead, and the effect below switches an existing map.
   const current = useRef(theme);
 
   const ref = useCallback((element: HTMLDivElement | null) => {
@@ -41,7 +39,7 @@ export function useLeafletMap(theme: Theme): LeafletBinding {
     layer.current = tileLayer(current.current).addTo(instance);
 
     // Leaflet caches the container size, so it has to be told when the layout
-    // shifts under it — the results sheet expanding, or a phone rotating.
+    // shifts under it: the results sheet expanding, or a phone rotating.
     const observer = new ResizeObserver(() => {
       instance.invalidateSize({ animate: false });
     });
@@ -57,11 +55,10 @@ export function useLeafletMap(theme: Theme): LeafletBinding {
     };
   }, []);
 
-  // The new layer goes on over the old one and the old one only comes off once
-  // the new tiles have painted, so the map changes value in place rather than
-  // blinking through empty ground. Removing the outgoing layer also takes its
-  // credit off the attribution control with it, which is why nothing here
-  // touches attribution by hand.
+  // The new layer goes on over the old one, which only comes off once the new
+  // tiles have painted, so the map does not blink through empty ground.
+  // Removing the outgoing layer takes its credit off the attribution control
+  // with it, which is why nothing here touches attribution by hand.
   useEffect(() => {
     if (current.current === theme) return;
     current.current = theme;

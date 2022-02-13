@@ -30,11 +30,11 @@ function stateOf(hours: DayHours): "open" | "closed" | "allDay" {
 }
 
 /**
- * Seven rows, because opening hours are seven rows. The alternative — one text
- * field parsed the way the OpenStreetMap import parses one — would accept far
- * more than the model can hold and then quietly drop the rest.
+ * Seven rows, one per day. A single free-text field parsed the way the OSM
+ * import parses one would accept far more than Schedule can hold and then drop
+ * the rest.
  *
- * Hours are optional as a whole: most of the imported places have none, and a
+ * Hours are optional as a whole, since most imported places have none and a
  * blank schedule would claim they are closed all week rather than unknown.
  */
 export function HoursEditor({ value, onChange, error }: HoursEditorProps) {
@@ -52,7 +52,8 @@ export function HoursEditor({ value, onChange, error }: HoursEditorProps) {
           Add opening hours
         </button>
         <p className={styles.hint}>
-          Left out, the place shows no hours rather than none.
+          Left out, the place shows no hours at all rather than claiming to be closed all
+          week.
         </p>
       </div>
     );
@@ -128,7 +129,7 @@ export function HoursEditor({ value, onChange, error }: HoursEditorProps) {
       </div>
 
       <p className={styles.hint}>
-        A closing time before the opening one runs past midnight — 20:00 to 02:00 is a bar
+        A closing time before the opening one runs past midnight: 20:00 to 02:00 is a bar
         open late, not an empty day.
       </p>
 

@@ -1,4 +1,5 @@
 import { useListReviewsQuery } from "../../app/placesApi";
+import { BOOKMARK } from "../../components/glyphs";
 import { CATEGORY_META, categoryOf } from "../../domain/categories";
 import { WEEKDAYS, type Place } from "../../domain/place";
 import { OpenBadge } from "./OpenBadge";
@@ -18,8 +19,7 @@ interface PlacePanelProps {
   onReview: () => void;
 }
 
-/** Websites were entered without a scheme, so build one rather than link to a
- * relative path. */
+/** Websites were entered without a scheme; without one the href is relative. */
 function href(website: string): string {
   return /^https?:\/\//i.test(website) ? website : `https://${website}`;
 }
@@ -29,9 +29,9 @@ function dayLabel(day: string): string {
 }
 
 /**
- * Five 16px line glyphs, drawn here rather than pulled from an icon set: five
- * shapes do not justify a dependency, and inline paths inherit `currentcolor`
- * from the row they sit in.
+ * 16px line glyphs, drawn here rather than pulled from an icon set: a handful
+ * of shapes do not justify a dependency, and inline paths inherit
+ * `currentcolor` from the row they sit in.
  */
 const PATHS = {
   address: (
@@ -61,13 +61,23 @@ const PATHS = {
       <path d="M8 1.4v2.3M8 12.3v2.3M1.4 8h2.3M12.3 8h2.3" />
     </>
   ),
+  // The three actions a place has: a bookmark, a pencil and a star. The
+  // bookmark is shared, since the filter chip draws it too.
+  save: <path d={BOOKMARK} />,
+  edit: (
+    <path d="m3 13 .8-2.8 6.6-6.6a1.4 1.4 0 0 1 2 0l.4.4a1.4 1.4 0 0 1 0 2l-6.6 6.6L3 13Z" />
+  ),
+  review: (
+    <path d="m8 2.2 1.8 3.7 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4L2.2 6.5l4-.6L8 2.2Z" />
+  ),
 };
 
-function Icon({ name }: { name: keyof typeof PATHS }) {
+/** `filled` is for the one mark with an on state to show: the bookmark. */
+function Icon({ name, filled = false }: { name: keyof typeof PATHS; filled?: boolean }) {
   return (
     <svg
       viewBox="0 0 16 16"
-      fill="none"
+      fill={filled ? "currentColor" : "none"}
       stroke="currentColor"
       strokeWidth="1.5"
       strokeLinecap="round"
@@ -120,22 +130,35 @@ export function PlacePanel({
       <div className={styles.panelActions}>
         <button
           type="button"
-          className={styles.saveButton}
+          className={styles.actionButton}
           onClick={() => {
             onToggleSaved(place.id);
           }}
           aria-pressed={saved}
         >
-          {saved ? "✦ Saved" : "✧ Save"}
+          <span className={styles.actionIcon}>
+            <Icon name="save" filled={saved} />
+          </span>
+          {saved ? "Saved" : "Save"}
         </button>
 
-        {/* Only offered where it would work. A button that exists to tell you
-            afterwards that you may not is worse than no button. */}
+        {/* Only offered where it would work, rather than shown and then
+            refused on submit. */}
         {canEdit ? (
-          <button type="button" className={styles.saveButton} onClick={onEdit}>
+          <button type="button" className={styles.actionButton} onClick={onEdit}>
+            <span className={styles.actionIcon}>
+              <Icon name="edit" />
+            </span>
             Edit
           </button>
         ) : null}
+
+        <button type="button" className={styles.actionButton} onClick={onReview}>
+          <span className={styles.actionIcon}>
+            <Icon name="review" />
+          </span>
+          Review
+        </button>
       </div>
 
       {place.about ? <p className={styles.about}>{place.about}</p> : null}
