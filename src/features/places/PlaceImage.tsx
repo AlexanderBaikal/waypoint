@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CategoryGlyph } from "../../components/CategoryGlyph";
 import { CATEGORY_META, categoryOf } from "../../domain/categories";
 import type { PhotoCredit, Place } from "../../domain/place";
 import styles from "./places.module.css";
@@ -47,25 +48,16 @@ export function PlaceImage({ place, variant }: PlaceImageProps) {
   // `img` below is reached only where there is something to put in its `src`.
   const cover = place.cover === failedUrl ? null : place.cover;
 
-  const category = CATEGORY_META[categoryOf(place)];
+  const category = categoryOf(place);
 
   const picture =
     cover === null ? (
       <div
         className={`${shape ?? ""} ${styles.placeholder ?? ""}`}
-        style={{ "--cat": category.colour } as React.CSSProperties}
+        style={{ "--cat": CATEGORY_META[category].colour } as React.CSSProperties}
         aria-hidden="true"
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d={category.path} />
-        </svg>
+        <CategoryGlyph category={category} weight={2} />
       </div>
     ) : (
       <img

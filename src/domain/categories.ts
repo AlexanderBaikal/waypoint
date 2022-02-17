@@ -19,8 +19,8 @@ interface CategoryMeta {
   glyph: string;
   /**
    * The category's icon, as the `d` of a single stroked path on a 24×24 grid.
-   * A string rather than a component so the same drawing can go into React and
-   * into the raw HTML a Leaflet divIcon takes.
+   * Drawn by components/CategoryGlyph, which is what decides the stroke; a
+   * table of drawings has no business holding markup.
    */
   path: string;
   /**

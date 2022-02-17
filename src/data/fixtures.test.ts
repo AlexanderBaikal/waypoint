@@ -1,6 +1,6 @@
 import { createFixtureRepository } from "./fixtures";
-import { foldRating, mayEdit } from "./repository";
-import { blankPlace } from "../domain/placeInput";
+import { applyInput, foldRating, mayEdit } from "./repository";
+import { blankPlace, toInput } from "../domain/placeInput";
 import type { Place, Review } from "../domain/place";
 import bundledPlaces from "./fixtures/places.json";
 import bundledReviews from "./fixtures/reviews.json";
@@ -227,6 +227,56 @@ describe("mayEdit", () => {
 
   it("treats an unowned place as community-maintained", () => {
     expect(mayEdit({ authorId: null }, "u2")).toBe(true);
+  });
+});
+
+/**
+ * Both repositories answer updatePlace through this, so the rules it holds are
+ * pinned here rather than once per backend.
+ */
+describe("applyInput", () => {
+  const credited: Place = {
+    ...blankPlace(coords),
+    id: "credited",
+    name: "Credited",
+    type: "Cafe",
+    cover: "https://example.com/old.jpg",
+    coverCredit: {
+      source: "Wikimedia Commons",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Old.jpg",
+      author: "A photographer",
+      licence: "CC BY-SA 4.0",
+      nearbyMetres: 20,
+      generic: false,
+    },
+    photos: ["https://example.com/other.jpg"],
+    rating: { value: 4, count: 2 },
+    authorId: null,
+  };
+
+  it("keeps the attribution while the photograph is untouched", () => {
+    const edited = applyInput(credited, { ...toInput(credited), phone: "+7 000" });
+    expect(edited.coverCredit).toEqual(credited.coverCredit);
+    expect(edited.phone).toBe("+7 000");
+  });
+
+  it("drops it the moment the link changes", () => {
+    const edited = applyInput(credited, {
+      ...toInput(credited),
+      cover: "https://example.com/new.jpg",
+    });
+    expect(edited.coverCredit).toBeNull();
+  });
+
+  it("leaves alone what a form does not carry", () => {
+    const edited = applyInput(credited, { ...toInput(credited), name: "  Renamed  " });
+    expect(edited.name).toBe("Renamed");
+    expect(edited).toMatchObject({
+      id: "credited",
+      photos: credited.photos,
+      rating: credited.rating,
+      authorId: null,
+    });
   });
 });
 

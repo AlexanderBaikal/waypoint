@@ -43,6 +43,7 @@
  * page, and PlacePanel shows them under the photograph.
  */
 import { readFileSync, writeFileSync } from "node:fs";
+import { postOverpass } from "./overpass.mjs";
 import {
   assignNearby,
   commonsImageUrl,
@@ -180,36 +181,6 @@ async function checkAll(urls, concurrency = 8) {
   });
   await Promise.all(workers);
   return results;
-}
-
-/** Same two mirrors import-osm.mjs uses, and for the same reason: both answer
- *  504 often enough that one endpoint is not a source. */
-const OVERPASS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
-];
-
-async function postOverpass(query, attempt = 0) {
-  for (const endpoint of OVERPASS) {
-    process.stderr.write(`  overpass: ${endpoint}\n`);
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "User-Agent": UA,
-        },
-        body: new URLSearchParams({ data: query }),
-      });
-      if (response.ok) return await response.json();
-      process.stderr.write(`    HTTP ${String(response.status)}\n`);
-    } catch (error) {
-      process.stderr.write(`    ${error.message}\n`);
-    }
-  }
-  if (attempt >= 2) throw new Error("every Overpass endpoint failed");
-  await nap(15_000 * (attempt + 1));
-  return postOverpass(query, attempt + 1);
 }
 
 // --- source 1: the places' own OpenStreetMap tags ------------------------

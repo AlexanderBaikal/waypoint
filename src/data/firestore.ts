@@ -27,8 +27,10 @@ import {
 import {
   NotAllowedError,
   RepositoryError,
+  applyInput,
   foldRating,
   mayEdit,
+  newPlace,
   type PlacesRepository,
 } from "./repository";
 
@@ -178,12 +180,14 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
 
     createPlace: async (input, author) => {
       const existing = await load();
-      const id = uniqueSlug(input.name, (slug) =>
-        existing.some((place) => place.id === slug),
+      const place = newPlace(
+        uniqueSlug(input.name, (slug) => existing.some((other) => other.id === slug)),
+        input,
+        author,
       );
 
       try {
-        await setDoc(doc(db, PLACES, id), {
+        await setDoc(doc(db, PLACES, place.id), {
           ...toDocument(input),
           photos: [],
           ratingValue: null,
@@ -197,22 +201,7 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
       }
 
       invalidate();
-      return {
-        id,
-        name: input.name.trim(),
-        type: input.type.trim(),
-        coords: input.coords,
-        address: input.address,
-        phone: input.phone,
-        website: input.website,
-        about: input.about,
-        cover: input.cover,
-        coverCredit: null,
-        photos: [],
-        rating: null,
-        schedule: input.schedule,
-        authorId: author.uid,
-      };
+      return place;
     },
 
     updatePlace: async (placeId, input, author) => {
@@ -221,15 +210,17 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
       // is the copy that matters.
       if (!mayEdit(existing, author.uid)) throw new NotAllowedError();
 
-      // A different link is a different photograph, and the stored credit names
-      // the author of the old one. Kept while the link is untouched, so editing
-      // a phone number does not strip attribution off a borrowed picture.
-      const keepsCover = input.cover === existing.cover;
+      const updated = applyInput(existing, input);
+      // applyInput has already decided whether the attribution survives this
+      // edit; the document follows it rather than restating the rule. Written
+      // only where one actually falls away, so editing a place that never had
+      // a credit does not touch the field.
+      const dropsCredit = existing.coverCredit !== null && updated.coverCredit === null;
 
       try {
         await updateDoc(doc(db, PLACES, placeId), {
           ...toDocument(input),
-          ...(keepsCover ? {} : { coverCredit: null }),
+          ...(dropsCredit ? { coverCredit: null } : {}),
           updatedAt: serverTimestamp(),
         });
       } catch (error) {
@@ -237,19 +228,7 @@ export function createFirestoreRepository(config: FirebaseConfig): PlacesReposit
       }
 
       invalidate();
-      return {
-        ...existing,
-        name: input.name.trim(),
-        type: input.type.trim(),
-        coords: input.coords,
-        address: input.address,
-        phone: input.phone,
-        website: input.website,
-        about: input.about,
-        cover: input.cover,
-        coverCredit: keepsCover ? existing.coverCredit : null,
-        schedule: input.schedule,
-      };
+      return updated;
     },
 
     addReview: async (placeId, input, author) => {

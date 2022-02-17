@@ -1,3 +1,4 @@
+import { CategoryGlyph } from "../../components/CategoryGlyph";
 import { BOOKMARK } from "../../components/glyphs";
 import { CATEGORY_META, type Category } from "../../domain/categories";
 import styles from "./search.module.css";
@@ -79,20 +80,10 @@ export function FilterChips({
               onToggle(category);
             }}
           >
-            {/* The same drawing the placeholder tile and the map pin carry,
-                from the one table in categories.ts. */}
+            {/* The same drawing the placeholder tile carries, and heavier here
+                only because the chip shows it at half the size. */}
             <span className={styles.chipIcon}>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d={meta.path} />
-              </svg>
+              <CategoryGlyph category={category} weight={2.5} />
             </span>
             {meta.label}
           </button>

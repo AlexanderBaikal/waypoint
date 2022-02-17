@@ -17,6 +17,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { asLink, curate } from "./curate.mjs";
 import { metres } from "./geo.mjs";
 import { parseOpeningHours } from "./opening-hours.mjs";
+import { postOverpass } from "./overpass.mjs";
 import { popularity, selectPopular } from "./popularity.mjs";
 
 const PLACES = new URL("../src/data/fixtures/places.json", import.meta.url);
@@ -56,11 +57,6 @@ const CENTRE = { lat: (SOUTH + NORTH) / 2, lng: (WEST + EAST) / 2 };
 
 /** Two places this close together with the same name are the same place. */
 const DUPLICATE_METRES = 150;
-
-const ENDPOINTS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
-];
 
 const SELECTORS = [
   'node["amenity"~"^(restaurant|cafe|bar|pub|fast_food|ice_cream|bakery|nightclub|pharmacy|hospital|clinic|doctors|dentist|bank|atm|post_office|fuel|car_wash|cinema|theatre|library|university|college|school|driving_school|marketplace|veterinary)$"]',
@@ -308,35 +304,12 @@ function toPlace(element) {
 /** Six decimals is roughly 10cm, far past what any of this data justifies. */
 const round = (value) => Math.round(value * 1e6) / 1e6;
 
-async function fetchOverpass() {
-  const query = `[out:json][timeout:180];
+/** Everything in the box matching one of the selectors, ways as their centre. */
+const QUERY = `[out:json][timeout:180];
 (
 ${SELECTORS.map((selector) => `  ${selector}(${BBOX});`).join("\n")}
 );
 out center;`;
-
-  for (const endpoint of ENDPOINTS) {
-    process.stderr.write(`overpass: ${endpoint}\n`);
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "User-Agent": "waypoint-fixture-import (github.com/AlexanderBaikal)",
-        },
-        body: new URLSearchParams({ data: query }),
-      });
-      if (!response.ok) {
-        process.stderr.write(`  HTTP ${response.status}\n`);
-        continue;
-      }
-      return await response.json();
-    } catch (error) {
-      process.stderr.write(`  ${error.message}\n`);
-    }
-  }
-  throw new Error("every Overpass endpoint failed");
-}
 
 // --- run ---------------------------------------------------------------
 
@@ -346,7 +319,7 @@ const dryRun = args.includes("--dry-run");
 
 const response =
   rawFlag === -1
-    ? await fetchOverpass()
+    ? await postOverpass(QUERY)
     : JSON.parse(readFileSync(args[rawFlag + 1], "utf8"));
 
 const existing = JSON.parse(readFileSync(PLACES, "utf8"));

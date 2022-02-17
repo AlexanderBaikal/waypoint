@@ -3,8 +3,10 @@ import { uniqueSlug } from "../domain/slug";
 import {
   NotAllowedError,
   RepositoryError,
+  applyInput,
   foldRating,
   mayEdit,
+  newPlace,
   type PlacesRepository,
 } from "./repository";
 import placesJson from "./fixtures/places.json";
@@ -93,23 +95,11 @@ export function createFixtureRepository(): PlacesRepository {
       ),
 
     createPlace: (input, author) => {
-      const id = uniqueSlug(input.name, (slug) => merged.has(slug));
-      const place: Place = {
-        id,
-        name: input.name.trim(),
-        type: input.type.trim(),
-        coords: input.coords,
-        address: input.address,
-        phone: input.phone,
-        website: input.website,
-        about: input.about,
-        cover: input.cover,
-        coverCredit: null,
-        photos: [],
-        rating: null,
-        schedule: input.schedule,
-        authorId: author.uid,
-      };
+      const place = newPlace(
+        uniqueSlug(input.name, (slug) => merged.has(slug)),
+        input,
+        author,
+      );
       commit(place);
       return Promise.resolve(place);
     },
@@ -118,21 +108,7 @@ export function createFixtureRepository(): PlacesRepository {
       const existing = find(placeId);
       if (!mayEdit(existing, author.uid)) return Promise.reject(new NotAllowedError());
 
-      const place: Place = {
-        ...existing,
-        name: input.name.trim(),
-        type: input.type.trim(),
-        coords: input.coords,
-        address: input.address,
-        phone: input.phone,
-        website: input.website,
-        about: input.about,
-        cover: input.cover,
-        // A different link is a different photograph; the credit stored with
-        // the old one names an author who did not take this one.
-        coverCredit: input.cover === existing.cover ? existing.coverCredit : null,
-        schedule: input.schedule,
-      };
+      const place = applyInput(existing, input);
       commit(place);
       return Promise.resolve(place);
     },

@@ -55,6 +55,58 @@ export function mayEdit(place: Pick<Place, "authorId">, uid: string | null): boo
   return place.authorId === null || place.authorId === uid;
 }
 
+/**
+ * Folds a form's fields onto a place. Both repositories build their answer to
+ * updatePlace through here, so the two cannot come to disagree about what an
+ * edit does — in particular about the credit rule below, which was stated
+ * separately in each of them.
+ *
+ * Everything not named here is not a person's to set: id, photos, rating and
+ * author survive the edit untouched.
+ */
+export function applyInput(place: Place, input: PlaceInput): Place {
+  return {
+    ...place,
+    name: input.name.trim(),
+    type: input.type.trim(),
+    coords: input.coords,
+    address: input.address,
+    phone: input.phone,
+    website: input.website,
+    about: input.about,
+    cover: input.cover,
+    // A different link is a different photograph, and the stored credit names
+    // the author of the old one. Kept while the link is untouched, so editing a
+    // phone number does not strip attribution off a borrowed picture.
+    coverCredit: input.cover === place.cover ? place.coverCredit : null,
+    schedule: input.schedule,
+  };
+}
+
+/**
+ * A place the moment someone adds it. No photographs, no rating and no credit:
+ * a pasted cover is the author's own link, not one this project sourced and
+ * owes attribution for.
+ */
+export function newPlace(id: string, input: PlaceInput, author: Author): Place {
+  return {
+    id,
+    name: input.name.trim(),
+    type: input.type.trim(),
+    coords: input.coords,
+    address: input.address,
+    phone: input.phone,
+    website: input.website,
+    about: input.about,
+    cover: input.cover,
+    coverCredit: null,
+    photos: [],
+    rating: null,
+    schedule: input.schedule,
+    authorId: author.uid,
+  };
+}
+
 /** Recomputes a rounded average as one more score arrives. */
 export function foldRating(
   current: { value: number; count: number } | null,
