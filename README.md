@@ -152,6 +152,8 @@ Started in July 2021 as `google-maps-clone`, a close visual copy of Google Maps,
 dataset and replaced everything else; what's left of the resemblance is the palette and the shape of
 the furniture.
 
+Built by [Alexander Baikal](https://github.com/AlexanderBaikal).
+
 MIT. Place and map data © OpenStreetMap contributors
 ([ODbL](https://www.openstreetmap.org/copyright)); tiles ©
 [MapTiler](https://www.maptiler.com/copyright/) with a key, © CARTO / © Esri, HERE, Garmin without

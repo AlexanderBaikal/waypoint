@@ -1,0 +1,26 @@
+/* A rule above it rather than a block of its own colour: the panel already has
+   one surface, and a tinted strip at the foot would read as a second panel. */
+.colophon {
+  flex: none;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  transition: color 120ms ease;
+}
+
+.link:hover {
+  color: var(--accent);
+}
+
+.icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}

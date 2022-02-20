@@ -12,6 +12,7 @@ import {
   themeToggled,
 } from "./app/uiSlice";
 import { INITIAL_VIEW } from "./config";
+import { Colophon } from "./components/Colophon";
 import { Mark } from "./components/Mark";
 import { presentCategories } from "./domain/categories";
 import { filterPlaces } from "./domain/search";
@@ -209,6 +210,8 @@ export function App() {
             </>
           )}
         </div>
+
+        <Colophon />
       </aside>
     </div>
   );
