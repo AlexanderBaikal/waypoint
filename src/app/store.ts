@@ -6,7 +6,9 @@ import {
   placeSelected,
   queryChanged,
   filtersCleared,
+  themeToggled,
 } from "./uiSlice";
+import { writeTheme } from "./themeStorage";
 import { authReducer } from "../features/auth/authSlice";
 import {
   savedReducer,
@@ -27,6 +29,16 @@ listener.startListening({
 
     const uid = state.auth.user?.uid;
     if (uid) void writeRemote(uid, state.saved.ids).catch(() => undefined);
+  },
+});
+
+// The theme is remembered the same way, and for the same reason: writing to
+// storage from the reducer would make it a function of more than its inputs,
+// and one that cannot be replayed.
+listener.startListening({
+  actionCreator: themeToggled,
+  effect: (_action, api) => {
+    writeTheme((api.getState() as RootState).ui.theme);
   },
 });
 

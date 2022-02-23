@@ -1,6 +1,21 @@
-import { useDeferredValue, useEffect, useMemo } from "react";
+import { useCallback, useDeferredValue, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { errorMessage, useListPlacesQuery } from "./app/placesApi";
+import {
+  selectAvailableCategories,
+  selectCategories,
+  selectEditor,
+  selectFiltering,
+  selectKnownTypes,
+  selectListExpanded,
+  selectMarkerPlaces,
+  selectQuery,
+  selectSavedIds,
+  selectSavedOnly,
+  selectSelectedPlace,
+  selectTheme,
+  selectVisiblePlaces,
+} from "./app/selectors";
 import {
   categoryToggled,
   editorOpened,
@@ -14,8 +29,7 @@ import {
 import { INITIAL_VIEW } from "./config";
 import { Colophon } from "./components/Colophon";
 import { Mark } from "./components/Mark";
-import { presentCategories } from "./domain/categories";
-import { filterPlaces } from "./domain/search";
+import type { Place } from "./domain/place";
 import { mayEdit } from "./data/repository";
 import { AccountButton } from "./features/auth/AccountButton";
 import { useAuthSession } from "./features/auth/useAuthSession";
@@ -30,14 +44,29 @@ import { FilterChips } from "./features/search/FilterChips";
 import { SearchBar } from "./features/search/SearchBar";
 import styles from "./App.module.css";
 
+/** One array rather than a fresh one per render, so the selectors below can
+    memoise across the load as well as after it. */
+const NO_PLACES: readonly Place[] = [];
+
 export function App() {
   useAuthSession();
 
   const dispatch = useAppDispatch();
-  const { data: places = [], isLoading, isError, error, refetch } = useListPlacesQuery();
-  const { query, categories, savedOnly, selectedPlaceId, listExpanded, theme, editor } =
-    useAppSelector((s) => s.ui);
-  const savedIds = useAppSelector((state) => state.saved.ids);
+  const {
+    data: places = NO_PLACES,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useListPlacesQuery();
+
+  const query = useAppSelector(selectQuery);
+  const categories = useAppSelector(selectCategories);
+  const savedOnly = useAppSelector(selectSavedOnly);
+  const listExpanded = useAppSelector(selectListExpanded);
+  const theme = useAppSelector(selectTheme);
+  const editor = useAppSelector(selectEditor);
+  const savedIds = useAppSelector(selectSavedIds);
   const { author } = useWriteIdentity();
 
   // On the document element rather than our own root, because the theme has to
@@ -52,45 +81,34 @@ export function App() {
   // the results catch up a frame later.
   const deferredQuery = useDeferredValue(query);
 
-  // Saved is applied after the search rather than inside it: which places this
-  // browser bookmarked is not something the domain scores.
-  //
-  // In two steps rather than one so that `savedIds` is not a dependency of the
-  // search. Bookmarking replaces that array, and folding the two together would
-  // re-run the search and hand back a new array of the same places on every
-  // press — which the marker layer reads as a new dataset and rebuilds, and the
-  // map as a reason to reframe.
-  const matched = useMemo(
-    () => filterPlaces(places, { query: deferredQuery, categories }),
-    [places, deferredQuery, categories],
+  // The places and the deferred query are not the store's to hold, so they are
+  // handed to the selectors instead. Every one of these is memoised on them.
+  const filtered = useAppSelector((state) =>
+    selectVisiblePlaces(state, places, deferredQuery),
   );
-  const filtered = useMemo(() => {
-    if (!savedOnly) return matched;
-
-    const saved = new Set(savedIds);
-    return matched.filter((place) => saved.has(place.id));
-  }, [matched, savedOnly, savedIds]);
-
-  const available = useMemo(() => presentCategories(places), [places]);
-  const selected = useMemo(
-    () => places.find((place) => place.id === selectedPlaceId) ?? null,
-    [places, selectedPlaceId],
+  const markers = useAppSelector((state) =>
+    selectMarkerPlaces(state, places, deferredQuery),
   );
-
-  // A deep link can name a place the current filter excludes, and the map still
-  // has to show it. Memoised because the marker layer keys its work off this
-  // array's identity.
-  const markers = useMemo(
-    () => (selected && !filtered.includes(selected) ? [...filtered, selected] : filtered),
-    [filtered, selected],
+  const filtering = useAppSelector((state) =>
+    selectFiltering(state, places, deferredQuery),
   );
+  const selected = useAppSelector((state) => selectSelectedPlace(state, places));
+  const available = useAppSelector((state) => selectAvailableCategories(state, places));
+  const knownTypes = useAppSelector((state) => selectKnownTypes(state, places));
 
-  // Whether the user has asked for anything. Decides both whether the map
-  // reframes and whether the panel lists results at all.
-  const filtering = deferredQuery.trim() !== "" || categories.length > 0 || savedOnly;
+  const editing = editor === "edit" ? selected : null;
 
-  const knownTypes = useMemo(() => places.map((place) => place.type), [places]);
-  const editing = editor?.mode === "edit" ? selected : null;
+  // Stable, so the memoised map is not re-rendered by a keystroke in the panel
+  // it does not draw.
+  const selectPlace = useCallback(
+    (placeId: string) => {
+      dispatch(placeSelected(placeId));
+    },
+    [dispatch],
+  );
+  const toggleTheme = useCallback(() => {
+    dispatch(themeToggled());
+  }, [dispatch]);
 
   return (
     <div className={styles.app}>
@@ -102,9 +120,9 @@ export function App() {
           places={markers}
           selected={selected}
           filtered={filtering}
-          onSelect={(id) => dispatch(placeSelected(id))}
+          onSelect={selectPlace}
           theme={theme}
-          onToggleTheme={() => dispatch(themeToggled())}
+          onToggleTheme={toggleTheme}
         />
       </main>
 
@@ -131,7 +149,7 @@ export function App() {
                 <button
                   type="button"
                   className={styles.addButton}
-                  onClick={() => dispatch(editorOpened({ mode: "create" }))}
+                  onClick={() => dispatch(editorOpened("create"))}
                 >
                   + Add
                 </button>
@@ -160,9 +178,9 @@ export function App() {
         </div>
 
         <div className={styles.panelBody}>
-          {editor?.mode === "review" && selected ? (
+          {editor === "review" && selected ? (
             <ReviewForm placeId={selected.id} placeName={selected.name} />
-          ) : editor?.mode === "create" || editing ? (
+          ) : editor === "create" || editing ? (
             <PlaceForm
               place={editing}
               origin={selected?.coords ?? INITIAL_VIEW.center}
@@ -175,12 +193,8 @@ export function App() {
               onBack={() => dispatch(placeSelected(null))}
               onToggleSaved={(id) => dispatch(savedToggled(id))}
               canEdit={mayEdit(selected, author?.uid ?? null)}
-              onEdit={() =>
-                dispatch(editorOpened({ mode: "edit", placeId: selected.id }))
-              }
-              onReview={() =>
-                dispatch(editorOpened({ mode: "review", placeId: selected.id }))
-              }
+              onEdit={() => dispatch(editorOpened("edit"))}
+              onReview={() => dispatch(editorOpened("review"))}
             />
           ) : (
             <>
@@ -203,7 +217,7 @@ export function App() {
                   savedIds={savedIds}
                   filtering={filtering}
                   savedOnly={savedOnly}
-                  onSelect={(id) => dispatch(placeSelected(id))}
+                  onSelect={selectPlace}
                   onClearFilters={() => dispatch(filtersCleared())}
                 />
               )}

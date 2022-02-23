@@ -1,15 +1,18 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Theme } from "../config";
 import { CATEGORIES, type Category } from "../domain/categories";
+import { readTheme } from "./themeStorage";
 
 /**
  * The panel shows one of three things, and which one is a single piece of
  * state rather than a pair of booleans that could both be true.
+ *
+ * Which place is being written about is not part of it: that is the selection,
+ * which is already state, and `placeSelected` closes the editor rather than
+ * letting the two drift apart. A copy here would be a second answer to the
+ * same question.
  */
-export type Editor =
-  | { mode: "create" }
-  | { mode: "edit"; placeId: string }
-  | { mode: "review"; placeId: string };
+export type Editor = "create" | "edit" | "review";
 
 export interface UiState {
   query: string;
@@ -26,34 +29,6 @@ export interface UiState {
 
 function isCategory(value: string): value is Category {
   return (CATEGORIES as readonly string[]).includes(value);
-}
-
-const THEME_KEY = "waypoint:theme";
-
-/**
- * The theme is a preference about this browser rather than about what is on
- * screen, so it lives in localStorage rather than in the deep link. Blocked
- * storage throws, and a preference is not worth a crash.
- *
- * Dark is the default and only an explicit "light" turns it off, so an
- * unreadable value falls to dark. The inline script in index.html makes the
- * same decision before React mounts, to avoid a flash of the light interface;
- * it reads THEME_KEY too, so the two have to agree.
- */
-function readTheme(): Theme {
-  try {
-    return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
-  } catch {
-    return "dark";
-  }
-}
-
-function writeTheme(theme: Theme): void {
-  try {
-    localStorage.setItem(THEME_KEY, theme);
-  } catch {
-    // Nothing useful to do; the choice still holds for this session.
-  }
 }
 
 /** Deep links carry the current view, so the state starts from the URL. */
@@ -113,9 +88,9 @@ const uiSlice = createSlice({
     listExpandedChanged(state, action: PayloadAction<boolean>) {
       state.listExpanded = action.payload;
     },
+    // Remembering the choice is a listener's job; see the store.
     themeToggled(state) {
       state.theme = state.theme === "dark" ? "light" : "dark";
-      writeTheme(state.theme);
     },
   },
 });

@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
 import { savedOnlyToggled } from "./app/uiSlice";
@@ -234,7 +234,10 @@ describe("App", () => {
     const { store } = renderWithStore(<App />);
     await loaded();
 
-    store.dispatch(savedOnlyToggled());
+    // Dispatched from outside React, so React is told to expect the render.
+    act(() => {
+      store.dispatch(savedOnlyToggled());
+    });
 
     expect(await screen.findByText(/nothing saved yet/i)).toBeInTheDocument();
 

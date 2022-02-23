@@ -1,5 +1,5 @@
 import L from "leaflet";
-import { useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import type { Theme } from "../../config";
 import type { Place } from "../../domain/place";
@@ -23,7 +23,13 @@ interface MapViewProps {
 /** Keeps a fitted marker clear of the panel edges. */
 const FIT_PADDING: L.PointExpression = [64, 64];
 
-export function MapView({
+/**
+ * Memoised, and every prop it takes is either a value or memoised upstream.
+ * The panel above it re-renders on each keystroke, and a map that rebuilt its
+ * marker layer and reframed itself along with it would be the expensive half
+ * of that.
+ */
+export const MapView = memo(function MapView({
   places,
   selected,
   filtered,
@@ -142,4 +148,4 @@ export function MapView({
       </div>
     </div>
   );
-}
+});
