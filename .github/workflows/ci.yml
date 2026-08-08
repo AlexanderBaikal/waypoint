@@ -15,10 +15,10 @@ jobs:
     name: Types, lint, format, unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 16
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run typecheck
@@ -30,17 +30,17 @@ jobs:
     name: Browser tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 16
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       # No Firebase config here on purpose: the suite runs against the bundled
       # fixtures, so it neither needs credentials nor depends on live data.
       - run: npm run e2e
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: playwright-report
@@ -53,10 +53,10 @@ jobs:
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 16
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run build
