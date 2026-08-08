@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { asLink, curate, field, photo, soundSchedule } from "./curate.mjs";
 
 const BOX = { south: 52.2, west: 104.15, north: 52.36, east: 104.42 };

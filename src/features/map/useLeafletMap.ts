@@ -13,7 +13,7 @@ export interface LeafletBinding {
  * Owns the Leaflet instance for the lifetime of its container element.
  *
  * Hangs off a ref callback rather than an effect, because the map's life is
- * tied to the DOM node rather than to a render pass and React 17 runs the
+ * tied to the DOM node rather than to a render pass and React 19 runs the
  * returned cleanup when that node goes away. An effect would also mean calling
  * setState from inside it.
  */

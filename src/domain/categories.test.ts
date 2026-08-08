@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { CATEGORY_META, categoryOf, presentCategories } from "./categories";
 import type { Place } from "./place";
 import places from "../data/fixtures/places.json";

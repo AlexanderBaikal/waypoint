@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import "@fontsource/inter";
+import "@fontsource-variable/inter";
 import "./index.css";
 import { App } from "./App";
 import { store } from "./app/store";
@@ -9,11 +9,10 @@ import { store } from "./app/store";
 const container = document.getElementById("root");
 if (!container) throw new Error("Missing #root element");
 
-ReactDOM.render(
+createRoot(container).render(
   <StrictMode>
     <Provider store={store}>
       <App />
     </Provider>
   </StrictMode>,
-  container,
 );

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import type { Place } from "../../domain/place";
 import { prominence, revealZooms } from "./prominence";
 

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from "vitest";
 import { createFixtureRepository } from "./fixtures";
 import { applyInput, foldRating, mayEdit } from "./repository";
 import { blankPlace, toInput } from "../domain/placeInput";

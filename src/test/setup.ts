@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 
 // jsdom has no ResizeObserver, and the map hook observes its container on mount.
 class ResizeObserverStub implements ResizeObserver {

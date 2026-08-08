@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { slugFor, uniqueSlug } from "./slug";
 
 describe("slugFor", () => {

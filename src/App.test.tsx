@@ -1,5 +1,6 @@
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { savedOnlyToggled } from "./app/uiSlice";
 import { setRepositoryForTesting } from "./data";
@@ -10,7 +11,7 @@ import { renderWithStore } from "./test/renderWithStore";
 // Leaflet needs real layout and a real canvas, neither of which jsdom provides.
 // The map is covered by the Playwright suite; here it stands in as a list of
 // buttons so map-to-panel selection is still exercised.
-jest.mock("./features/map/MapView", () => ({
+vi.mock("./features/map/MapView", () => ({
   MapView: ({
     places,
     onSelect,
@@ -37,7 +38,7 @@ jest.mock("./features/map/MapView", () => ({
 // The form's location picker is a second Leaflet map, for the same reason.
 // A place opens the form already carrying coordinates, so a readout is enough
 // to prove the form is wired to them.
-jest.mock("./features/places/LocationPicker", () => ({
+vi.mock("./features/places/LocationPicker", () => ({
   LocationPicker: ({ value }: { value: { lat: number; lng: number } }) => (
     <div data-testid="location-picker">{`${String(value.lat)},${String(value.lng)}`}</div>
   ),
@@ -273,7 +274,7 @@ describe("App: writing", () => {
 
   it("adds a place and opens it", async () => {
     const user = userEvent.setup();
-    const createPlace = jest.fn((input: { name: string }) =>
+    const createPlace = vi.fn((input: { name: string }) =>
       Promise.resolve({ ...place("new-cafe", input.name, "Cafe"), authorId: "local" }),
     );
     setRepositoryForTesting(stubRepository({ createPlace }));
@@ -321,7 +322,7 @@ describe("App: writing", () => {
 
   it("will not submit a place with nothing in it", async () => {
     const user = userEvent.setup();
-    const createPlace = jest.fn();
+    const createPlace = vi.fn();
     setRepositoryForTesting(stubRepository({ createPlace }));
 
     renderWithStore(<App />);
@@ -336,7 +337,7 @@ describe("App: writing", () => {
 
   it("edits a place that has no owner", async () => {
     const user = userEvent.setup();
-    const updatePlace = jest.fn((id: string, input: { name: string }) =>
+    const updatePlace = vi.fn((id: string, input: { name: string }) =>
       Promise.resolve(place(id, input.name, "Fast food")),
     );
     setRepositoryForTesting(stubRepository({ updatePlace }));
@@ -378,7 +379,7 @@ describe("App: writing", () => {
 
   it("posts a review and shows it without refetching", async () => {
     const user = userEvent.setup();
-    const addReview = jest.fn((placeId: string, input: { rating: number; text: string }) =>
+    const addReview = vi.fn((placeId: string, input: { rating: number; text: string }) =>
       Promise.resolve({
         id: "new",
         placeId,

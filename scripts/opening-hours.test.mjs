@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { parseOpeningHours } from "./opening-hours.mjs";
 
 const open = (from, to) => ({ open: from, close: to, allDay: false, closed: false });

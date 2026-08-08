@@ -5,7 +5,7 @@ Search 199 places, filter by category, open one for its hours, contacts, photo a
 tile, marker and popup is drawn by Leaflet over open data: no Google Maps key, no per-load billing,
 and no routing or Street View either.
 
-**[Live demo](https://g-maps-clone.web.app/)** · React 17 · TypeScript · Redux Toolkit · Vite · Firebase
+**[Live demo](https://g-maps-clone.web.app/)** · React 19 · TypeScript · Redux Toolkit · Vite · Firebase
 
 ![The map and results panel](docs/screenshot-map.webp)
 

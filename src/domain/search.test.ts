@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import type { Place } from "./place";
 import { filterPlaces, normaliseForSearch, scorePlace } from "./search";
 

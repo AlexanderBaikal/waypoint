@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { detail, popularity, selectPopular } from "./popularity.mjs";
 
 const CENTRE = { lat: 52.28, lng: 104.285 };

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { openStateAt, parseTime, weekdayIndex } from "./hours";
 import { WEEKDAYS, type DayHours, type Schedule } from "./place";
 
