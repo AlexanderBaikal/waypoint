@@ -2,10 +2,11 @@
 
 A map client for exploring places in a city, built on **Leaflet** and **OpenStreetMap** data.
 Search 199 places, filter by category, open one for its hours, contacts, photo and reviews. Every
-tile, marker and popup is drawn by Leaflet over open data: no Google Maps key, no per-load billing,
-and no routing or Street View either.
+tile, marker and popup is drawn by Leaflet over open data: no proprietary maps SDK, no per-load
+billing, and no routing or panoramas either.
 
-**[Live demo](https://g-maps-clone.web.app/)** · React 19 · TypeScript · Redux Toolkit · Vite · Firebase
+**[waypoint.alexbaikal.dev](https://waypoint.alexbaikal.dev/)** · React 19 · TypeScript · Redux
+Toolkit · Vite · Firebase
 
 ![The map and results panel](docs/screenshot-map.webp)
 
@@ -145,14 +146,28 @@ dynamically imported, and a fixtures build never fetches the SDK at all. First c
 ~85 ms and pins on screen ~105 ms locally; throttled to a quarter of the CPU on simulated fast 3G,
 pins are there in 1.5 s and the last tile lands at 4.3 s.
 
-## History and licence
+## Where it started
 
-Started in July 2021 as `google-maps-clone`, a close visual copy of Google Maps, tagged
-**[`v0.1-google-maps-clone`](../../tree/v0.1-google-maps-clone)**. The rewrite kept the idea and the
-dataset and replaced everything else; what's left of the resemblance is the palette and the shape of
-the furniture.
+Waypoint began in July 2021 as a learning project: a familiar mapping interface rebuilt from scratch
+on Leaflet and Firebase to see how far the pattern could be taken. That version is kept as the tag
+**[`v0.1`](../../tree/v0.1-google-maps-clone)**, with
+[its own README](../../blob/v0.1-google-maps-clone/README.md).
+
+<details>
+<summary>Screenshots of the 2021 version</summary>
+
+![The 2021 desktop layout](docs/archive/screenshot-2021-desktop.webp)
+![The 2021 mobile layout](docs/archive/screenshot-2021-mobile.webp)
+
+</details>
+
+The rewrite kept the goal and the hand-entered dataset and replaced everything else — data layer,
+state, map layer, tests, deployment — and the interface stopped imitating anyone else's and became
+its own: a single results column, a thinning marker layer, editing in place instead of in modals.
 
 Built by [Alexander Baikal](https://github.com/AlexanderBaikal).
+
+## Licence
 
 MIT. Place and map data © OpenStreetMap contributors
 ([ODbL](https://www.openstreetmap.org/copyright)); tiles ©
